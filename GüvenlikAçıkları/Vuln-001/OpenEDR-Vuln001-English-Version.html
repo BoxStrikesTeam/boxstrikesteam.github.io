@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Open EDR – Supply Chain Vulnerability Report</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: #ffffff;
+            font-family: 'Segoe UI', 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif;
+            padding: 40px 20px;
+            color: #1e1e1e;
+            line-height: 1.7;
+        }
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 30px 40px;
+            border-radius: 8px;
+        }
+
+        h1 {
+            font-size: 26px;
+            font-weight: 600;
+            letter-spacing: -0.3px;
+            border-bottom: 2px solid #eaeaea;
+            padding-bottom: 14px;
+            margin-bottom: 22px;
+            color: #0a0a0a;
+        }
+
+        .meta {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            background: #f7f7f9;
+            padding: 12px 18px;
+            border-radius: 6px;
+            margin-bottom: 28px;
+            font-size: 14px;
+            color: #2c2c2c;
+            border-left: 4px solid #888;
+        }
+
+        .meta span {
+            font-weight: 500;
+        }
+
+        h2 {
+            font-size: 20px;
+            font-weight: 600;
+            margin-top: 34px;
+            margin-bottom: 12px;
+            padding-bottom: 6px;
+            border-bottom: 2px solid #eee;
+        }
+
+        h3 {
+            font-size: 17px;
+            font-weight: 600;
+            margin-top: 26px;
+            margin-bottom: 10px;
+            color: #1f1f1f;
+        }
+
+        p {
+            margin-bottom: 16px;
+            font-size: 15px;
+            color: #222;
+        }
+
+        ul, ol {
+            margin-left: 24px;
+            margin-bottom: 20px;
+        }
+
+        li {
+            margin-bottom: 6px;
+            font-size: 15px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 24px 0 28px 0;
+            font-size: 14px;
+            border-radius: 6px;
+            overflow: hidden;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+        }
+
+        th {
+            background: #f1f1f4;
+            text-align: left;
+            padding: 10px 14px;
+            font-weight: 600;
+            border-bottom: 1px solid #d0d0d0;
+        }
+
+        td {
+            padding: 10px 14px;
+            border-bottom: 1px solid #eaeaea;
+            vertical-align: top;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        .vuln-badge {
+            background: #b22222;
+            color: #fff;
+            font-weight: 600;
+            font-size: 12px;
+            padding: 2px 10px;
+            border-radius: 30px;
+            display: inline-block;
+            letter-spacing: 0.3px;
+        }
+
+        .cve-tag {
+            background: #f0f0f0;
+            padding: 2px 10px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-family: 'SF Mono', 'Consolas', monospace;
+            color: #1a1a1a;
+            display: inline-block;
+            margin: 2px 4px 2px 0;
+        }
+
+        .box-info {
+            background: #f8f8fa;
+            border-left: 5px solid #888;
+            padding: 16px 20px;
+            border-radius: 6px;
+            margin: 24px 0;
+        }
+
+        .box-warning {
+            background: #fff8f0;
+            border-left: 5px solid #b8860b;
+            padding: 16px 20px;
+            border-radius: 6px;
+            margin: 24px 0;
+        }
+
+        .box-critical {
+            background: #fdf1f1;
+            border-left: 5px solid #a00000;
+            padding: 16px 20px;
+            border-radius: 6px;
+            margin: 24px 0;
+        }
+
+        .ref-link {
+            word-break: break-all;
+            color: #1a1a1a;
+            text-decoration: underline;
+            text-underline-offset: 2px;
+        }
+
+        .footer-note {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+            font-size: 14px;
+            color: #3a3a3a;
+        }
+
+        @media (max-width: 700px) {
+            .container { padding: 20px 16px; }
+            h1 { font-size: 22px; }
+            .meta { flex-direction: column; gap: 6px; }
+            table { font-size: 13px; }
+            th, td { padding: 8px 10px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <h1>Open EDR – Supply Chain Vulnerability Report</h1>
+
+    <div class="meta">
+        <span><strong>Report Date:</strong> July 10, 2026</span>
+        <span><strong>Researcher:</strong> Eneshan Erdoğan Karaca</span>
+        <span><strong>GitHub:</strong> <a href="https://github.com/Kisaca-Enes" target="_blank" style="color:#1a1a1a; text-decoration:underline;">Kisaca-Enes</a></span>
+        <span><strong>Status:</strong> Full Disclosure</span>
+    </div>
+
+    <!-- Summary -->
+    <h2>1. Summary</h2>
+    <p>
+        The Open EDR (Xcitium / Comodo) project has <strong>not updated its bundled third-party libraries for 7–8 years</strong>. 
+        These libraries contain <strong>12 directly identifiable</strong> and <strong>over 100 indirect CVEs</strong>, 
+        including <strong>Remote Code Execution (RCE)</strong>, <strong>Information Disclosure</strong>, 
+        <strong>Denial of Service (DoS)</strong>, and <strong>Security Bypass</strong> vulnerabilities.
+    </p>
+    <p>
+        The vendor (Xcitium/Comodo) was notified on <strong>June 21, 2026</strong>. On <strong>June 23</strong>, 
+        a one-sentence reply was received: <em>"We will update."</em> Since then, <strong>4 follow-up emails</strong> 
+        have been sent – all <strong>ignored</strong>. 
+        This report is published after the <strong>responsible disclosure</strong> period to inform the public.
+    </p>
+
+    <!-- Supply Chain Attack -->
+    <h2>2. What is a Supply Chain Attack?</h2>
+    <p>
+        A supply chain attack targets a software product through its <strong>external dependencies</strong> 
+        rather than its own code. If a Python project uses a vulnerable library, that project becomes vulnerable too.
+        Similarly, Open EDR relies on libraries like <strong>cURL, OpenSSL, Boost, and AWS SDK</strong> – 
+        any known vulnerability in these directly affects Open EDR.
+    </p>
+    <p>
+        This creates a <strong>0-day vector</strong> for <strong>APT groups</strong> and <strong>cyber attackers</strong>. 
+        Instead of attacking the target directly, adversaries can exploit a <strong>weak dependency</strong> 
+        to gain access. This is a <strong>stealthy</strong> attack vector that often bypasses firewalls and monitoring systems.
+    </p>
+    <div class="box-info">
+        <strong>🔹 Example:</strong> A company uses software from vendor X. Vendor X uses an outdated, vulnerable OpenSSL. 
+        An attacker exploits that OpenSSL flaw to breach vendor X's software, then pivots into the company's network. 
+        This is a <strong>supply chain attack</strong>.
+    </div>
+
+    <!-- Affected Components -->
+    <h2>3. Affected Components & Vulnerabilities</h2>
+    <p>
+        The table below lists <strong>12 directly identified</strong> vulnerabilities (classified as <strong>Vuln-001</strong> 
+        through <strong>Vuln-012</strong>) found in Open EDR's bundled libraries.
+    </p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Library</th>
+                <th>Version</th>
+                <th>Related CVE</th>
+                <th>Impact</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><span class="vuln-badge">Vuln-001</span></td>
+                <td>AWS SDK C++</td>
+                <td>1.7.63</td>
+                <td><span class="cve-tag">CVE-2025-14760</span></td>
+                <td>Data Integrity Violation</td>
+            </tr>
+            <tr>
+                <td><span class="vuln-badge">Vuln-002</span></td>
+                <td>Boost</td>
+                <td>1.70.0</td>
+                <td><span class="cve-tag">CVE-2023-52323</span></td>
+                <td>Heap Overflow – RCE</td>
+            </tr>
+            <tr>
+                <td><span class="vuln-badge">Vuln-003</span></td>
+                <td>cURL</td>
+                <td>7.63.0</td>
+                <td><span class="cve-tag">CVE-2019-3822</span></td>
+                <td>Stack Overflow – RCE</td>
+            </tr>
+            <tr>
+                <td><span class="vuln-badge">Vuln-004</span></td>
+                <td>cURL</td>
+                <td>7.63.0</td>
+                <td><span class="cve-tag">CVE-2018-16890</span></td>
+                <td>Information Disclosure</td>
+            </tr>
+            <tr>
+                <td><span class="vuln-badge">Vuln-005</span></td>
+                <td>cURL</td>
+                <td>7.63.0</td>
+                <td><span class="cve-tag">CVE-2021-22890</span></td>
+                <td>MITM Attack</td>
+            </tr>
+            <tr>
+                <td><span class="vuln-badge">Vuln-006</span></td>
+                <td>OpenSSL</td>
+                <td>1.1.1b</td>
+                <td><span class="cve-tag">CVE-2026-41676</span></td>
+                <td>Buffer Overflow – RCE</td>
+            </tr>
+            <tr>
+                <td><span class="vuln-badge">Vuln-007</span></td>
+                <td>OpenSSL</td>
+                <td>1.1.1b</td>
+                <td><span class="cve-tag">CVE-2019-1543</span></td>
+                <td>Nonce Reuse – Info Leak</td>
+            </tr>
+            <tr>
+                <td><span class="vuln-badge">Vuln-008</span></td>
+                <td>OpenSSL</td>
+                <td>1.1.1b</td>
+                <td><span class="cve-tag">CVE-2023-0215</span></td>
+                <td>Use-After-Free – RCE/DoS</td>
+            </tr>
+            <tr>
+                <td><span class="vuln-badge">Vuln-009</span></td>
+                <td>OpenSSL</td>
+                <td>1.1.1b</td>
+                <td><span class="cve-tag">CVE-2023-0286</span></td>
+                <td>Type Confusion – Info Leak</td>
+            </tr>
+            <tr>
+                <td><span class="vuln-badge">Vuln-010</span></td>
+                <td>OpenSSL</td>
+                <td>1.1.1b</td>
+                <td><span class="cve-tag">CVE-2022-0778</span></td>
+                <td>Infinite Loop – DoS</td>
+            </tr>
+            <tr>
+                <td><span class="vuln-badge">Vuln-011</span></td>
+                <td>OpenSSL</td>
+                <td>1.1.1b</td>
+                <td><span class="cve-tag">CVE-2023-0464</span></td>
+                <td>Resource Exhaustion – DoS</td>
+            </tr>
+            <tr>
+                <td><span class="vuln-badge">Vuln-012</span></td>
+                <td>OpenSSL</td>
+                <td>1.1.1b</td>
+                <td><span class="cve-tag">CVE-2023-0465</span></td>
+                <td>Security Bypass</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="box-critical">
+        <strong>⚠️ In total, 12 direct CVEs</strong> and <strong>100+ indirect CVEs</strong> exist in these outdated versions. 
+        <strong>RCE vulnerabilities</strong> are especially critical because the EDR runs with <strong>SYSTEM</strong> privileges.
+    </div>
+
+    <!-- Repository References -->
+    <h2>4. Repository References (Evidence)</h2>
+    <p>
+        The following links provide <strong>direct evidence</strong> of the vulnerable library versions used in Open EDR.
+    </p>
+    <ul>
+        <li><strong>AWS SDK C++ (1.7.63):</strong><br>
+            <a href="https://github.com/ComodoSecurity/openedr/blob/main/edrav2/eprj/awssdkcpp/CHANGELOG.md" target="_blank" class="ref-link">https://github.com/ComodoSecurity/openedr/blob/main/edrav2/eprj/awssdkcpp/CHANGELOG.md</a>
+        </li>
+        <li><strong>Boost (1.70.0):</strong><br>
+            <a href="https://github.com/ComodoSecurity/openedr/blob/main/edrav2/eprj/boost/boost/version.hpp" target="_blank" class="ref-link">https://github.com/ComodoSecurity/openedr/blob/main/edrav2/eprj/boost/boost/version.hpp</a>
+        </li>
+        <li><strong>cURL (7.63.0):</strong><br>
+            <a href="https://github.com/ComodoSecurity/openedr/blob/main/edrav2/eprj/curl/RELEASE-NOTES" target="_blank" class="ref-link">https://github.com/ComodoSecurity/openedr/blob/main/edrav2/eprj/curl/RELEASE-NOTES</a>
+        </li>
+        <li><strong>OpenSSL (1.1.1b):</strong><br>
+            <a href="https://github.com/ComodoSecurity/openedr/blob/main/edrav2/eprj/openssl/openssl/README" target="_blank" class="ref-link">https://github.com/ComodoSecurity/openedr/blob/main/edrav2/eprj/openssl/openssl/README</a>
+        </li>
+    </ul>
+
+    <!-- Vendor Communication -->
+    <h2>5. Vendor Communication Timeline</h2>
+    <ul>
+        <li><strong>June 21, 2026</strong> – Initial report sent to <code>security@xcitium.com</code>.</li>
+        <li><strong>June 22, 2026</strong> – Oleg Kalinin (Development Manager CCS) replied with a single sentence: 
+            <em>"We haven't updated for a long time, we will update in the next release."</em></li>
+        <li><strong>June 22 – July 10, 2026</strong> – <strong>4 follow-up emails</strong> sent requesting 
+            update timeline, CVE assignment, and additional technical details.</li>
+        <li><strong>July 10, 2026 (today)</strong> – <strong>No response</strong> received to any of these follow-up emails.</li>
+    </ul>
+
+    <div class="box-warning">
+        <strong>❗ Note:</strong> Xcitium/Comodo has <strong>no official security policy</strong> listed in the repository. 
+        There is also no indication whether Open EDR is <strong>actively maintained</strong> or <strong>deprecated</strong>. 
+        This creates uncertainty and risk for both users and researchers.
+    </div>
+
+    <!-- Comodo's Historical Pattern -->
+    <h2>6. Comodo's Historical Pattern of Negligence</h2>
+    <p>
+        Comodo has a track record of <strong>ignoring security researchers</strong>. Two notable examples:
+    </p>
+    <ul>
+        <li>
+            <strong>2016 – Google Project Zero:</strong> Researchers disclosed a Comodo vulnerability after <strong>12 days</strong>. 
+            Comodo responded by claiming they "follow responsible disclosure" but had <strong>no actual policy</strong> in place.
+        </li>
+        <li>
+            <strong>2017 – Marcus Hutchins (MalwareTech):</strong> The researcher reported a vulnerability (ComoDoS) 
+            to Comodo multiple times, received <strong>no response</strong>, and was forced to disclose publicly.
+        </li>
+    </ul>
+    <p>
+        These examples show a <strong>systematic disregard</strong> for security researchers. The current case follows the same pattern.
+    </p>
+
+    <!-- Technical Assessment -->
+    <h2>7. Technical Assessment</h2>
+    <p>
+        All vulnerabilities were identified using <strong>Occam's Razor</strong> – the simplest method: 
+        reviewing <strong>README</strong>, <strong>CHANGELOG</strong>, and <strong>version</strong> files. 
+        No <strong>fuzzing</strong>, <strong>debugging</strong>, or <strong>exploit development</strong> was performed.
+    </p>
+    <p>
+        This demonstrates how <strong>easily</strong> supply chain vulnerabilities can be discovered. 
+        Attackers can use the same approach to find <strong>critical flaws</strong> in seconds.
+    </p>
+    <div class="box-info">
+        <strong>🔹 Recommendation:</strong> Developers should <strong>regularly audit</strong> their dependencies 
+        and keep them <strong>up‑to‑date</strong>. They should also establish a <strong>clear security policy</strong> 
+        to guide researchers.
+    </div>
+
+    <!-- Conclusion -->
+    <h2>8. Conclusion & Recommendations</h2>
+    <ul>
+        <li><strong>For Open EDR users:</strong> Take <strong>immediate defensive measures</strong> – monitor network traffic, restrict EDR communications, and consider alternative EDR solutions.</li>
+        <li><strong>For Xcitium/Comodo:</strong> Update all third‑party libraries <strong>urgently</strong>. Create and publish a <strong>formal security policy</strong>. Clearly state the project's maintenance status.</li>
+        <li><strong>For the security community:</strong> Treat this as a case study in <strong>supply chain risk</strong>. Always verify the hygiene of your dependencies – including those used by your security tools.</li>
+    </ul>
+
+    <div class="box-critical">
+        <strong>🚨 Critical Takeaway:</strong> An EDR that fails to secure its own dependencies cannot be trusted to secure anything else. 
+        If Open EDR contains <strong>7‑year‑old libraries with 100+ CVEs</strong>, it poses a <strong>direct risk</strong> to every environment where it is deployed.
+    </div>
+
+    <!-- Footer -->
+    <div class="footer-note">
+        <p>
+            <strong>Disclaimer:</strong> This report is published after a <strong>30‑day responsible disclosure period</strong> 
+            and <strong>4 follow‑up emails</strong> with <strong>no meaningful response</strong> from the vendor. 
+            The purpose is to <strong>inform users</strong> and <strong>improve security awareness</strong> in the open‑source ecosystem.
+        </p>
+        <p style="margin-top: 8px; font-weight: 400;">
+            © 2026 BoxStrikes Team, Eneshan Erdoğan Karaca – This document may be freely shared and referenced with attribution.
+        </p>
+    </div>
+
+</div>
+
+</body>
+</html>

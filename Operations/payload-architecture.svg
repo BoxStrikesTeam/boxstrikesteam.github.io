@@ -1,0 +1,33 @@
+<svg width="680" height="610" viewBox="0 0 680 610" xmlns="http://www.w3.org/2000/svg" font-family="Helvetica, Arial, sans-serif">
+<defs><marker id="arrow2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#534AB7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+<rect width="680" height="610" fill="#ffffff"/>
+
+<rect x="190" y="40" width="300" height="56" rx="8" fill="#EEEDFE" stroke="#534AB7" stroke-width="1"/>
+<text x="340" y="60" text-anchor="middle" font-size="14" font-weight="600" fill="#26215C">attachBaseContext()</text>
+<text x="340" y="78" text-anchor="middle" font-size="12" fill="#3C3489">Application entry point, runs first</text>
+<line x1="340" y1="96" x2="340" y2="136" stroke="#534AB7" stroke-width="1.5" marker-end="url(#arrow2)"/>
+
+<rect x="190" y="136" width="300" height="56" rx="8" fill="#EEEDFE" stroke="#534AB7" stroke-width="1"/>
+<text x="340" y="156" text-anchor="middle" font-size="14" font-weight="600" fill="#26215C">8-method junk chain</text>
+<text x="340" y="174" text-anchor="middle" font-size="12" fill="#3C3489">Anti-analysis padding, no real logic</text>
+<line x1="340" y1="192" x2="340" y2="232" stroke="#534AB7" stroke-width="1.5" marker-end="url(#arrow2)"/>
+
+<rect x="190" y="232" width="300" height="56" rx="8" fill="#EEEDFE" stroke="#534AB7" stroke-width="1"/>
+<text x="340" y="252" text-anchor="middle" font-size="14" font-weight="600" fill="#26215C">XOR string decryption</text>
+<text x="340" y="270" text-anchor="middle" font-size="12" fill="#3C3489">Reveals DexPathList, getAssets</text>
+<line x1="340" y1="288" x2="340" y2="328" stroke="#534AB7" stroke-width="1.5" marker-end="url(#arrow2)"/>
+
+<rect x="190" y="328" width="300" height="56" rx="8" fill="#FAECE7" stroke="#993C1D" stroke-width="1"/>
+<text x="340" y="348" text-anchor="middle" font-size="14" font-weight="600" fill="#4A1B0C">assets/Mbqct opened</text>
+<text x="340" y="366" text-anchor="middle" font-size="12" fill="#712B13">Valid zip, 2.15MB hidden past EOCD</text>
+<line x1="340" y1="384" x2="340" y2="424" stroke="#993C1D" stroke-width="1.5" marker-end="url(#arrow2)"/>
+
+<rect x="190" y="424" width="300" height="56" rx="8" fill="#FAECE7" stroke="#993C1D" stroke-width="1"/>
+<text x="340" y="444" text-anchor="middle" font-size="14" font-weight="600" fill="#4A1B0C">Runtime XOR decrypt</text>
+<text x="340" y="462" text-anchor="middle" font-size="12" fill="#712B13">Hidden blob resolves to classes.dex</text>
+<line x1="340" y1="480" x2="340" y2="520" stroke="#993C1D" stroke-width="1.5" marker-end="url(#arrow2)"/>
+
+<rect x="190" y="520" width="300" height="56" rx="8" fill="#FCEBEB" stroke="#A32D2D" stroke-width="1"/>
+<text x="340" y="540" text-anchor="middle" font-size="14" font-weight="600" fill="#501313">Reflection injection</text>
+<text x="340" y="558" text-anchor="middle" font-size="12" fill="#791F1F">classes.dex spliced into classloader</text>
+</svg>

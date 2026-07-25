@@ -1,0 +1,23 @@
+<svg width="680" height="420" viewBox="0 0 680 420" xmlns="http://www.w3.org/2000/svg" font-family="Helvetica, Arial, sans-serif">
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#993C1D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+<rect width="680" height="420" fill="#ffffff"/>
+
+<rect x="190" y="40" width="300" height="56" rx="8" fill="#FAECE7" stroke="#993C1D" stroke-width="1"/>
+<text x="340" y="60" text-anchor="middle" font-size="14" font-weight="600" fill="#4A1B0C">Fake GitHub repo</text>
+<text x="340" y="78" text-anchor="middle" font-size="12" fill="#712B13">SEO README, no real script code</text>
+<line x1="340" y1="96" x2="340" y2="136" stroke="#993C1D" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+<rect x="190" y="136" width="300" height="56" rx="8" fill="#FAECE7" stroke="#993C1D" stroke-width="1"/>
+<text x="340" y="156" text-anchor="middle" font-size="14" font-weight="600" fill="#4A1B0C">GitHub Pages portal</text>
+<text x="340" y="174" text-anchor="middle" font-size="12" fill="#712B13">Spoofs GitHub branding, fake countdown</text>
+<line x1="340" y1="192" x2="340" y2="232" stroke="#993C1D" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+<rect x="190" y="232" width="300" height="56" rx="8" fill="#F1EFE8" stroke="#5F5E5A" stroke-width="1"/>
+<text x="340" y="252" text-anchor="middle" font-size="14" font-weight="600" fill="#2C2C2A">APK download and install</text>
+<text x="340" y="270" text-anchor="middle" font-size="12" fill="#444441">Victim runs the installer</text>
+<line x1="340" y1="288" x2="340" y2="328" stroke="#993C1D" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+<rect x="190" y="328" width="300" height="56" rx="8" fill="#FCEBEB" stroke="#A32D2D" stroke-width="1"/>
+<text x="340" y="348" text-anchor="middle" font-size="14" font-weight="600" fill="#501313">Payload runs (Konfety)</text>
+<text x="340" y="366" text-anchor="middle" font-size="12" fill="#791F1F">Ad fraud, clipboard, device data</text>
+</svg>

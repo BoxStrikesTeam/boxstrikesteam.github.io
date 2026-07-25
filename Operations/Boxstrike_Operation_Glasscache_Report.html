@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Operation Glasscache: Abuse of Google Trusted Services for Malware Distribution — Boxstrike Team</title>
+<style>
+  @page {
+    size: A4;
+    margin: 22mm 18mm 22mm 18mm;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', Arial, Helvetica, sans-serif;
+    color: #1c2430;
+    font-size: 10.5pt;
+    line-height: 1.55;
+    margin: 0;
+    padding: 0;
+    background: #ffffff;
+  }
+  .tlp-tag {
+    display: inline-block;
+    background: #e9edf2;
+    color: #445;
+    border: 1px solid #c3cad4;
+    font-size: 8pt;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    padding: 2px 10px;
+    border-radius: 3px;
+  }
+  /* ---------- Cover page ---------- */
+  .cover {
+    height: 240mm;
+    page-break-after: always;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding-top: 10mm;
+  }
+  .cover-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+  .brand {
+    font-weight: 800;
+    font-size: 15pt;
+    color: #0f2a4a;
+    letter-spacing: 0.02em;
+  }
+  .brand span { color: #c0392b; }
+  .cover-mid { margin-top: 60mm; }
+  .cover-mid h1 {
+    font-size: 30pt;
+    margin: 0 0 6px 0;
+    color: #0f2a4a;
+    line-height: 1.15;
+  }
+  .cover-mid h2 {
+    font-size: 14pt;
+    font-weight: 500;
+    color: #4a5568;
+    margin: 0 0 30px 0;
+  }
+  .cover-meta {
+    font-size: 9.5pt;
+    color: #445;
+    border-top: 1px solid #c3cad4;
+    padding-top: 10px;
+    margin-top: 10px;
+    width: 60%;
+  }
+  .cover-meta div { margin-bottom: 3px; }
+  .cover-bottom {
+    font-size: 8.5pt;
+    color: #778;
+    border-top: 1px solid #dde3ea;
+    padding-top: 8px;
+  }
+
+  /* ---------- headers/footers on content pages ---------- */
+  .pagehead {
+    display: flex;
+    justify-content: space-between;
+    font-size: 8pt;
+    color: #7a8494;
+    border-bottom: 1px solid #dde3ea;
+    padding-bottom: 4px;
+    margin-bottom: 14px;
+  }
+
+  h1.section-title {
+    font-size: 17pt;
+    color: #0f2a4a;
+    border-bottom: 3px solid #c0392b;
+    padding-bottom: 6px;
+    margin-top: 30px;
+    margin-bottom: 14px;
+    page-break-before: always;
+  }
+  h1.section-title.nobreak { page-break-before: auto; }
+  h2 {
+    font-size: 13pt;
+    color: #16324f;
+    margin-top: 22px;
+    margin-bottom: 8px;
+    border-left: 4px solid #c0392b;
+    padding-left: 8px;
+  }
+  h3 {
+    font-size: 11.5pt;
+    color: #223;
+    margin-top: 16px;
+    margin-bottom: 6px;
+  }
+  p { margin: 6px 0 10px 0; text-align: justify; }
+  ul, ol { margin: 6px 0 12px 0; padding-left: 22px; }
+  li { margin-bottom: 4px; }
+
+  .callout {
+    background: #f5f7fa;
+    border-left: 4px solid #2c5f8a;
+    padding: 10px 14px;
+    margin: 12px 0;
+    font-size: 9.8pt;
+  }
+  .callout.warn { border-left-color: #c0392b; background: #fdf1ef; }
+  .callout.assess { border-left-color: #b7860b; background: #fbf5e6; }
+
+  .confbadge {
+    display: inline-block;
+    font-size: 7.8pt;
+    font-weight: 700;
+    padding: 1px 8px;
+    border-radius: 10px;
+    margin-left: 6px;
+    letter-spacing: 0.03em;
+  }
+  .conf-high { background: #dff0d8; color: #2c6e2f; }
+  .conf-mod  { background: #fdf1cf; color: #8a6300; }
+  .conf-low  { background: #f6dede; color: #8a2c2c; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 10px 0 16px 0;
+    font-size: 9.2pt;
+  }
+  th, td {
+    border: 1px solid #ccd3dc;
+    padding: 5px 8px;
+    text-align: left;
+    vertical-align: top;
+  }
+  th {
+    background: #16324f;
+    color: #fff;
+    font-weight: 600;
+  }
+  tr:nth-child(even) td { background: #f5f7fa; }
+
+  code, pre {
+    font-family: 'Consolas', 'Courier New', monospace;
+    font-size: 8.6pt;
+  }
+  pre {
+    background: #10151d;
+    color: #cfe3f7;
+    padding: 12px 14px;
+    border-radius: 4px;
+    overflow-x: auto;
+    line-height: 1.45;
+    margin: 10px 0 14px 0;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  .inlinecode {
+    background: #eef1f5;
+    border: 1px solid #dde3ea;
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-family: 'Consolas','Courier New', monospace;
+    font-size: 9pt;
+  }
+  .figure-cap {
+    font-size: 8.5pt;
+    color: #667;
+    text-align: center;
+    margin: -8px 0 14px 0;
+  }
+  .ioc-list li { font-family: 'Consolas','Courier New', monospace; font-size: 9pt; }
+
+  .toc { margin-top: 10px; }
+  .toc a { text-decoration: none; color: #16324f; }
+  .toc-row {
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px dotted #c3cad4;
+    padding: 4px 0;
+    font-size: 10pt;
+  }
+  .subtoc { padding-left: 18px; font-size: 9.3pt; color: #445; }
+
+  .kv {
+    display: grid;
+    grid-template-columns: 180px 1fr;
+    row-gap: 4px;
+    font-size: 9.5pt;
+    margin: 8px 0 14px 0;
+  }
+  .kv div.k { font-weight: 700; color: #16324f; }
+
+  footer.pagefoot {
+    font-size: 7.6pt;
+    color: #99a3b0;
+    border-top: 1px solid #e2e6ec;
+    margin-top: 26px;
+    padding-top: 6px;
+    display: flex;
+    justify-content: space-between;
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ COVER PAGE ============ -->
+<div class="cover">
+  <div class="cover-top">
+    <div class="brand">BOX<span>STRIKE</span></div>
+    <span class="tlp-tag">TLP: WHITE</span>
+  </div>
+  <div class="cover-mid">
+    <h1>OPERATION GLASSCACHE</h1>
+    <h2>Abuse of Google-Hosted Trusted Infrastructure to Distribute Commodity Infostealers via Fake Game-Cheat and Software Lures</h2>
+    <div class="cover-meta">
+      <div><strong>Report type:</strong> Threat Intelligence &amp; Malware Analysis</div>
+      <div><strong>Authoring team:</strong> Boxstrike Team</div>
+      <div><strong>Lead analyst / Team founder:</strong> Enesen Erdoğan Karaca</div>
+      <div><strong>Publication date:</strong> July 2026</div>
+      <div><strong>Version:</strong> 1.0</div>
+    </div>
+  </div>
+  <div class="cover-bottom">
+    This report may be shared without restriction, in accordance with the Traffic Light Protocol designation of TLP:WHITE.<br>
+    Boxstrike Team — independent threat research. Findings reflect open-source intelligence, static and dynamic malware analysis performed on samples obtained by the authors, and third-party sandbox telemetry (Recorded Future Triage, VirusTotal) referenced throughout. Attribution statements are technical assessments, not legal or nation-state attribution.
+  </div>
+</div>
+
+<!-- ============ TABLE OF CONTENTS ============ -->
+<div class="pagehead"><span>Operation Glasscache — Boxstrike Team</span><span>TLP: WHITE</span></div>
+<h1 class="section-title nobreak" style="border-bottom:3px solid #16324f;">Contents</h1>
+<div class="toc">
+  <div class="toc-row"><a href="#exec">1. Executive Summary</a><span>3</span></div>
+  <div class="toc-row"><a href="#background">2. Operation Background &amp; Naming</a><span>4</span></div>
+  <div class="toc-row"><a href="#vector">3. Infection Vector: Abuse of Google-Hosted Infrastructure</a><span>5</span></div>
+  <div class="subtoc">3.1 Google Sites as a distribution front &nbsp;·&nbsp; 3.2 Google Drive as a payload host &nbsp;·&nbsp; 3.3 Why the attackers chose Google services</div>
+  <div class="toc-row"><a href="#mw1">4. Malware Family 1 — "ScarfaceStealer" (KiddonsModMenu.exe)</a><span>7</span></div>
+  <div class="subtoc">4.1 Static analysis &nbsp;·&nbsp; 4.2 Dynamic analysis &nbsp;·&nbsp; 4.3 Assessment</div>
+  <div class="toc-row"><a href="#mw2">5. Malware Family 2 — "Silent Stealer" / ShinySpider Loader (Setup.exe)</a><span>10</span></div>
+  <div class="subtoc">5.1 Static analysis &nbsp;·&nbsp; 5.2 Dynamic analysis &nbsp;·&nbsp; 5.3 Assessment</div>
+  <div class="toc-row"><a href="#rationale">6. Why the Operators Chose This Approach</a><span>13</span></div>
+  <div class="toc-row"><a href="#c2">7. Command and Control Infrastructure</a><span>14</span></div>
+  <div class="toc-row"><a href="#yara">8. YARA Rules</a><span>15</span></div>
+  <div class="toc-row"><a href="#conclusion">9. Conclusion &amp; Recommendations</a><span>16</span></div>
+  <div class="toc-row"><a href="#iocs">10. Appendix — Indicators of Compromise</a><span>17</span></div>
+</div>
+
+<!-- ============ 1. EXECUTIVE SUMMARY ============ -->
+<h1 class="section-title" id="exec">1. Executive Summary</h1>
+<div class="pagehead"><span>Operation Glasscache — Boxstrike Team</span><span>TLP: WHITE</span></div>
+
+<p>Boxstrike Team has spent the past several weeks tracking a cluster of commodity infostealer distribution activity that shares a distinctive and consistent infection vector: the abuse of Google's own trusted web infrastructure — specifically <span class="inlinecode">sites.google.com</span> and <span class="inlinecode">drive.google.com</span> — to host and distribute malicious payloads disguised as video-game cheats, "mod menus", and pirated or "free" software.</p>
+
+<p>We have named this activity <strong>Operation Glasscache</strong>: <em>"Glass"</em> for the transparent, trusted veneer that a well-known and rarely-blocked domain like Google's lends to otherwise unremarkable malware, and <em>"cache"</em> both as a nod to the operation's original working name and to the attackers' practice of stashing payloads inside Google's own storage and hosting products rather than dedicated, more easily blocklisted infrastructure.</p>
+
+<p>During this investigation, Boxstrike Team performed in-depth static and dynamic analysis of two distinct malware families distributed through this vector:</p>
+
+<ul>
+  <li><strong>ScarfaceStealer</strong> (sample <span class="inlinecode">KiddonsModMenu.exe</span>) — a heavily packed, self-signed trojan disguised as a game "mod menu", using direct syscalls and process-memory hooking to evade EDR detection.</li>
+  <li><strong>Silent Stealer</strong>, delivered through a loader built with the <strong>ShinySpider</strong> NSIS/Electron wrapper (sample <span class="inlinecode">Setup.exe</span>) — an Electron-based dropper impersonating a Razer Inc. utility, which systematically disables Windows Defender protections, exfiltrates via Telegram, and stages a secondary <span class="inlinecode">payload.exe</span>.</li>
+</ul>
+
+<p>Of the two, the ScarfaceStealer / mod-menu lure family was, in our observation set, the malware most consistently distributed directly through Google's own web properties, while the Silent Stealer / fake-installer family was the second most frequently encountered payload in our sample collection.</p>
+
+<div class="callout assess">
+<strong>Assessment</strong> <span class="confbadge conf-high">HIGH CONFIDENCE</span><br>
+The operation(s) behind this activity are financially motivated, commodity cybercrime actors — almost certainly customers or affiliates of Malware-as-a-Service (MaaS) offerings advertised on Telegram — rather than a single cohesive APT group. The common thread is not shared authorship of the malware, but a shared, deliberate choice of distribution infrastructure that abuses the reputation of Google's domains to bypass web filtering, browser warnings, and blocklist-based defenses.
+</div>
+
+<!-- ============ 2. BACKGROUND ============ -->
+<h1 class="section-title" id="background">2. Operation Background &amp; Naming</h1>
+<div class="pagehead"><span>Operation Glasscache — Boxstrike Team</span><span>TLP: WHITE</span></div>
+
+<h2>2.1 Why we started this investigation</h2>
+<p>Boxstrike Team's investigation began with the static and dynamic triage of a single suspicious executable, <span class="inlinecode">KiddonsModMenu.exe</span>, submitted for analysis on the assumption that it was a pirated cheat tool for a video game. Structural analysis of the binary — mismatched internal metadata, a self-signed Authenticode certificate with an implausible "Not Before" date, obfuscated section names, and an entry point protected by anti-disassembly stub code — indicated deliberate concealment inconsistent with legitimate software.</p>
+<p>Cross-referencing the file hash against sandbox telemetry (Recorded Future Triage, VirusTotal) confirmed the sample as belonging to the ScarfaceStealer family. Pivoting on distribution artifacts and infrastructure overlaps led the team to a second, unrelated-at-first-glance sample — a fake "Razer" installer, <span class="inlinecode">Setup.exe</span> — which on inspection turned out to be an Electron-packaged dropper for a Telegram-operated "Silent Stealer" payload, wrapped by a custom NSIS builder we could fingerprint via a uniquely named plugin, <span class="inlinecode">SpiderBanner.dll</span>.</p>
+<p>Both samples, and a wider set of related hashes gathered during the investigation (Section 10), trace back to download pages hosted directly on Google's own domains.</p>
+
+<h2>2.2 Operation naming</h2>
+<p>The investigation was internally referred to during its early stages as "Operation Önbellek" ("Operation Cache" in Turkish), reflecting the team's original framing of the work as "clearing out" abuse of Google's caching and hosting infrastructure. For this public-facing report, Boxstrike Team has renamed the effort <strong>Operation Glasscache</strong>, retaining the original "cache" concept while better conveying the central finding: that attackers are hiding behind the reflective, trusted "glass" of Google's brand and infrastructure.</p>
+
+<!-- ============ 3. VECTOR ============ -->
+<h1 class="section-title" id="vector">3. Infection Vector: Abuse of Google-Hosted Infrastructure</h1>
+<div class="pagehead"><span>Operation Glasscache — Boxstrike Team</span><span>TLP: WHITE</span></div>
+
+<h2>3.1 Google Sites as a distribution front</h2>
+<p>The defining characteristic of Operation Glasscache is the operators' near-exclusive reliance on <strong>Google Sites</strong> (<span class="inlinecode">sites.google.com</span>) to host landing pages for their malware, rather than purpose-registered attacker-controlled domains. Boxstrike Team identified and directly reviewed multiple such pages, all following an identical template: a short pitch promising a game "cheat" or "mod menu", a download button routed through <span class="inlinecode">google.com/url?q=</span> redirects or shortened links, and — in every case observed — a password-protected archive hosted on a third-party file locker (chiefly Mediafire or Google Drive itself).</p>
+
+<table>
+<tr><th>Google Sites URL</th><th>Lure theme</th><th>Payload delivery</th><th>Notable detail</th></tr>
+<tr><td class="ioc-list">sites.google.com/view/medusaloader</td><td>"Medusa Loader" game cheat pack</td><td>Mediafire ZIP, password "Medusa"</td><td>Branded "Medusa Team"</td></tr>
+<tr><td class="ioc-list">sites.google.com/view/quantumdotexe</td><td>"Quantum" game cheat</td><td>Google Drive + Mediafire, password "Quantumcheats"</td><td>Page explicitly instructs victim to disable Windows Defender before running the executable</td></tr>
+<tr><td class="ioc-list">sites.google.com/view/hidden-pro2</td><td>"KERNEL_HUB" mod menu</td><td>Mediafire folder</td><td>Publishes operator contact (Gmail / WhatsApp) for "technical support" — consistent with a paid cheat/malware bundle sold to end users</td></tr>
+<tr><td class="ioc-list">sites.google.com/view/spctra</td><td>Cheat/loader lure</td><td>Third-party host</td><td>Referenced in operation sample set</td></tr>
+<tr><td class="ioc-list">sites.google.com/view/spctrra</td><td>Near-duplicate of spctra page</td><td>Third-party host</td><td>Likely re-upload after takedown of the original page</td></tr>
+<tr><td class="ioc-list">sites.google.com/view/ultratrn</td><td>Cheat/loader lure</td><td>Third-party host</td><td>Referenced in operation sample set</td></tr>
+<tr><td class="ioc-list">sites.google.com/view/newext</td><td>Browser extension / utility lure</td><td>Third-party host</td><td>Referenced in operation sample set</td></tr>
+<tr><td class="ioc-list">sites.google.com/view/drcheats6</td><td>Cheat lure</td><td>Third-party host</td><td>Sequentially numbered page name suggests repeated redeployment after takedowns</td></tr>
+<tr><td class="ioc-list">sites.google.com/view/freesoftwaresite</td><td>Generic "free software" lure</td><td>Third-party host</td><td>Broader targeting beyond gamers</td></tr>
+<tr><td class="ioc-list">sites.google.com/view/freemsoft</td><td>Generic "free Microsoft software" lure</td><td>Third-party host</td><td>Impersonates legitimate software category</td></tr>
+</table>
+
+<div class="callout">
+Boxstrike Team directly retrieved and reviewed the <em>medusaloader</em>, <em>quantumdotexe</em>, and <em>hidden-pro2</em> pages listed above at the time of writing; their content is quoted and summarized accurately above. The remaining pages in this table were supplied as part of the operation's collected indicator set and are included on that basis; Boxstrike Team has not independently re-verified their live content at time of publication.
+</div>
+
+<h2>3.2 Google Drive as a payload host</h2>
+<p>In addition to Sites, the operators use <strong>Google Drive</strong> directly as a file host for payload archives (see the Quantum lure above, which offers a <span class="inlinecode">drive.google.com/file/d/...</span> link as a primary download option alongside Mediafire). Because Drive shared-file links resolve under Google's own domain and TLS certificate, they inherit the same reputation benefits as Sites pages and are similarly unlikely to be flagged by domain-reputation-based web filtering.</p>
+
+<h2>3.3 Why the attackers chose Google services</h2>
+<p>Boxstrike Team's assessment is that this is a deliberate, low-cost, high-yield infrastructure choice rather than an incidental one:</p>
+<ul>
+  <li><strong>Trust and filtering bypass.</strong> <span class="inlinecode">google.com</span> and its subdomains are near-universally allow-listed or given elevated trust scores by web filters, secure email gateways, and browser reputation engines. A malicious link on a corporate-owned or bulletproof-hosted domain is trivial to blocklist; a link on <span class="inlinecode">sites.google.com</span> is not, because blocking the base domain would break access to millions of legitimate Sites pages.</li>
+  <li><strong>Zero infrastructure cost and disposability.</strong> Google Sites and Drive accounts are free to create, require no domain registration or hosting payment (both of which can leave a financial paper trail), and are trivially disposable — when a page is reported and removed, the operators observed by Boxstrike Team simply stood up a near-identical replacement (e.g. <span class="inlinecode">spctra</span> → <span class="inlinecode">spctrra</span>) within a short window.</li>
+  <li><strong>Valid, Google-issued TLS.</strong> Every payload delivery URL inherits a legitimate certificate under Google's own PKI, removing "invalid certificate" browser warnings that would otherwise deter less technical victims.</li>
+  <li><strong>SEO and social distribution.</strong> Google Sites pages are indexable and shareable, and the observed lure pages are written to match exactly the kind of search queries ("free [game] cheat", "[game] mod menu download") that the target demographic — predominantly gamers seeking cheats — is likely to type into a search engine or follow from a Discord/YouTube link.</li>
+  <li><strong>Layered redirection.</strong> Routing the actual payload through a secondary host (Mediafire) via a Google redirect (<span class="inlinecode">google.com/url?q=</span>) adds a hop that both obscures the final destination from simple link-preview tools and splits the "reputation cost" of the delivery chain across two trusted-looking domains instead of one.</li>
+</ul>
+<p>This combination allows financially motivated actors distributing commodity malware — who have no need for, and no access to, the kind of dedicated bulletproof infrastructure used by state-sponsored operators — to achieve a distribution reach and filter-evasion rate that would otherwise require considerably more investment.</p>
+
+<!-- ============ 4. MALWARE 1 ============ -->
+<h1 class="section-title" id="mw1">4. Malware Family 1 — "ScarfaceStealer" (KiddonsModMenu.exe)</h1>
+<div class="pagehead"><span>Operation Glasscache — Boxstrike Team</span><span>TLP: WHITE</span></div>
+
+<div class="kv">
+  <div class="k">File name</div><div>KiddonsModMenu.exe</div>
+  <div class="k">SHA-256</div><div class="ioc-list">d33fe738471c6f21f7f9c2c56893c5e286f110bb0eb242ec1b3f9145fccdaf79</div>
+  <div class="k">MD5</div><div class="ioc-list">04cb543da02c2227c4ec3a17d72d41fb</div>
+  <div class="k">SHA-1</div><div class="ioc-list">7707d9dcb3332125863f4432f75d3026d5439899</div>
+  <div class="k">File size</div><div>12,696,176 bytes</div>
+  <div class="k">Type</div><div>PE32+ executable (GUI), x86-64</div>
+  <div class="k">Family (community tag)</div><div>ScarfaceStealer <span class="confbadge conf-high">HIGH CONFIDENCE</span></div>
+</div>
+
+<h2>4.1 Static analysis</h2>
+<p>The sample presents as a game "mod menu" but its embedded version resource tells a different story entirely: <span class="inlinecode">ProductName: "Temp File Mode Toggle"</span>, <span class="inlinecode">CompanyName: "GoldGrove Cloud Works, LLC"</span> — a generic, deliberately unremarkable identity bearing no relation to the file's advertised purpose. This mismatch between external lure and internal metadata is a recurring signature of the operation.</p>
+
+<h3>4.1.1 Structural anomalies</h3>
+<ul>
+  <li>Section table contains non-standard, corrupted-looking names — <span class="inlinecode">.n{Q</span>, <span class="inlinecode">.3KC</span>, <span class="inlinecode">.B'#</span> — inconsistent with any standard compiler or linker output.</li>
+  <li>Only three imported functions are declared statically (<span class="inlinecode">GetProcessHeap</span>, <span class="inlinecode">IsWindowVisible</span>, <span class="inlinecode">GetStockObject</span>), indicating the real API surface is resolved dynamically at runtime — a hallmark of custom packing/crypter layers.</li>
+  <li>The <span class="inlinecode">.B'#</span> section, occupying roughly 95% of the file, measures 7.83–8.0 bits/byte of Shannon entropy across nearly its entire length — consistent with strong encryption or dense compression of the real payload.</li>
+  <li>The program entry point resolves into the <span class="inlinecode">.B'#</span> section rather than <span class="inlinecode">.text</span>; disassembly of the entry point and its call targets yields a single valid instruction followed by deliberately non-decodable byte sequences, consistent with anti-disassembly padding designed to defeat linear-sweep disassemblers.</li>
+</ul>
+
+<h3>4.1.2 Fraudulent code-signing certificate</h3>
+<p>The binary carries an Authenticode signature that fails chain validation: the certificate is <strong>self-signed</strong> (issuer and subject are identical), bearing the subject <span class="inlinecode">CN="Temp File Mode Toggle, O=GoldGrove Cloud Works, LLC, OU=Platform Operations, L=Toronto, S=ON, C=CA"</span>. Cross-referencing dynamic sandbox telemetry revealed a striking temporal anomaly: the certificate's "Not Before" date is <strong>23 July 2026</strong>, while the PE's compile timestamp reads <strong>15 April 2021</strong> — a five-year impossibility indicating the certificate is freshly generated per build (or per campaign) by the packer/builder tooling, entirely decoupled from the (likely also forged) compile timestamp.</p>
+
+<h2>4.2 Dynamic analysis</h2>
+<p>Sandbox execution (Recorded Future Triage, analysis score <strong>68/100, classified MALICIOUS</strong>) confirmed the behaviors predicted by static analysis and surfaced further capability:</p>
+<table>
+<tr><th>Behavior</th><th>MITRE ATT&amp;CK</th><th>Detail</th></tr>
+<tr><td>Direct / indirect syscall use</td><td>T1562.008</td><td>Syscalls invoked directly at multiple code addresses, bypassing user-mode API hooks placed by EDR products.</td></tr>
+<tr><td>Foreign process code modification</td><td>T1055</td><td>Memory writes at two distinct base addresses overwrite code with unconditional jump (<span class="inlinecode">E9</span>) opcodes — consistent with inline hooking or code redirection inside another process.</td></tr>
+<tr><td>Obfuscated / non-standard PE sections</td><td>T1027.009</td><td>Confirms the special-character section names identified in static analysis.</td></tr>
+<tr><td>Fraudulent digital signature</td><td>T1036.005</td><td>Confirmed by both static inspection and the sandbox's own AI-assisted signature classifier.</td></tr>
+</table>
+<p>Multi-engine AV scanning at time of detonation returned an 11–13% detection rate (ReversingLabs, VirusTotal) despite the sandbox's own machine-learning classifier flagging the sample with 100% confidence — illustrating the practical effectiveness of the packing layer against signature-based defenses, even as behavioral detection catches it immediately.</p>
+
+<h2>4.3 Assessment</h2>
+<div class="callout assess">
+ScarfaceStealer, as delivered via <span class="inlinecode">KiddonsModMenu.exe</span>, is assessed with <span class="confbadge conf-high">HIGH CONFIDENCE</span> to be an information-stealing / process-injection capable trojan, consistent with prior public reporting on the ScarfaceStealer family and near-identical prior samples (e.g. <span class="inlinecode">8BallPoolModMenu.exe</span>) sharing the same lure convention, injection behavior, and fake-certificate pattern.
+</div>
+
+<!-- ============ 5. MALWARE 2 ============ -->
+<h1 class="section-title" id="mw2">5. Malware Family 2 — "Silent Stealer" / ShinySpider Loader (Setup.exe)</h1>
+<div class="pagehead"><span>Operation Glasscache — Boxstrike Team</span><span>TLP: WHITE</span></div>
+
+<div class="kv">
+  <div class="k">File name</div><div>Setup.exe</div>
+  <div class="k">SHA-256</div><div class="ioc-list">0b90f6350ae636a8f19550e562f5957dd2c07cff0323520c2a11822dfafd5a38</div>
+  <div class="k">MD5</div><div class="ioc-list">65cc2a77f13e566b5974a2c6f617980f</div>
+  <div class="k">File size</div><div>77,656,590 bytes</div>
+  <div class="k">Type</div><div>NSIS self-extracting installer, PE32, wrapping an Electron application</div>
+  <div class="k">Wrapper / builder</div><div>"ShinySpider" (fingerprinted via <span class="inlinecode">SpiderBanner.dll</span>) <span class="confbadge conf-mod">MODERATE CONFIDENCE</span></div>
+  <div class="k">Payload family</div><div>"Silent Stealer" (Telegram-operated MaaS) <span class="confbadge conf-mod">MODERATE CONFIDENCE</span></div>
+</div>
+
+<h2>5.1 Static analysis</h2>
+<p>Unlike the ScarfaceStealer sample, <span class="inlinecode">Setup.exe</span> is not itself packed or obfuscated at the PE level — it is a completely ordinary NSIS installer stub. Extracting its contents reveals a legitimate-looking Electron application shell (locale <span class="inlinecode">.pak</span> files, Chromium DLLs, V8 snapshot blobs) padded to nearly 78 MB, inside which the malicious logic is concealed.</p>
+
+<h3>5.1.1 Brand impersonation and lack of signing</h3>
+<p>Version metadata claims <span class="inlinecode">CompanyName: "Razer Inc."</span> with <span class="inlinecode">FileDescription: "Windows system configuration and optimization tool"</span> — a generic description bearing no resemblance to any genuine Razer product, and the file carries <strong>no digital signature whatsoever</strong> (empty certificate directory), whereas authentic Razer software is consistently code-signed.</p>
+
+<h3>5.1.2 The ShinySpider NSIS wrapper</h3>
+<p>Among the NSIS plugin DLLs extracted from the installer was <span class="inlinecode">SpiderBanner.dll</span> — not a standard or publicly documented NSIS plugin. This specific filename is documented in independent open-source reporting as a fingerprint of a custom NSIS wrapper attributed to a builder/packer identity referred to as "ShinySpider," used to package the "Silent Stealer" malware family, a Telegram-operated Malware-as-a-Service product.</p>
+
+<h3>5.1.3 The Electron payload: main.js</h3>
+<p>The Electron application's <span class="inlinecode">main.js</span> (147 KB) is deliberately obfuscated using the <span class="inlinecode">javascript-obfuscator</span> npm package — explicitly declared in the shipped <span class="inlinecode">package.json</span> under an <span class="inlinecode">allowScripts</span> block — using hex-named identifiers, string-array shuffling, and control-flow flattening. Despite the obfuscation, several literal strings survive dynamic string construction and are directly recoverable from the file:</p>
+<pre>https://api.telegram.org/bot
+https://api.ipify.org
+https://icanhazip.com
+https://ifconfig.me/ip
+https://ipinfo.io/ip</pre>
+<p>Alongside references to a <span class="inlinecode">CONFIG</span> object containing <span class="inlinecode">TG_CHAT_ID</span> / <span class="inlinecode">TG_BOT_TOKEN</span>-style keys and a <span class="inlinecode">CONFIG['PAYLOADS'].forEach(...)</span> loop, this confirms the malware uses the Telegram Bot API as its command-and-control and exfiltration channel, and is designed to download and stage further payloads rather than acting purely as a single-stage stealer.</p>
+
+<h2>5.2 Dynamic analysis</h2>
+<p>Sandbox execution (Recorded Future Triage, analysis score <strong>10/10, MALICIOUS</strong>) traced the following process chain and behaviors:</p>
+<pre>Setup.exe
+ └── Installer.exe   (Electron shell, dropped to %LOCALAPPDATA%\Programs\installer)
+      ├── net.exe / net1.exe "session"          — silent admin-privilege check
+      ├── wscript.exe wmi_&lt;hash&gt;.vbs             — WMI-based host reconnaissance
+      ├── reg.exe add ...Defender\Exclusions\Paths      — excludes Installer.exe
+      ├── reg.exe add ...Defender\Exclusions\Paths      — excludes Setup\cache\&lt;id&gt;\payload.exe
+      ├── reg.exe add ...Defender\Exclusions\Extensions — excludes .exe and .tmp system-wide
+      ├── reg.exe add ...Defender\Exclusions\Processes  — excludes payload.exe by name
+      ├── powershell.exe -EncodedCommand ...            — base64-obfuscated Add-MpPreference chain
+      └── powershell.exe -WindowStyle Hidden -Command   — repeated screen-capture routine
+           (System.Windows.Forms / System.Drawing screenshot saved to %TEMP%\scr_&lt;timestamp&gt;.png,
+            executed on a short repeating interval throughout the sandbox session)</pre>
+<table>
+<tr><th>Behavior</th><th>MITRE ATT&amp;CK</th><th>Detail</th></tr>
+<tr><td>Windows Defender exclusion abuse</td><td>T1562.001</td><td>Multiple <span class="inlinecode">Add-MpPreference</span> / <span class="inlinecode">reg add</span> calls specifically exclude a staged <span class="inlinecode">payload.exe</span>, its containing cache folder, and the <span class="inlinecode">.exe</span>/<span class="inlinecode">.tmp</span> extensions entirely.</td></tr>
+<tr><td>Command obfuscation</td><td>T1027.010</td><td>Defender-exclusion commands are chained and delivered as a single base64 <span class="inlinecode">-EncodedCommand</span> PowerShell blob.</td></tr>
+<tr><td>Hidden-window PowerShell execution</td><td>T1564.003 / T1059.001</td><td>All PowerShell invocations run with <span class="inlinecode">-WindowStyle Hidden</span>, presenting no visible UI to the victim.</td></tr>
+<tr><td>VBScript execution via WSH</td><td>T1059.005</td><td>A dropped <span class="inlinecode">wmi_*.vbs</span> script is run through <span class="inlinecode">wscript.exe</span> for WMI-based reconnaissance.</td></tr>
+<tr><td>System / language / location discovery</td><td>T1082, T1614.001</td><td>Registry queries against <span class="inlinecode">NLS\Language</span> and repeated public-IP lookups (Section 3 above) are consistent with victim geofencing.</td></tr>
+<tr><td>Screen capture</td><td>(Collection)</td><td>Periodic full-screen screenshots via a PowerShell/.NET one-liner, saved locally and — per static findings — available for exfiltration through the Telegram channel.</td></tr>
+</table>
+
+<h2>5.3 Assessment</h2>
+<div class="callout assess">
+With <span class="confbadge conf-mod">MODERATE-TO-HIGH CONFIDENCE</span>, Boxstrike Team assesses <span class="inlinecode">Setup.exe</span> as a Silent Stealer deployment packaged by the ShinySpider builder. This assessment rests on the distinctive <span class="inlinecode">SpiderBanner.dll</span> plugin fingerprint and a close behavioral match (Electron packaging, Defender-exclusion sequence, screen capture, Telegram C2) to independently published reporting on the same tooling. Boxstrike Team did not directly recover or crack the Telegram bot token or a fully decoded configuration, and this attribution should therefore be treated as a strong behavioral and infrastructural match rather than a code-level confirmation.
+</div>
+
+<!-- ============ 6. RATIONALE ============ -->
+<h1 class="section-title" id="rationale">6. Why the Operators Chose This Approach</h1>
+<div class="pagehead"><span>Operation Glasscache — Boxstrike Team</span><span>TLP: WHITE</span></div>
+
+<p>Across both malware families, Boxstrike Team observes a consistent underlying logic that explains the specific technical choices made by the operators:</p>
+
+<h2>6.1 Target selection favors low-friction, high-volume victims</h2>
+<p>Both lures target people actively searching for free or cracked software — predominantly gamers seeking cheats, but also users of the generic "free software" pages. This population is (a) large, (b) accustomed to bypassing security warnings and disabling antivirus as a normal part of "installing a cheat," and (c) unlikely to report incidents to IT security teams, since the activity they were engaged in was itself against a game's terms of service. This makes social engineering around AV/Defender disabling far more effective than it would be against a corporate target.</p>
+
+<h2>6.2 Infrastructure economics over infrastructure sophistication</h2>
+<p>Neither family invests in bespoke C2 protocols or dedicated hosting. ScarfaceStealer relies on commodity packing to buy time against signature AV. Silent Stealer relies on the Telegram Bot API — a free, reliable, encrypted-transport messaging platform that most corporate web filters do not block, and that requires no infrastructure maintenance by the operator at all. Both choices minimize operational cost and maximize resilience to takedown, at the expense of the kind of stealth a targeted, well-resourced operator would build custom infrastructure to achieve.</p>
+
+<h2>6.3 Defender-exclusion abuse as a force multiplier</h2>
+<p>The explicit, repeated targeting of Windows Defender's exclusion list (both via GUI-instructed manual disabling on the Google Sites lure pages, and via automated <span class="inlinecode">Add-MpPreference</span> calls inside Setup.exe) reflects a pragmatic reality: Windows Defender is the default, unpaid AV on the overwhelming majority of consumer Windows installations. Neutralizing it — rather than evading a wide range of possible third-party products — covers the largest practical share of the target population for the least engineering effort.</p>
+
+<h2>6.4 Reuse of Google's trust for both distribution and payload legitimacy signals</h2>
+<p>Beyond the distribution vector discussed in Section 3, using Google's infrastructure also lends a subtle legitimacy signal to the victim at the point of decision: a download button on a page under <span class="inlinecode">google.com</span>, or a file served from <span class="inlinecode">drive.google.com</span>, does not trigger the instinctive distrust that an unfamiliar domain would. This is social engineering that operates on the browser's own trust indicators (padlock icon, familiar domain) rather than on the content of the page itself.</p>
+
+<!-- ============ 7. C2 ============ -->
+<h1 class="section-title" id="c2">7. Command and Control Infrastructure</h1>
+<div class="pagehead"><span>Operation Glasscache — Boxstrike Team</span><span>TLP: WHITE</span></div>
+
+<p>Boxstrike Team directly confirmed Telegram Bot API usage (<span class="inlinecode">api.telegram.org/bot</span>) as the C2/exfiltration channel for the Silent Stealer sample through static string recovery (Section 5.1.3). The following additional network indicators were collected during the broader operation and are included here as supporting infrastructure; they were supplied as part of the operation's indicator set and, unless otherwise noted, were not independently re-verified live by Boxstrike Team at time of publication.</p>
+
+<table>
+<tr><th>Indicator</th><th>Type</th><th>Notes</th></tr>
+<tr><td class="ioc-list">api.telegram.org/bot</td><td>C2 / exfiltration API</td><td>Confirmed via static analysis of Setup.exe (Section 5)</td></tr>
+<tr><td class="ioc-list">icanhazip.com</td><td>Public-IP lookup / victim fingerprinting</td><td>Confirmed via static analysis of Setup.exe</td></tr>
+<tr><td class="ioc-list">cucumber-oslo[.]cc</td><td>Suspected C2 domain</td><td>Operation indicator set</td></tr>
+<tr><td class="ioc-list">195.201.63[.]48</td><td>Suspected C2 IP (HTTPS)</td><td>Operation indicator set</td></tr>
+<tr><td class="ioc-list">62.60.226[.]198:80</td><td>Suspected C2 IP</td><td>Operation indicator set</td></tr>
+<tr><td class="ioc-list">2.28.12[.]152</td><td>Suspected C2 IP (HTTPS)</td><td>Operation indicator set</td></tr>
+</table>
+
+<!-- ============ 8. YARA ============ -->
+<h1 class="section-title" id="yara">8. YARA Rules</h1>
+<div class="pagehead"><span>Operation Glasscache — Boxstrike Team</span><span>TLP: WHITE</span></div>
+
+<p>The following rules were developed by Boxstrike Team against confirmed static indicators from the two fully analyzed samples in this report. Rule 1 and Rule 2 target the ScarfaceStealer / fake-metadata crypter layer; Rule 3 targets the ShinySpider NSIS wrapper used to package Silent Stealer.</p>
+
+<pre>rule Boxstrike_ScarfaceStealer_FakeCert_Crypter
+{
+    meta:
+        description = "Fake 'Temp File Mode Toggle / GoldGrove Cloud Works' self-signed"
+                       " certificate + packer combination used by ScarfaceStealer samples"
+                       " distributed as game mod-menu lures (Operation Glasscache)"
+        author       = "Boxstrike Team"
+        date         = "2026-07-25"
+        reference     = "d33fe738471c6f21f7f9c2c56893c5e286f110bb0eb242ec1b3f9145fccdaf79"
+
+    strings:
+        $meta_product  = "Temp File Mode Toggle" ascii wide
+        $meta_company  = "GoldGrove Cloud Works, LLC" ascii wide
+
+        $sec1 = ".n{Q"
+        $sec2 = ".3KC"
+        $sec3 = ".B'#"
+
+        $api1 = "GetProcessHeap" ascii
+        $api2 = "IsWindowVisible" ascii
+        $api3 = "GetStockObject" ascii
+
+    condition:
+        uint16(0) == 0x5A4D
+        and filesize > 5MB
+        and (
+            any of ($meta_*)
+            or (2 of ($sec*) and 2 of ($api*))
+        )
+}
+
+rule Boxstrike_HighEntropy_SingleSection_Packer
+{
+    meta:
+        description = "Generic heuristic: single PE section occupying most of the file"
+                       " with near-maximum entropy, consistent with the ScarfaceStealer"
+                       " packing layer observed in Operation Glasscache"
+        author       = "Boxstrike Team"
+
+    condition:
+        uint16(0) == 0x5A4D
+        and pe.number_of_sections <= 8
+        and for any i in (0..pe.number_of_sections - 1):
+              ( pe.sections[i].raw_data_size > filesize * 0.7 )
+}
+
+rule Boxstrike_ShinySpider_NSIS_Wrapper
+{
+    meta:
+        description = "Detects the ShinySpider custom NSIS wrapper used to package the"
+                       " Silent Stealer Telegram-operated MaaS payload (Operation Glasscache)"
+        author       = "Boxstrike Team"
+        date         = "2026-07-25"
+        reference     = "0b90f6350ae636a8f19550e562f5957dd2c07cff0323520c2a11822dfafd5a38"
+
+    strings:
+        $plugin_name    = "SpiderBanner.dll" ascii wide nocase
+        $tg_api         = "api.telegram.org/bot" ascii
+        $ip_lookup1     = "icanhazip.com" ascii
+        $ip_lookup2     = "ipinfo.io/ip" ascii
+        $ip_lookup3     = "ifconfig.me/ip" ascii
+        $obfuscator_ref = "javascript-obfuscator" ascii
+        $config_payloads = "PAYLOADS" ascii
+
+    condition:
+        uint16(0) == 0x5A4D
+        and (
+            $plugin_name
+            or ($tg_api and 1 of ($ip_lookup*))
+            or ($obfuscator_ref and $config_payloads)
+        )
+}</pre>
+
+<!-- ============ 9. CONCLUSION ============ -->
+<h1 class="section-title" id="conclusion">9. Conclusion &amp; Recommendations</h1>
+<div class="pagehead"><span>Operation Glasscache — Boxstrike Team</span><span>TLP: WHITE</span></div>
+
+<p>Operation Glasscache is not, in Boxstrike Team's assessment, the work of a single group in the way a nation-state APT cluster would be. It is better understood as a distribution <em>pattern</em> — the systematic abuse of Google Sites and Google Drive as free, trusted, disposable hosting for commodity malware — adopted independently or semi-independently by multiple financially motivated actors and MaaS customers, of whom ScarfaceStealer and Silent Stealer/ShinySpider operators are two clearly documented examples. The consistency of the lure format (game-cheat branding, password-protected archives, explicit AV-disabling instructions) across otherwise unrelated payload families suggests this pattern is itself being shared or templated within the underground cheat/crack distribution community.</p>
+
+<h2>Recommendations</h2>
+<ul>
+  <li><strong>Do not allow-list Google Sites or Drive wholesale.</strong> Where feasible, apply content-based or path-based scrutiny (e.g. newly created <span class="inlinecode">sites.google.com/view/*</span> pages, or Drive files matching known-bad hashes) rather than trusting the base domain outright.</li>
+  <li><strong>Alert on Defender configuration changes.</strong> Monitor for <span class="inlinecode">Add-MpPreference</span> / <span class="inlinecode">Set-MpPreference</span> PowerShell invocations and direct registry writes to <span class="inlinecode">Windows Defender\Exclusions</span>, particularly when originating from a recently created or downloaded executable.</li>
+  <li><strong>Treat "disable your antivirus to install this" instructions as a hard red flag</strong> in security-awareness training aimed at gaming and general consumer audiences, not only enterprise users.</li>
+  <li><strong>Deploy the YARA rules in Section 8</strong> across endpoint and email/web-gateway scanning to catch both documented families and near-variant rebuilds sharing the same packer or NSIS wrapper.</li>
+  <li><strong>Monitor for Telegram Bot API traffic</strong> (<span class="inlinecode">api.telegram.org</span>) originating from unexpected processes as a low-cost, high-value detection opportunity, since this channel is reused across many unrelated stealer families precisely because it is rarely blocked.</li>
+</ul>
+
+<!-- ============ 10. IOCs ============ -->
+<h1 class="section-title" id="iocs">10. Appendix — Indicators of Compromise</h1>
+<div class="pagehead"><span>Operation Glasscache — Boxstrike Team</span><span>TLP: WHITE</span></div>
+
+<h2>10.1 Fully analyzed samples (Boxstrike Team static + dynamic analysis)</h2>
+<table>
+<tr><th>File</th><th>SHA-256</th><th>Family</th></tr>
+<tr><td>KiddonsModMenu.exe</td><td class="ioc-list">d33fe738471c6f21f7f9c2c56893c5e286f110bb0eb242ec1b3f9145fccdaf79</td><td>ScarfaceStealer</td></tr>
+<tr><td>Setup.exe</td><td class="ioc-list">0b90f6350ae636a8f19550e562f5957dd2c07cff0323520c2a11822dfafd5a38</td><td>Silent Stealer / ShinySpider</td></tr>
+</table>
+
+<h2>10.2 Additional sample hashes (operation indicator set — not independently deep-analyzed by Boxstrike Team)</h2>
+<ul class="ioc-list">
+  <li>fd96f560525dc3a5e4bfae2c530517dddb5fb84da1ac36a47b2a371a082494bb</li>
+  <li>16b64c290c9dcccff6551e06ad9db02cc42603f3744d0d70cc3a5f86fe5ff975</li>
+  <li>f1d9bb30fe8ae9eee06331ebb1d6e81080f33560973a514db93472754d95defe</li>
+  <li>241b0137545bcf2a250bfe0704fbdbd3795472a7224e80da043b86b0d8ea2558</li>
+  <li>f1287db3579acf33370549d42ea9b98304537bd5aa9db3c4c46d408819f4390d</li>
+</ul>
+
+<h2>10.3 Sandbox report references</h2>
+<ul class="ioc-list">
+  <li>tria.ge/260723-nmst2shr9y/behavioral2</li>
+  <li>tria.ge/260720-nr5peagx3q/behavioral2</li>
+  <li>tria.ge/260723-n9mxbaal9w/behavioral8</li>
+  <li>tria.ge/260723-pttklaw1et (Setup.exe — analyzed in depth, Section 5)</li>
+  <li>tria.ge/260724-lz1djswydz/behavioral2</li>
+  <li>tria.ge/260724-pg9faazdkg/behavioral3</li>
+</ul>
+
+<h2>10.4 Distribution pages (Google-hosted)</h2>
+<ul class="ioc-list">
+  <li>sites.google.com/view/medusaloader — directly reviewed</li>
+  <li>sites.google.com/view/quantumdotexe — directly reviewed</li>
+  <li>sites.google.com/view/hidden-pro2 — directly reviewed</li>
+  <li>sites.google.com/view/spctra</li>
+  <li>sites.google.com/view/spctrra</li>
+  <li>sites.google.com/view/ultratrn</li>
+  <li>sites.google.com/view/newext</li>
+  <li>sites.google.com/view/drcheats6</li>
+  <li>sites.google.com/view/freesoftwaresite</li>
+  <li>sites.google.com/view/freemsoft</li>
+</ul>
+
+<h2>10.5 Network indicators</h2>
+<ul class="ioc-list">
+  <li>api.telegram.org/bot — confirmed C2/exfiltration channel</li>
+  <li>icanhazip.com — confirmed victim IP fingerprinting service</li>
+  <li>cucumber-oslo[.]cc</li>
+  <li>195.201.63[.]48</li>
+  <li>62.60.226[.]198:80</li>
+  <li>2.28.12[.]152</li>
+</ul>
+
+<footer class="pagefoot">
+  <span>Operation Glasscache — Boxstrike Team — TLP:WHITE</span>
+  <span>Page intentionally formatted for print / PDF export</span>
+</footer>
+
+</body>
+</html>

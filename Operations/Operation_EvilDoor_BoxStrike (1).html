@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Operation EvilDoor — BoxStrike Threat Intelligence</title>
+<style>
+  @page { size: A4; margin: 22mm 18mm; }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    font-family: "Segoe UI", Helvetica, Arial, sans-serif;
+    color: #1c2430;
+    background: #ffffff;
+    font-size: 11.5pt;
+    line-height: 1.55;
+  }
+  h1, h2, h3, h4 { font-family: Georgia, "Times New Roman", serif; font-weight: 700; color: #142338; }
+  a { color: #1b4f8a; text-decoration: none; }
+
+  /* ---------- TLP banner ---------- */
+  .tlp-bar {
+    background: #ffffff;
+    border-top: 3px solid #142338;
+    border-bottom: 1px solid #ccc;
+    padding: 4px 0;
+    font-size: 9pt;
+    letter-spacing: 0.08em;
+    color: #444;
+    text-align: right;
+    padding-right: 4px;
+  }
+  .tlp-bar b { color: #142338; }
+
+  /* ---------- Cover page ---------- */
+  .cover {
+    min-height: 240mm;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    page-break-after: always;
+    position: relative;
+    padding: 40px 10px;
+  }
+  .cover .brand {
+    font-family: Georgia, serif;
+    font-size: 15pt;
+    letter-spacing: 0.18em;
+    color: #b8860b;
+    text-transform: uppercase;
+    margin-bottom: 60px;
+  }
+  .cover .brand span { color: #142338; }
+  .cover .op-label {
+    font-size: 11pt;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #8a1f2d;
+    font-weight: 600;
+    margin-bottom: 14px;
+  }
+  .cover h1 {
+    font-size: 34pt;
+    line-height: 1.15;
+    margin: 0 0 18px 0;
+    max-width: 90%;
+  }
+  .cover .subtitle {
+    font-size: 13pt;
+    color: #445;
+    max-width: 85%;
+    margin-bottom: 40px;
+    font-style: italic;
+  }
+  .cover .meta-table {
+    border-top: 1px solid #999;
+    padding-top: 18px;
+    font-size: 10.5pt;
+    color: #333;
+    max-width: 420px;
+  }
+  .cover .meta-table div { display: flex; justify-content: space-between; padding: 3px 0; }
+  .cover .meta-table .k { color: #777; }
+  .cover .tlp-clear-badge {
+    display: inline-block;
+    border: 1.5px solid #142338;
+    color: #142338;
+    font-weight: 700;
+    font-size: 10pt;
+    letter-spacing: 0.1em;
+    padding: 3px 10px;
+    margin-top: 26px;
+  }
+
+  /* ---------- TOC ---------- */
+  .toc { page-break-after: always; padding-top: 10px; }
+  .toc h2 { border-bottom: 2px solid #142338; padding-bottom: 6px; }
+  .toc ol { list-style: none; padding-left: 0; counter-reset: sec; }
+  .toc li { counter-increment: sec; padding: 5px 0; border-bottom: 1px dotted #ccc; display: flex; }
+  .toc li::before { content: counter(sec) ".  "; color: #b8860b; font-weight: 700; width: 26px; }
+  .toc li a { color: #142338; }
+
+  /* ---------- Section styling ---------- */
+  section { page-break-before: always; padding-top: 4px; }
+  section.nobreak { page-break-before: auto; }
+  h2.sec-title {
+    font-size: 19pt;
+    border-bottom: 2px solid #142338;
+    padding-bottom: 8px;
+    margin-bottom: 4px;
+  }
+  h2.sec-title .num { color: #b8860b; margin-right: 10px; }
+  h3 { font-size: 13.5pt; margin-top: 28px; color: #1b3a5c; }
+  h4 { font-size: 11.5pt; margin-top: 18px; color: #2a4a6a; }
+
+  p { margin: 10px 0; text-align: justify; }
+  ul, ol { margin: 8px 0; padding-left: 22px; }
+  li { margin: 4px 0; }
+
+  .callout {
+    background: #f7f4ea;
+    border-left: 4px solid #b8860b;
+    padding: 12px 16px;
+    margin: 16px 0;
+    font-size: 10.8pt;
+  }
+  .callout .label {
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 9pt;
+    letter-spacing: 0.08em;
+    color: #8a6d1a;
+    display: block;
+    margin-bottom: 4px;
+  }
+  .quote-cite {
+    border-left: 3px solid #999;
+    padding: 8px 14px;
+    margin: 14px 0;
+    font-style: italic;
+    color: #444;
+    font-size: 10.5pt;
+    background: #fafafa;
+  }
+
+  code, pre, .mono { font-family: "Consolas", "SFMono-Regular", Menlo, monospace; }
+  pre {
+    background: #10192a;
+    color: #d7e3f4;
+    padding: 14px 16px;
+    border-radius: 3px;
+    overflow-x: auto;
+    font-size: 9.3pt;
+    line-height: 1.5;
+    margin: 12px 0;
+  }
+  code.inline {
+    background: #eef0f3;
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-size: 92%;
+    color: #8a1f2d;
+  }
+  .diagram-box {
+    border: 1px solid #ccc;
+    background: #fbfbf9;
+    padding: 14px;
+    margin: 16px 0;
+    text-align: center;
+  }
+  .diagram-box img { max-width: 100%; }
+  .fig-caption {
+    font-size: 9.5pt;
+    color: #666;
+    text-align: center;
+    margin-top: 6px;
+    font-style: italic;
+  }
+
+  table { border-collapse: collapse; width: 100%; margin: 14px 0; font-size: 10.2pt; }
+  th, td { border: 1px solid #d3d3d3; padding: 6px 9px; text-align: left; vertical-align: top; }
+  th { background: #142338; color: #fff; font-weight: 600; }
+  tr:nth-child(even) td { background: #f5f6f8; }
+
+  .ioc-block { background: #10192a; color: #cfe0f5; padding: 12px 16px; font-family: monospace; font-size: 9.6pt; border-radius: 3px; margin: 10px 0; white-space: pre-wrap; }
+
+  .badge-row { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0; }
+  .badge { font-size: 9pt; border: 1px solid #b8860b; color: #8a6d1a; padding: 2px 9px; border-radius: 10px; }
+
+  footer.report-footer {
+    margin-top: 40px;
+    border-top: 1px solid #ccc;
+    padding-top: 10px;
+    font-size: 9pt;
+    color: #888;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .about-box {
+    background: #142338;
+    color: #dbe4f0;
+    padding: 26px 28px;
+    margin-top: 20px;
+  }
+  .about-box h3 { color: #fff; margin-top: 0; }
+  .about-box a { color: #f0c96a; }
+
+  .confidence-tag {
+    display: inline-block;
+    font-size: 8.6pt;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 1px 7px;
+    border-radius: 3px;
+    margin-left: 6px;
+    position: relative;
+    top: -1px;
+  }
+  .conf-confirmed { background: #dcefe1; color: #1e6b3a; }
+  .conf-reported { background: #eee6d0; color: #7a5c10; }
+  .conf-low { background: #f3dede; color: #8a2f2f; }
+</style>
+</head>
+<body>
+
+<div class="tlp-bar">TLP:CLEAR — <b>Distribution unlimited, no restrictions</b></div>
+
+<!-- ================= COVER ================= -->
+<div class="cover">
+  <div class="brand"><span>BOX</span>STRIKE — Threat Intelligence</div>
+  <div class="op-label">Threat Operation Report</div>
+  <h1>Operation EvilDoor</h1>
+  <div class="subtitle">A GitHub-based distribution network delivering the Konfety Android ad-fraud family through fake Roblox cheat repositories</div>
+  <div class="meta-table">
+    <div><span class="k">Publisher</span><span>BoxStrike — independent cybersecurity research</span></div>
+    <div><span class="k">Lead researcher</span><span>Eneshan Erdoğan Karaca</span></div>
+    <div><span class="k">Malware family</span><span>Konfety (Android ad-fraud)</span></div>
+    <div><span class="k">Distribution channel</span><span>GitHub, YouTube</span></div>
+    <div><span class="k">Report version</span><span>1.0</span></div>
+    <div><span class="k">Classification</span><span>TLP:CLEAR</span></div>
+  </div>
+  <div class="tlp-clear-badge">TLP:CLEAR</div>
+</div>
+
+<!-- ================= TOC ================= -->
+<div class="toc">
+  <h2>Contents</h2>
+  <ol>
+    <li><a href="#s1">Executive summary</a></li>
+    <li><a href="#s2">Background and timeline</a></li>
+    <li><a href="#s3">Operation EvilDoor modus operandi</a></li>
+    <li><a href="#s4">Distribution infrastructure</a></li>
+    <li><a href="#s5">Konfety malware architecture</a></li>
+    <li><a href="#s6">Dynamic analysis and sandbox confirmation</a></li>
+    <li><a href="#s7">Family attribution</a></li>
+    <li><a href="#s8">MITRE ATT&amp;CK mapping</a></li>
+    <li><a href="#s9">Infrastructure and command and control</a></li>
+    <li><a href="#s10">Actor attribution assessment</a></li>
+    <li><a href="#s11">Detection guidance</a></li>
+    <li><a href="#s12">Recommendations</a></li>
+    <li><a href="#s13">Conclusion</a></li>
+    <li><a href="#s14">Indicators of compromise</a></li>
+    <li><a href="#s15">About BoxStrike</a></li>
+  </ol>
+</div>
+
+<!-- ================= 1. EXECUTIVE SUMMARY ================= -->
+<section class="nobreak" id="s1">
+<h2 class="sec-title"><span class="num">1.</span>Executive summary</h2>
+
+<p>BoxStrike researchers have identified and documented a distribution operation, which we track as <b>Operation EvilDoor</b>, that delivers the previously-documented Android ad-fraud family <b>Konfety</b> to victims searching for Roblox game cheats, executors, and exploits. The operation has been active since 2024 through YouTube video descriptions and, in the months preceding this report, expanded to a second, more scalable channel: a network of disposable GitHub accounts publishing search-optimized, AI-authored repository pages themed around the Roblox game <i>DOORS</i> and similar titles.</p>
+
+<p>A sample obtained directly from this GitHub network was decompiled and analyzed both statically and dynamically by BoxStrike. The sample matches the Konfety family with high confidence: it smuggles a fully encrypted, second-stage DEX payload inside a booby-trapped ZIP asset and loads it directly into the app's classloader in memory at runtime, a technique that defeats static scanning entirely. Two independent public sandboxes corroborated this behavior executing live, down to the exact obfuscated class names appearing as dropped files on disk.</p>
+
+<p>This report's contribution is not the discovery of a new malware family — Konfety is already tracked by the wider security community — but the documentation of a previously unreported distribution vector for it, together with a full architectural breakdown of why the malware is built the way it is, not only what it does.</p>
+
+<div class="badge-row">
+  <span class="badge">Family: Konfety</span>
+  <span class="badge">Platform: Android</span>
+  <span class="badge">Vector: GitHub, YouTube</span>
+  <span class="badge">Motive: Financial (ad fraud)</span>
+  <span class="badge">TLP:CLEAR</span>
+</div>
+</section>
+
+<!-- ================= 2. BACKGROUND ================= -->
+<section id="s2">
+<h2 class="sec-title"><span class="num">2.</span>Background and timeline</h2>
+
+<p>The fake Roblox cheat marketplace behind Operation EvilDoor has run since 2024, primarily through YouTube video descriptions promising working executors and exploits, with download links placed below gameplay footage. This channel remains active in parallel with the newer one described in this report.</p>
+
+<p>Roughly three months before this report's publication, the same operators (or a closely related group reusing the same playbook) opened a second channel on GitHub: dozens of new accounts began publishing long-form, professionally formatted repository pages for tools with names like "Doors Script Hub," "Rooms and Doors Toolkit," and various generically-named "executors," each ultimately funneling the visitor to a malicious download.</p>
+
+<table>
+<tr><th>Period</th><th>Activity</th><th>Confidence</th></tr>
+<tr><td>2024 – present</td><td>Fake cheat marketplace operating via YouTube video descriptions</td><td><span class="confidence-tag conf-reported">reported</span></td></tr>
+<tr><td>~3 months prior to report</td><td>Expansion to a GitHub-hosted network of disposable accounts and repositories</td><td><span class="confidence-tag conf-reported">reported</span>, structurally corroborated</td></tr>
+<tr><td>Ongoing</td><td>Payload family observed through the GitHub channel has shifted over time; earlier waves are associated with Lumma Stealer, more recent ones with Konfety</td><td><span class="confidence-tag conf-reported">reported</span></td></tr>
+<tr><td>This report</td><td>First public documentation connecting Konfety to this specific GitHub distribution network</td><td><span class="confidence-tag conf-confirmed">confirmed</span></td></tr>
+</table>
+
+<div class="callout">
+<span class="label">Analyst commentary — why the pivot to GitHub</span>
+A YouTube-only distribution model has a structural weakness for the operators: video takedowns are fast, comments and descriptions are moderated, and the platform actively demotes content associated with malware reports. GitHub, by contrast, is widely treated as an inherently trustworthy domain by both end users and network security tooling — many corporate web filters and parental-control products do not flag <code class="inline">github.com</code> or <code class="inline">*.github.io</code> at all, since the domain is core developer infrastructure. Moving distribution to GitHub buys the operators a second channel that benefits from that borrowed trust, free HTTPS hosting via GitHub Pages, and a search-engine-friendly surface (repository READMEs are indexed and rank well for the exact search terms — "roblox executor," "doors script" — that the victim population is already typing into Google or an AI assistant).
+</div>
+</section>
+
+<!-- ================= 3. MODUS OPERANDI ================= -->
+<section id="s3">
+<h2 class="sec-title"><span class="num">3.</span>Operation EvilDoor modus operandi</h2>
+
+<p>Across the accounts reviewed, Operation EvilDoor follows a consistent four-stage chain from lure to payload execution.</p>
+
+<div class="diagram-box">
+  <img src="distribution-chain.svg" alt="Distribution chain diagram: fake GitHub repo to GitHub Pages portal to APK install to Konfety payload">
+  <div class="fig-caption">Figure 1. Simplified scheme of the GitHub-based delivery chain used in Operation EvilDoor.</div>
+</div>
+
+<p>The victim discovers a repository while searching for a Roblox executor or script, either directly on GitHub or via a search engine that has indexed the README's keyword-dense content. The repository itself contains no functional tool — its only job is to look credible for exactly as long as it takes the visitor to click through to a download page hosted on the same account's GitHub Pages subdomain. That page is engineered to look like an official GitHub-branded download portal and drives the visitor toward executing the downloaded file with minimal friction.</p>
+
+<div class="callout">
+<span class="label">Analyst commentary — target selection</span>
+Roblox's player base skews young, and the specific demand being served here — free, working "executors" that inject arbitrary code into a game client to cheat — is itself already a security-adverse request: a working executor is, by definition, a tool designed to bypass anti-cheat protections, so the target audience is pre-selected for a willingness to disable protective controls (antivirus exclusions, "install from unknown sources," ignoring browser warnings) in pursuit of the tool. This is not incidental; it is very likely the reason this demographic and this specific search-intent category were chosen as the lure, independent of which payload family happens to be served through it at any given time.
+</div>
+</section>
+
+<!-- ================= 4. DISTRIBUTION INFRASTRUCTURE ================= -->
+<section id="s4">
+<h2 class="sec-title"><span class="num">4.</span>Distribution infrastructure</h2>
+
+<h3>4.1 Account and repository pattern</h3>
+<p>23 GitHub accounts and repositories associated with Operation EvilDoor were identified by BoxStrike:</p>
+<div class="ioc-block">doorsrbx/doors
+kinokyzx/doors-roblox-script-hub
+Capivaraango/doors-roblox-script-hub
+jorgeolmos08/doors-essentials-roblox-scripts
+Gwisty/rooms-and-doors-roblox-toolkit
+valexexecs/valex
+sw1ft-exec/swift
+oxygenexec/oxygen-u
+kiddokristalos26/executorrb
+Translumina/Swift-Execute-New-Update
+nebulaexecs/nebula
+visual-devz/visual
+serotonin-devz/serotonin
+krampus-devz/krampus
+nihon-devz/nihon
+appleware-devz/appleware
+celeryexec/celery
+crypt1c-devop/cryptic
+dreamsmoke6zp/Athena-Executor
+wave-devz/wave
+rc7-devop/rc7
+Alfajkadivar/aero-roblox-executor-suite</div>
+
+<p>Independent, read-only inspection of a representative account (<code class="inline">doorsrbx/doors</code>) confirmed the following, which the naming pattern above suggests is shared across the set:</p>
+<ul>
+<li>No functional source code in the repository — in this case two files only (<code class="inline">LICENSE.md</code>, <code class="inline">index.html</code>), three commits, zero stars, forks, or watchers.</li>
+<li>A multi-thousand-word README written as a marketing landing page: feature lists, fabricated user testimonials, an executor-compatibility table, hardware "system requirements," and dense repetition of search-intent keywords (<i>"doors script github," "doors script pastebin 2026," "doors scriptblox"</i>) consistent with LLM-generated SEO copy rather than genuine documentation.</li>
+<li>A "Download" call to action that does not point at a GitHub release, but at a second page hosted on the same account's GitHub Pages subdomain.</li>
+</ul>
+
+<div class="callout">
+<span class="label">Analyst commentary — why an AI-written README, specifically</span>
+The repetitive, keyword-saturated structure of the README is not a stylistic accident: it is optimized for two audiences simultaneously — the human visitor skimming for credibility signals (testimonials, a feature table, "system requirements"), and the search/ranking algorithms (GitHub's own search, Google, and increasingly AI chat assistants that summarize search results) that reward keyword density and content length. Generating this at scale across 20+ accounts by hand would be labor-intensive; an LLM can produce a plausible, on-topic wall of text for a new repository in seconds, which is almost certainly why the account-creation and content-publishing pattern observed here looks semi-automated rather than bespoke.
+</div>
+
+<h3>4.2 The download portal</h3>
+<p>The linked GitHub Pages site presents as <i>"Download Ready — Secure Archive."</i> It imitates GitHub's own site chrome, displays a green "Verified" badge alongside unearned "100% Safe / Protected / Encrypted" labels, and runs an auto-starting countdown timer straight into a download action.</p>
+
+<div class="callout">
+<span class="label">Analyst commentary — why the countdown and fake badges work</span>
+This page design borrows directly from two well-studied influence principles: <i>authority</i> (imitating GitHub's own branding transfers the platform's credibility onto the page) and <i>urgency</i> (the countdown removes the natural pause in which a visitor might otherwise open a new tab to check the tool's legitimacy). Neither the "Verified" badge nor the "100% Safe" label is backed by any actual verification process — they are static images placed for their psychological effect, not functional trust indicators. This is a low-cost, high-yield technique: it requires no server-side logic, only a convincing static page, and it is trivially reproducible across every account in the network.
+</div>
+
+<h3>4.3 Provenance of the analyzed sample</h3>
+<p>The <code class="inline">Install.apk</code> sample analyzed in this report was obtained directly from this distribution chain by the BoxStrike research team, then decompiled and submitted for sandbox analysis. <span class="confidence-tag conf-reported">reported by the researcher</span></p>
+</section>
+
+<!-- ================= 5. MALWARE ARCHITECTURE ================= -->
+<section id="s5">
+<h2 class="sec-title"><span class="num">5.</span>Konfety malware architecture</h2>
+
+<h3>5.1 The decoy layer</h3>
+<p>The APK bundles a full set of legitimate, functioning ad-mediation SDKs: AppLovin, Unity Ads, Chartboost, Vungle, Pangle, BigoAds, Fyber, AdMob, Meta Audience Network, and Firebase. This is the layer a cursory static scan sees, and it is convincing enough on its own that the sample presents as an unremarkable ad-monetized app.</p>
+
+<div class="callout">
+<span class="label">Analyst commentary — why bundle real ad SDKs at all</span>
+Bundling genuine, functioning ad SDKs serves two purposes simultaneously. First, it gives the app a legitimate monetization path independent of the hidden payload, meaning the app is not <i>only</i> malicious — it is a real (if low-quality) ad-supported app that happens to also carry a hidden loader, which raises the bar for both automated classifiers and human reviewers who are looking for an app that does nothing but harm. Second, and more directly tied to Konfety's known "evil twin" model (see §7), the visible ad SDK traffic gives the app a plausible reason to make constant network requests — which helps mask the C2 registration and remote-config traffic described in §9 inside what looks like routine ad-network chatter.
+</div>
+
+<h3>5.2 Entry point and control-flow obfuscation</h3>
+<p>Execution begins in the app's <code class="inline">Application</code> subclass:</p>
+<pre>public final class BLAcKr extends Application {
+    private final Fqb wbCfMcQ = new Fqb();
+
+    protected void attachBaseContext(Context context) {
+        ILHwmX = context;
+        this.wbCfMcQ.run();
+        super.attachBaseContext(...);
+    }
+}</pre>
+
+<p><code class="inline">run()</code> routes through an eight-method call chain interleaved with calls that produce no useful output — <code class="inline">System.nanoTime()</code>, <code class="inline">Locale.getDefault()</code>, <code class="inline">Environment.getRootDirectory()</code>:</p>
+<pre>run → ILHwmX → tNF → tBKiQ → pOEXilH → cKVP → NfxL → ZyKCx → [payload logic]</pre>
+
+<div class="callout">
+<span class="label">Analyst commentary — why pad the call graph instead of just hiding the logic</span>
+This technique targets the economics of manual reverse engineering rather than any specific detection signature. A decompiled call graph with eight hops and interleaved no-op API calls costs an analyst real time to trace by hand, and automated tools that flag "suspicious" API usage (dynamic class loading, reflection) are less likely to surface a short, clearly-suspicious function if it is buried eight calls deep behind functions that look benign at each individual step. The technique does not defeat analysis — as this report demonstrates — but it raises the cost of analysis, which for a high-volume, disposable-build operation is often sufficient: the goal is not to be unbreakable, it is to outlast the average analyst's patience and the average scanner's static call-depth limit.
+</div>
+
+<h3>5.3 String encryption</h3>
+<p>Every reflection target — class names, method names, the payload's asset filename — is stored XOR-encrypted, keyed by a custom reimplementation of <code class="inline">java.util.Random</code>'s LCG algorithm, seeded by each string's own length. Reproducing the algorithm recovers the plaintext:</p>
+<pre>"g}~e\u007fk7cgad`j$JfzQwivPjkp"    -&gt; "dalvik.system.DexPathList"
+"d\u007fmv_yZ\u007fdwmeJ~oXcbydezf" -&gt; "makeInMemoryDexElements"
+"ws`nwn&lt;|fc}\u007fn DmeuIyvY}mkoGm\u007fot}" -&gt; "dalvik.system.BaseDexClassLoader"
+"rh`Sfihja"                        -&gt; "getAssets"
+"zwt|"                             -&gt; "open"
+"Ejzqa"                            -&gt; "Mbqct"
+"xciaft\u007f"                     -&gt; "classes"</pre>
+
+<div class="callout">
+<span class="label">Analyst commentary — why reimplement Random instead of using a standard cipher</span>
+Reimplementing <code class="inline">java.util.Random</code>'s algorithm by hand, rather than calling the real class, is a deliberate choice aimed at static-signature evasion: many mobile security products flag the literal bytecode signature of constructing a <code class="inline">java.util.Random</code> instance and calling <code class="inline">nextInt</code>/<code class="inline">nextBytes</code> near a <code class="inline">Class.forName</code> call, since that combination is a known indicator of runtime string decryption. By hand-rolling an identical algorithm under an obfuscated class name, the malware achieves the same cryptographic result while avoiding the specific API call pattern that a signature-based detector is likely to be watching for. It is a functionally pointless but detection-relevant distinction — the seed constant it depends on is, as it happens, exactly the kind of durable artifact that survives this evasion (see §11).
+</div>
+
+<h3>5.4 The hidden payload</h3>
+<p><code class="inline">assets/Mbqct</code> is a genuinely valid ZIP file containing harmless auto-generated resource-ID stub classes, including a <code class="inline">com/nextg/...</code> package path — likely a remnant of the app's original, pre-repackaging identity. The ZIP's official End-Of-Central-Directory record places its true end at byte 146,739 of a 2,395,655-byte file, leaving <b>2,248,916 bytes appended after the archive's stated end</b>, invisible to standard archive tools.</p>
+
+<div class="callout">
+<span class="label">Analyst commentary — why hide data past the ZIP's declared end, specifically</span>
+An APK is itself a ZIP file, and the overwhelming majority of both automated scanners and human analysts inspect an APK's contents by asking the operating system's or a library's ZIP parser to enumerate its entries — which, by design, only reads what the central directory declares. Data appended after the declared end is invisible to that entire class of tooling without ever being "encrypted" in a way that would itself look suspicious to a file-type classifier; the outer file still reports as a normal, well-formed ZIP/APK. This is a lower-effort, higher-yield evasion than encrypting the whole APK, because it requires no custom unpacking stub in the visible code path at all — only a component that knows to keep reading past where every other tool stops.
+</div>
+
+<p>At runtime, the app reads the full file, XOR-decrypts it against a keystream from a fixed-seed <code class="inline">java.util.Random(4339707483826144610L)</code>, skips a pseudo-randomized offset, and parses the remainder as a second ZIP stream:</p>
+<pre>Random random = new Random(4339707483826144610L);
+for (int i = 0; i &lt; iAvailable; i++) {
+    bArr[i] = (byte) (bArr[i] ^ iNextInt);
+}
+int offset = new Random(4339707483826144610L).nextInt(307201) + 204800;
+ZipInputStream zip = new ZipInputStream(
+    new ByteArrayInputStream(bArr, offset, iAvailable - offset));</pre>
+
+<p>Reproducing this algorithm confirms a valid ZIP local header at decrypted offset 207,084, containing a single entry: <code class="inline">classes.dex</code> — a complete, independent Android program never visible anywhere in the outer APK.</p>
+
+<div class="callout">
+<span class="label">Analyst commentary — why a fixed seed instead of a per-build random key</span>
+Using a hardcoded seed rather than generating a fresh key per build is, from the operator's perspective, almost certainly a convenience decision rather than a security one: it means the same build tooling can encrypt a payload once and reuse the identical decryption stub across every app built from that toolkit, without needing to manage or distribute per-sample keys. The tradeoff is that this constant becomes a durable artifact investigators can search for across future samples regardless of how the surrounding obfuscation is reshuffled — precisely the property this report's YARA signature (§11) is built around.
+</div>
+
+<h3>5.5 In-memory injection</h3>
+<p><code class="inline">classes.dex</code> is spliced directly into the running app's <code class="inline">ClassLoader</code> via reflection, without ever touching disk as a standalone file:</p>
+<pre>Method m = Class.forName("dalvik.system.BaseDexClassLoader")
+             .getDeclaredMethod("makeInMemoryDexElements", ...);
+m.setAccessible(true);
+Object newElements = m.invoke(null, dexBytes, null);
+// merged into pathList.dexElements via reflection</pre>
+
+<div class="diagram-box">
+  <img src="payload-architecture.svg" alt="Payload architecture diagram: attachBaseContext to junk chain to string decryption to hidden asset to runtime decrypt to reflection injection">
+  <div class="fig-caption">Figure 2. Internal payload-loading chain inside the Konfety sample analyzed for this report.</div>
+</div>
+
+<div class="callout">
+<span class="label">Analyst commentary — why in-memory injection instead of writing a second APK or service</span>
+Loading the payload purely in memory, rather than dropping it as an installed component, sidesteps two separate detection surfaces at once: Android's package manager never sees a second app to flag, and no new file with a suspicious hash persists on disk between reboots for an on-demand or scheduled AV scan to find. The cost to the operator is that the payload must be re-decrypted and re-injected every time the process restarts — which is an acceptable tradeoff for an ad-fraud operation that only needs the payload live while the app is in the foreground or running as a background service generating traffic, not a persistent, always-on implant.
+</div>
+</section>
+
+<!-- ================= 6. DYNAMIC ANALYSIS ================= -->
+<section id="s6">
+<h2 class="sec-title"><span class="num">6.</span>Dynamic analysis and sandbox confirmation</h2>
+
+<p>Running the sample through Triage and ANY.RUN confirmed every static finding and surfaced additional behavior only visible at execution time.</p>
+
+<table>
+<tr><th>Static finding</th><th>Dynamic confirmation</th></tr>
+<tr><td>Encrypted secondary DEX in <code class="inline">assets/Mbqct</code></td><td><code class="inline">Anonymous-DexFile@2055833589.jar</code> (5.8MB) loaded at runtime — MITRE T1407</td></tr>
+<tr><td>Obfuscated helper classes <code class="inline">ILHwmX</code>, <code class="inline">wbCfMcQ</code></td><td>Identically named files dropped under <code class="inline">/data/data/&lt;pkg&gt;/files/</code></td></tr>
+<tr><td>String-encrypted C2 logic</td><td>Cleartext traffic: <code class="inline">GET http://push.razkondronging.com/register?uid=&lt;uuid&gt;</code></td></tr>
+<tr><td><code class="inline">CONNECTIVITY_CHANGE</code>/<code class="inline">WIFI_STATE_CHANGED</code> receiver</td><td>Live <code class="inline">registerReceiver</code> call + MCC/network-operator queries</td></tr>
+<tr><td><code class="inline">FOREGROUND_SERVICE_DATA_SYNC</code> permission</td><td>Flagged: "Abuses foreground service for persistence"</td></tr>
+<tr><td>(not visible statically)</td><td><code class="inline">IClipboard.addPrimaryClipChangedListener</code> — runtime clipboard monitoring</td></tr>
+<tr><td>Bundled legitimate ad SDKs</td><td>Live ad-fraud redirect chains (<code class="inline">topofpopstar.com</code>, <code class="inline">ldl1.com</code>) and a remote-config fetch (<code class="inline">one.confbesttop.xyz/v2/client-config</code>)</td></tr>
+</table>
+
+<div class="callout">
+<span class="label">Analyst commentary — why clipboard monitoring in an ad-fraud family</span>
+Clipboard monitoring costs the operator almost nothing to add — <code class="inline">addPrimaryClipChangedListener</code> requires no special manifest permission and adds negligible code — while opening a second, unrelated monetization path: any cryptocurrency wallet address, password, or one-time code a victim copies during normal phone use is harvested for free alongside the ad-fraud functionality. This is best read as opportunistic scope creep rather than a core design goal of the family, but it is precisely why sandbox vendors tag this sample with both <code class="inline">infostealer</code> and <code class="inline">adware</code> labels rather than one or the other.
+</div>
+
+<div class="callout">
+<span class="label">Analyst commentary — why query MCC/MNC and geolocation before generating ad traffic</span>
+Ad-fraud revenue is geography-dependent: cost-per-impression and cost-per-click rates paid by ad networks vary substantially by country, and some ad-fraud detection platforms apply stricter scrutiny to traffic from specific regions. Querying the mobile country code before generating fraudulent impressions lets the operators selectively throttle or redirect behavior toward the highest-yield or lowest-scrutiny geographies, and the remote-config fetch observed in this sample (§9) is the mechanism by which that behavior can be updated centrally without shipping a new app build.
+</div>
+</section>
+
+<!-- ================= 7. FAMILY ATTRIBUTION ================= -->
+<section id="s7">
+<h2 class="sec-title"><span class="num">7.</span>Family attribution</h2>
+
+<p>Both sandboxes independently tag the sample <b>Konfety</b>. The technique matches published research on the family closely enough to treat attribution as high-confidence.</p>
+
+<div class="quote-cite">"The Konfety malware family first emerged as part of a massive mobile advertising fraud campaign that was initially disrupted by security researchers in 2024. The original operation involved more than 250 decoy applications on Google Play Store, each paired with malicious 'evil twin' counterparts distributed through third-party channels. At its peak, the campaign generated an astounding 10 billion fraudulent ad requests per day." — cited from public threat research</div>
+
+<div class="quote-cite">"Konfety includes an encrypted secondary DEX file within its APK, which is decrypted at runtime. This allows the installation of additional malicious modules dynamically." — cited from public threat research</div>
+
+<div class="callout">
+<span class="label">Analyst commentary — why the "evil twin" model specifically</span>
+Publishing a genuinely harmless "twin" app on the Google Play Store under the same package name and branding as the malicious version accomplishes something the GitHub lure alone cannot: it gives the operation a legitimate, reviewable, Play-Protect-scanned artifact to point to if questioned, while the actual malicious distribution happens entirely outside Google's review pipeline through GitHub and YouTube. A victim (or a cursory automated check) who searches for the app name and finds a real, functioning Play Store listing has little reason to suspect the file they downloaded from a GitHub Pages link is anything other than the same app obtained through a different channel. This is the same trust-transfer logic used by the download-portal branding in §4.2, applied one layer up, at the level of app identity rather than page design.
+</div>
+
+<p><b>What this report adds:</b> prior public research documents Konfety's distribution via third-party app stores and package-name-spoofed "evil twin" apps. This is, to BoxStrike's knowledge, the first documentation of the same payload family being funneled through a GitHub-hosted, Roblox-cheat-themed lure network — an additional distribution vector for an already-tracked family, not a new family.</p>
+</section>
+
+<!-- ================= 8. ATT&CK ================= -->
+<section id="s8">
+<h2 class="sec-title"><span class="num">8.</span>MITRE ATT&amp;CK mapping</h2>
+
+<table>
+<tr><th>Phase</th><th>Technique</th><th>ID</th></tr>
+<tr><td>Initial Access</td><td>Deliver Malicious App via Other Means</td><td>T1476</td></tr>
+<tr><td>Defense Evasion</td><td>Masquerade as Legitimate Application</td><td>T1444</td></tr>
+<tr><td>Defense Evasion</td><td>Obfuscated Files or Information</td><td>T1406</td></tr>
+<tr><td>Defense Evasion / Execution</td><td>Download New Code at Runtime</td><td>T1407</td></tr>
+<tr><td>Persistence</td><td>Foreground Persistence</td><td>T1541</td></tr>
+<tr><td>Persistence</td><td>Broadcast Receivers</td><td>T1624.001</td></tr>
+<tr><td>Discovery</td><td>System Network Connections Discovery</td><td>T1421</td></tr>
+<tr><td>Discovery</td><td>System Network Configuration Discovery</td><td>T1422</td></tr>
+<tr><td>Collection</td><td>Clipboard Data</td><td>T1414</td></tr>
+<tr><td>Impact</td><td>Transmitted Data Manipulation</td><td>T1641.001</td></tr>
+</table>
+</section>
+
+<!-- ================= 9. INFRA ================= -->
+<section id="s9">
+<h2 class="sec-title"><span class="num">9.</span>Infrastructure and command and control</h2>
+<div class="ioc-block">C2 registration endpoint:  http://push.razkondronging.com/register?uid=&lt;device-uuid&gt;
+Ad-fraud redirect chain:   topofpopstar.com, ldl1.com, cdn.ak2yy.com
+Remote config endpoint:    http://one.confbesttop.xyz/v2/client-config
+Anti-fraud check target:   cdntechone.com</div>
+
+<p>No passive DNS, WHOIS registration-date, or hosting-provider pivot was performed for this report; these domains are provided as first-order network indicators only.</p>
+
+<div class="callout">
+<span class="label">Analyst commentary — the anti-fraud check-in</span>
+The sample's observed communication with <code class="inline">cdntechone.com</code>, an anti-ad-fraud detection platform, is most plausibly explained as the operators monitoring their own traffic's detection status rather than any legitimate integration. This is a recurring pattern in ad-fraud tooling generally: operators build feedback loops against the very detection systems designed to stop them, using the results to decide when to rotate infrastructure or throttle behavior in a given ad network before their traffic is blocklisted.
+</div>
+</section>
+
+<!-- ================= 10. ACTOR ATTRIBUTION ================= -->
+<section id="s10">
+<h2 class="sec-title"><span class="num">10.</span>Actor attribution assessment</h2>
+<p><b>Confidence: low.</b><span class="confidence-tag conf-low">low confidence</span> No technical evidence in this analysis ties the operation to a specific named threat actor or nation-state.</p>
+<ul>
+<li>The operation is consistent with a financially motivated ad-fraud and credential-collection operation rather than an espionage-driven one — the payload's design (ad SDK bundling, remote-config-driven fraud traffic, opportunistic clipboard monitoring) points to monetization, not targeted intelligence collection.</li>
+<li>Public research on the Konfety family has previously noted Russian-language artifacts in earlier campaign infrastructure. <span class="confidence-tag conf-reported">reported, not independently verified</span></li>
+<li>The GitHub distribution wave's account-creation pattern (batch-created, single-purpose, disposable) suggests a semi-automated operational workflow rather than manual, bespoke targeting.</li>
+</ul>
+<p>This assessment should be treated as a starting hypothesis for further collection, not a conclusion. BoxStrike does not attribute this activity to any nation state; our use of the term "operation" refers to a coordinated distribution and monetization effort, not a state-directed campaign.</p>
+</section>
+
+<!-- ================= 11. DETECTION ================= -->
+<section id="s11">
+<h2 class="sec-title"><span class="num">11.</span>Detection guidance</h2>
+
+<h3>11.1 YARA (static)</h3>
+<pre>rule Konfety_EvilDoor_HiddenPayload
+{
+    meta:
+        description = "Detects Konfety-family Android droppers using the EvilDoor technique: XOR-encrypted secondary DEX appended after a decoy ZIP asset's EOCD record"
+        family = "Konfety"
+        operation = "EvilDoor"
+        author = "BoxStrike - Eneshan Erdogan Karaca"
+        tlp = "CLEAR"
+
+    strings:
+        // Fixed PRNG seed (4339707483826144610) used to key the XOR keystream
+        $seed_le = { 62 C5 8F BA F6 BC 39 3C }
+        $seed_be = { 3C 39 BC F6 BA 8F C5 62 }
+
+        // Obfuscated class/package identifiers observed in this sample family
+        $cls1 = "viewcb/lej" ascii
+        $cls2 = "ILHwmX" ascii
+        $cls3 = "wbCfMcQ" ascii
+        $cls4 = "BLAcKr" ascii
+
+        // Reflection targets used for in-memory dex injection
+        $api1 = "makeInMemoryDexElements" ascii
+        $api2 = "dalvik/system/DexPathList" ascii
+
+        $eocd = { 50 4B 05 06 }
+
+    condition:
+        uint32(0) == 0x04034b50
+        and (any of ($seed_le, $seed_be)
+             or (2 of ($cls1, $cls2, $cls3, $cls4))
+             or any of ($api1, $api2))
+        and for any i in (1..#eocd):
+            (filesize - @eocd[i] &gt; 200)
+}</pre>
+<p style="font-size:10pt;color:#666;">Note: the class-name strings are sample-specific to this obfuscator run and will rotate across builds — the seed-constant and trailing-data conditions are the more durable detection surface, precisely because of the build-tooling tradeoff discussed in §5.4.</p>
+
+<h3>11.2 Sigma-style behavioral detection</h3>
+<pre>title: Konfety-style in-memory DEX injection followed by ad-fraud C2 beacon
+id: 8f2b1a6e-3c7d-4e91-9a2f-evildoor001
+status: experimental
+logsource:
+  category: mobile_process_creation
+  product: android
+detection:
+  dex_load:
+    EventID: 'dex_load'
+    FileName|contains: 'Anonymous-DexFile'
+  network_beacon:
+    EventID: 'network_connection'
+    DestinationHostname|contains:
+      - 'razkondronging.com'
+      - 'confbesttop.xyz'
+  condition: dex_load and network_beacon
+falsepositives:
+  - Legitimate apps using MultiDex or dynamic feature delivery
+level: high</pre>
+</section>
+
+<!-- ================= 12. RECOMMENDATIONS ================= -->
+<section id="s12">
+<h2 class="sec-title"><span class="num">12.</span>Recommendations</h2>
+<ul>
+<li>Block the listed C2/redirect domains at network egress where feasible.</li>
+<li>Treat any "download our tool from GitHub, then run it" flow from an unofficial source as high-risk by default, particularly when the repository contains no functional source code.</li>
+<li>Never grant AV/Defender exclusions at the request of a downloaded tool's install instructions.</li>
+<li>Mobile threat defense vendors should prioritize detection on the dex-injection-then-beacon behavior chain (§11.2) over static hash matching, since the obfuscator output — and likely the payload family — will continue to rotate.</li>
+<li>Parents and guardians of Roblox players: executors and cheat scripts are, by construction, third-party code injection tools; there is no way to run one "safely" from an unverified source regardless of how polished the accompanying README or download page appears.</li>
+</ul>
+</section>
+
+<!-- ================= 13. CONCLUSION ================= -->
+<section id="s13">
+<h2 class="sec-title"><span class="num">13.</span>Conclusion</h2>
+<p>Operation EvilDoor is best understood not as a new threat, but as an existing, well-documented ad-fraud family — Konfety — being fed through a new, low-cost distribution surface that trades on the borrowed trust of GitHub and the specific vulnerability profile of a young, cheat-seeking audience already primed to disable their own protections. The technical sophistication observed in the payload (in-memory DEX injection, custom string encryption, steganographic asset abuse) is real and non-trivial, but it exists in service of a financially motivated ad-fraud and opportunistic data-collection operation, not a targeted intrusion.</p>
+<p>BoxStrike will continue monitoring this distribution network and the Konfety family's evolution, and will publish updates as new samples, infrastructure, or distribution vectors are identified.</p>
+</section>
+
+<!-- ================= 14. IOCS ================= -->
+<section id="s14">
+<h2 class="sec-title"><span class="num">14.</span>Indicators of compromise</h2>
+
+<h3>Sample</h3>
+<div class="ioc-block">File: Install.apk
+Package: com.bamasncika.letwec2zyc.n731.grousenkc7
+SHA256: 1ae72c2f58378f765357c4d42ba7352082beee1651923009e79909415a8fbdad
+MD5: D99808C57617AE31BE0129629C445A74</div>
+
+<h3>Network</h3>
+<div class="ioc-block">http://push.razkondronging.com/register?uid=
+topofpopstar.com
+ldl1.com
+cdn.ak2yy.com
+one.confbesttop.xyz
+cdntechone.com</div>
+
+<h3>On-device artifacts</h3>
+<div class="ioc-block">/data/user/0/&lt;pkg&gt;/Anonymous-DexFile@2055833589.jar
+/data/data/&lt;pkg&gt;/files/ILHwmX
+/data/data/&lt;pkg&gt;/files/wbCfMcQ</div>
+
+<h3>Distribution accounts (GitHub)</h3>
+<div class="ioc-block">doorsrbx/doors
+kinokyzx/doors-roblox-script-hub
+Capivaraango/doors-roblox-script-hub
+jorgeolmos08/doors-essentials-roblox-scripts
+Gwisty/rooms-and-doors-roblox-toolkit
+valexexecs/valex
+sw1ft-exec/swift
+oxygenexec/oxygen-u
+kiddokristalos26/executorrb
+Translumina/Swift-Execute-New-Update
+nebulaexecs/nebula
+visual-devz/visual
+serotonin-devz/serotonin
+krampus-devz/krampus
+nihon-devz/nihon
+appleware-devz/appleware
+celeryexec/celery
+crypt1c-devop/cryptic
+dreamsmoke6zp/Athena-Executor
+wave-devz/wave
+rc7-devop/rc7
+Alfajkadivar/aero-roblox-executor-suite</div>
+</section>
+
+<!-- ================= 15. ABOUT ================= -->
+<section id="s15">
+<h2 class="sec-title"><span class="num">15.</span>About BoxStrike</h2>
+<div class="about-box">
+<h3>BoxStrike</h3>
+<p>BoxStrike is an independent cybersecurity research group focused on tracking malware distribution networks, mobile threats, and the social-engineering infrastructure that delivers them. This report was researched and authored by <b>Eneshan Erdoğan Karaca</b>, lead researcher at BoxStrike.</p>
+<p>This report is published under <b>TLP:CLEAR</b> and may be shared without restriction.</p>
+</div>
+</section>
+
+<footer class="report-footer">
+  <span>Operation EvilDoor — BoxStrike Threat Intelligence — TLP:CLEAR</span>
+  <span>© BoxStrike — Researcher: Eneshan Erdoğan Karaca</span>
+</footer>
+
+</body>
+</html>

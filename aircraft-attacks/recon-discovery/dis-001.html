@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BS-DIS-001: Cabin Network & Port Enumeration | Box Strike</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="logo"><a href="../index.html" style="text-decoration:none; color:inherit;">BOX STRIKE <span class="badge">AVIATION SECURITY</span></a></div>
+            <nav class="nav">
+                <a href="../index.html">Home</a>
+                <a href="../avionics/">Avionics</a>
+                <a href="../air-ground/">Air-Ground</a>
+                <a href="../airport/">Airport</a>
+                <a href="../actors/">Actors</a>
+            </nav>
+        </div>
+    </header>
+
+    <section class="section">
+        <div class="container">
+            <span style="background: #f5f3ff; color: #6d28d9; font-size: 0.75rem; font-weight: 700; padding: 4px 8px; border-radius: 4px;">DISCOVERY</span>
+            <h1 class="section-title" style="margin-top:15px;">BS-DIS-001: Cabin Network & Port Enumeration</h1>
+            <p class="section-subtitle">Enumerating in-flight entertainment (IFE) networks, Wi-Fi SSIDs, and exposed services post-initial access.</p>
+            
+            <div class="card" style="margin-top: 30px; border-left: 4px solid #7c3aed;">
+                <div style="display: flex; justify-content: space-between; align-items: start; flex-wrap: wrap;">
+                    <h3>Technique Description</h3>
+                    <span style="background: #fef3c7; color: #92400e; font-size: 0.8rem; font-weight: 600; padding: 4px 10px; border-radius: 4px;">🟡 Local Network</span>
+                </div>
+                <p style="margin-top: 15px; color: var(--text);">
+                    Once initial access is gained (e.g., via a passenger device or compromised cabin Wi-Fi), the adversary enumerates the local network. This involves discovering the Cabin Wi-Fi SSID, testing for weak encryption, and scanning for misconfigured open ports. If the aircraft's systems are exposed to external networks, attackers may also use platforms like Shodan to pre-enumerate these ports and gather basic topology information to plan lateral movement.
+                </p>
+                <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid var(--border);">
+                    <strong style="color: var(--primary);">Targeted Systems:</strong>
+                    <span style="color: var(--text-light);"> IFE Systems, In-flight Wi-Fi Routers, Cabin Domain Controllers.</span>
+                </div>
+            </div>
+        </div>
+    </section>
+    <footer class="footer"><div class="container"><p>&copy; 2024 Box Strike Team.</p></div></footer>
+</body>
+</html>

@@ -1,1 +1,230 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>BoxStrike Team</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        --bg: #0b0f14;
+        --card: #121a23;
+        --text: #e6edf3;
+        --muted: #9fb0c0;
+        --border: rgba(255, 255, 255, 0.12);
+        --accent: #4aa3ff;
+      }
+      @media (prefers-color-scheme: light) {
+        :root {
+          --bg: #f7f9fc;
+          --card: #ffffff;
+          --text: #0b1220;
+          --muted: #516174;
+          --border: rgba(11, 18, 32, 0.12);
+          --accent: #0b63ce;
+        }
+      }
+      body {
+        margin: 0;
+        font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial,
+          "Apple Color Emoji", "Segoe UI Emoji";
+        background: var(--bg);
+        color: var(--text);
+      }
+      .wrap {
+        max-width: 920px;
+        margin: 0 auto;
+        padding: 32px 16px 48px;
+      }
+      header {
+        margin-bottom: 20px;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+      }
+      h1 {
+        font-size: 22px;
+        margin: 0 0 6px;
+        letter-spacing: 0.2px;
+      }
+      .brand {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+      }
+      .logo {
+        width: 220px;
+        max-width: 78vw;
+        height: auto;
+        display: block;
+      }
+      p {
+        margin: 0;
+        color: var(--muted);
+        line-height: 1.5;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(12, 1fr);
+        gap: 12px;
+        margin-top: 18px;
+      }
+      .card {
+        grid-column: span 12;
+        border: 1px solid var(--border);
+        background: var(--card);
+        border-radius: 12px;
+        padding: 14px;
+      }
+      @media (min-width: 760px) {
+        .card {
+          grid-column: span 6;
+        }
+      }
+      h2 {
+        margin: 0 0 10px;
+        font-size: 14px;
+        letter-spacing: 0.6px;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+      .links {
+        display: grid;
+        gap: 10px;
+        justify-items: center;
+      }
+      a.btn {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 12px 12px;
+        border-radius: 10px;
+        border: 1px solid var(--border);
+        text-decoration: none;
+        color: var(--text);
+        background: rgba(255, 255, 255, 0.04);
+        width: min(560px, 100%);
+      }
+      a.btn:hover,
+      a.btn:focus-visible {
+        border-color: color-mix(in srgb, var(--accent) 55%, var(--border));
+        outline: none;
+      }
+      .btn .meta {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        min-width: 0;
+      }
+      .btn .title {
+        font-weight: 600;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .btn .path {
+        font-size: 12px;
+        color: var(--muted);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .btn .arrow {
+        color: var(--muted);
+        flex: 0 0 auto;
+      }
+      footer {
+        margin-top: 22px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="wrap">
+      <header>
+        <div class="brand">
+          <img class="logo" src="logo.png" alt="BoxStrike logo" />
+          <h1>BoxStrike Team</h1>
+        </div>
+        <p>Raporlar ve içeriklere hızlı yönlendirme.</p>
+      </header>
 
+      <section class="grid" aria-label="İçerikler">
+        <div class="card">
+          <h2>Operations</h2>
+          <div class="links">
+            <a class="btn" href="Operations/Operation_EvilDoor_BoxStrike.html">
+              <span class="meta">
+                <span class="title">Operation EvilDoor</span>
+                <span class="path">Operations/Operation_EvilDoor_BoxStrike.html</span>
+              </span>
+              <span class="arrow">→</span>
+            </a>
+            <a class="btn" href="Operations/Boxstrike_Operation_Glasscache_Report.html">
+              <span class="meta">
+                <span class="title">Operation Glasscache Report</span>
+                <span class="path">Operations/Boxstrike_Operation_Glasscache_Report.html</span>
+              </span>
+              <span class="arrow">→</span>
+            </a>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Bulgular</h2>
+          <div class="links">
+            <a class="btn" href="Bulgular/001/Bulgu-001.html">
+              <span class="meta">
+                <span class="title">Bulgu-001 (TR)</span>
+                <span class="path">Bulgular/001/Bulgu-001.html</span>
+              </span>
+              <span class="arrow">→</span>
+            </a>
+            <a class="btn" href="Bulgular/001/finding-001.html">
+              <span class="meta">
+                <span class="title">Finding-001 (EN)</span>
+                <span class="path">Bulgular/001/finding-001.html</span>
+              </span>
+              <span class="arrow">→</span>
+            </a>
+            <a class="btn" href="Bulgular/001/buldu-sunum.html">
+              <span class="meta">
+                <span class="title">Buldu Sunum</span>
+                <span class="path">Bulgular/001/buldu-sunum.html</span>
+              </span>
+              <span class="arrow">→</span>
+            </a>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Güvenlik Açıkları</h2>
+          <div class="links">
+            <a class="btn" href="GüvenlikAçıkları/Vuln-001/Comodo-OpenEDR-Vuln-001.html">
+              <span class="meta">
+                <span class="title">Comodo OpenEDR Vuln-001</span>
+                <span class="path">GüvenlikAçıkları/Vuln-001/Comodo-OpenEDR-Vuln-001.html</span>
+              </span>
+              <span class="arrow">→</span>
+            </a>
+            <a class="btn" href="GüvenlikAçıkları/Vuln-001/OpenEDR-Vuln001-English-Version.html">
+              <span class="meta">
+                <span class="title">OpenEDR Vuln001 (EN)</span>
+                <span class="path">GüvenlikAçıkları/Vuln-001/OpenEDR-Vuln001-English-Version.html</span>
+              </span>
+              <span class="arrow">→</span>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <footer>
+      </footer>
+    </main>
+  </body>
+</html>

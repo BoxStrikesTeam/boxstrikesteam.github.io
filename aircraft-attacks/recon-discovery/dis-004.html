@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BS-DIS-004: ADS-B Signal Interception & Airspace Enumeration | Box Strike</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="logo"><a href="../index.html" style="text-decoration:none; color:inherit;">BOX STRIKE <span class="badge">AVIATION SECURITY</span></a></div>
+            <nav class="nav">
+                <a href="../index.html">Home</a>
+                <a href="../avionics/">Avionics</a>
+                <a href="../air-ground/">Air-Ground</a>
+                <a href="../airport/">Airport</a>
+                <a href="../actors/">Actors</a>
+            </nav>
+        </div>
+    </header>
+
+    <section class="section">
+        <div class="container">
+            <span style="background: #f5f3ff; color: #6d28d9; font-size: 0.75rem; font-weight: 700; padding: 4px 8px; border-radius: 4px;">DISCOVERY</span>
+            <h1 class="section-title" style="margin-top:15px;">BS-DIS-004: ADS-B Signal Interception & Airspace Enumeration</h1>
+            <p class="section-subtitle">Capturing, decoding, and analyzing 1090 MHz Mode S/ADS-B signals using SDR to map airborne targets and extract real-time telemetry.</p>
+            
+            <div class="card" style="margin-top: 30px; border-left: 4px solid #7c3aed;">
+                <div style="display: flex; justify-content: space-between; align-items: start; flex-wrap: wrap;">
+                    <h3>Technique Description</h3>
+                    <span style="background: #fce7f3; color: #9d174d; font-size: 0.8rem; font-weight: 600; padding: 4px 10px; border-radius: 4px;">📡 RF / Physical</span>
+                </div>
+                <p style="margin-top: 15px; color: var(--text);">
+                    Adversaries utilize Software Defined Radio (SDR) hardware, such as RTL-SDR, connected to a computing device with an appropriately placed antenna to intercept aviation telemetry. After installing and compiling the necessary decoding software (e.g., dump1090), the attacker initiates the capture process on the 1090 MHz frequency. The adversary then continuously monitors the data stream. By extracting structured JSON outputs or saving raw data packets for deeper offline inspection, the attacker successfully enumerates aircraft identities (ICAO 24-bit addresses, flight numbers), real-time telemetry (altitude, speed, heading), and operational patterns within the target airspace.
+                </p>
+                <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid var(--border);">
+                    <strong style="color: var(--primary);">Targeted Systems:</strong>
+                    <span style="color: var(--text-light);"> ADS-B Out Transponders (1090ES), RTL-SDR Hardware, Decoding Software (dump1090, piaware, ModeSBeast).</span>
+                </div>
+                <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid var(--border);">
+                    <strong style="color: var(--primary);">Box Strike Note:</strong>
+                    <span style="color: var(--text-light);"> This technique requires zero authentication or initial access to the aircraft. It is a purely passive discovery method that exploits the inherent lack of encryption and cryptographic authentication in the ADS-B protocol, serving as the foundational step for subsequent spoofing or ghost aircraft injection attacks.</span>
+                </div>
+            </div>
+        </div>
+    </section>
+    <footer class="footer"><div class="container"><p>&copy; 2024 Box Strike Team.</p></div></footer>
+</body>
+</html>

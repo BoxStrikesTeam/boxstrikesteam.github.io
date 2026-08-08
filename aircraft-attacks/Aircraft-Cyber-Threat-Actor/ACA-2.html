@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ACA-2 — BoxStrike Analysis</title>
+    <style>
+        /* CSS unchanged — same as provided */
+        @page { size: A4; margin: 22mm 18mm; }
+        * { box-sizing: border-box; }
+        html, body {
+            margin: 0; padding: 0;
+            font-family: "Segoe UI", Helvetica, Arial, sans-serif;
+            color: #1c2430;
+            background: #ffffff;
+            font-size: 11.5pt;
+            line-height: 1.55;
+        }
+        h1, h2, h3, h4 { font-family: Georgia, "Times New Roman", serif; font-weight: 700; color: #142338; }
+        a { color: #1b4f8a; text-decoration: none; }
+        .tlp-bar {
+            background: #ffffff;
+            border-top: 3px solid #142338;
+            border-bottom: 1px solid #ccc;
+            padding: 4px 0;
+            font-size: 9pt;
+            letter-spacing: 0.08em;
+            color: #444;
+            text-align: right;
+            padding-right: 4px;
+        }
+        .tlp-bar b { color: #142338; }
+        .cover {
+            min-height: 240mm;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            page-break-after: always;
+            position: relative;
+            padding: 40px 10px;
+        }
+        .cover .brand {
+            font-family: Georgia, serif;
+            font-size: 15pt;
+            letter-spacing: 0.18em;
+            color: #b8860b;
+            text-transform: uppercase;
+            margin-bottom: 60px;
+        }
+        .cover .brand span { color: #142338; }
+        .cover .op-label {
+            font-size: 11pt;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: #8a1f2d;
+            font-weight: 600;
+            margin-bottom: 14px;
+        }
+        .cover h1 {
+            font-size: 34pt;
+            line-height: 1.15;
+            margin: 0 0 18px 0;
+            max-width: 90%;
+        }
+        .cover .subtitle {
+            font-size: 13pt;
+            color: #445;
+            max-width: 85%;
+            margin-bottom: 40px;
+            font-style: italic;
+        }
+        .cover .meta-table {
+            border-top: 1px solid #999;
+            padding-top: 18px;
+            font-size: 10.5pt;
+            color: #333;
+            max-width: 520px;
+        }
+        .cover .meta-table div { display: flex; justify-content: space-between; gap: 20px; padding: 3px 0; }
+        .cover .meta-table .k { color: #777; min-width: 160px; }
+        .cover .tlp-clear-badge {
+            display: inline-block;
+            border: 1.5px solid #142338;
+            color: #142338;
+            font-weight: 700;
+            font-size: 10pt;
+            letter-spacing: 0.1em;
+            padding: 3px 10px;
+            margin-top: 26px;
+        }
+        .toc { page-break-after: always; padding-top: 10px; }
+        .toc h2 { border-bottom: 2px solid #142338; padding-bottom: 6px; }
+        .toc ol { list-style: none; padding-left: 0; counter-reset: sec; }
+        .toc li { counter-increment: sec; padding: 5px 0; border-bottom: 1px dotted #ccc; display: flex; }
+        .toc li::before { content: counter(sec) ".  "; color: #b8860b; font-weight: 700; width: 28px; }
+        .toc li a { color: #142338; }
+        section { page-break-before: always; padding-top: 4px; }
+        section.nobreak { page-break-before: auto; }
+        h2.sec-title {
+            font-size: 19pt;
+            border-bottom: 2px solid #142338;
+            padding-bottom: 8px;
+            margin-bottom: 4px;
+        }
+        h2.sec-title .num { color: #b8860b; margin-right: 10px; }
+        h3 { font-size: 13.5pt; margin-top: 28px; color: #1b3a5c; }
+        h4 { font-size: 11.5pt; margin-top: 18px; color: #2a4a6a; }
+        p { margin: 10px 0; text-align: justify; }
+        ul, ol { margin: 8px 0; padding-left: 22px; }
+        li { margin: 4px 0; }
+        .callout {
+            background: #f7f4ea;
+            border-left: 4px solid #b8860b;
+            padding: 12px 16px;
+            margin: 16px 0;
+            font-size: 10.8pt;
+        }
+        .callout.warn { background: #f9ecec; border-left-color: #8a2f2f; }
+        .callout .label {
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 9pt;
+            letter-spacing: 0.08em;
+            color: #8a6d1a;
+            display: block;
+            margin-bottom: 4px;
+        }
+        .callout.warn .label { color: #8a2f2f; }
+        .quote-cite {
+            border-left: 3px solid #999;
+            padding: 8px 14px;
+            margin: 14px 0;
+            font-style: italic;
+            color: #444;
+            font-size: 10.5pt;
+            background: #fafafa;
+        }
+        table { border-collapse: collapse; width: 100%; margin: 14px 0; font-size: 10.2pt; }
+        th, td { border: 1px solid #d3d3d3; padding: 6px 9px; text-align: left; vertical-align: top; }
+        th { background: #142338; color: #fff; font-weight: 600; }
+        tr:nth-child(even) td { background: #f5f6f8; }
+        .ioc-block { background: #10192a; color: #cfe0f5; padding: 12px 16px; font-family: monospace; font-size: 9.6pt; border-radius: 3px; margin: 10px 0; white-space: pre-wrap; }
+        .badge-row { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0; }
+        .badge { font-size: 9pt; border: 1px solid #b8860b; color: #8a6d1a; padding: 2px 9px; border-radius: 10px; }
+        .confidence-tag {
+            display: inline-block;
+            font-size: 8.6pt;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 1px 7px;
+            border-radius: 3px;
+            margin-left: 6px;
+            position: relative;
+            top: -1px;
+            white-space: nowrap;
+        }
+        .conf-confirmed { background: #dcefe1; color: #1e6b3a; }
+        .conf-reported { background: #eee6d0; color: #7a5c10; }
+        .conf-low { background: #f3dede; color: #8a2f2f; }
+        .conf-unverified { background: #e6e6e6; color: #555; }
+        footer.report-footer {
+            margin-top: 40px;
+            border-top: 1px solid #ccc;
+            padding-top: 10px;
+            font-size: 9pt;
+            color: #888;
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .about-box {
+            background: #142338;
+            color: #dbe4f0;
+            padding: 26px 28px;
+            margin-top: 20px;
+        }
+        .about-box h3 { color: #fff; margin-top: 0; }
+        .about-box a { color: #f0c96a; }
+        .chart-box {
+            border: 1px solid #d8d8d2;
+            background: #fbfbf9;
+            padding: 18px 20px 10px 20px;
+            margin: 18px 0;
+        }
+        .chart-title {
+            font-family: Georgia, serif;
+            font-size: 11.5pt;
+            font-weight: 700;
+            color: #142338;
+            margin-bottom: 4px;
+        }
+        .chart-note {
+            font-size: 9pt;
+            color: #888;
+            margin-top: 8px;
+            font-style: italic;
+        }
+        .legend-row { display: flex; gap: 16px; flex-wrap: wrap; font-size: 9.3pt; color: #444; margin-top: 8px; }
+        .legend-swatch { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 5px; position: relative; top: 1px; }
+        .stat-grid { display: flex; gap: 14px; flex-wrap: wrap; margin: 16px 0; }
+        .stat-card {
+            flex: 1; min-width: 130px;
+            border: 1px solid #d8d8d2;
+            border-top: 3px solid #b8860b;
+            background: #fbfbf9;
+            padding: 12px 14px;
+        }
+        .stat-card .num { font-family: Georgia, serif; font-size: 20pt; font-weight: 700; color: #142338; line-height: 1; }
+        .stat-card .lbl { font-size: 9pt; color: #666; margin-top: 6px; }
+        .ref-list { font-size: 9.6pt; }
+        .ref-list li { margin: 6px 0; }
+        .ref-list .src { color: #666; }
+    </style>
+</head>
+<body>
+
+<div class="tlp-bar">TLP:CLEAR — <b>Distribution unlimited, no restrictions</b></div>
+
+<div class="cover">
+    <div class="brand"><span>BOX</span>STRIKE — Strategic Analysis</div>
+    <div class="op-label">Aviation GNSS Interference Activity</div>
+    <h1>ACA-2</h1>
+    <div class="subtitle">Israel-linked GPS spoofing and jamming against civil aviation — an operational assessment, 2023–2026, including temporal trends, kill‑chain analysis, and statistical overview</div>
+    <div class="meta-table">
+        <div><span class="k">Publisher</span><span>BoxStrike — Independent Strategic Research</span></div>
+        <div><span class="k">Lead researcher</span><span>Eneshan Erdoğan Karaca and Alper Müdar</span></div>
+        <div><span class="k">Scope</span><span>GNSS manipulation, civil aviation security</span></div>
+        <div><span class="k">Period covered</span><span>2023–2026</span></div>
+        <div><span class="k">Report version</span><span>3.2 — English edition, full case details retained</span></div>
+        <div><span class="k">Classification</span><span>TLP:CLEAR</span></div>
+    </div>
+    <div class="tlp-clear-badge">TLP:CLEAR</div>
+</div>
+
+<div class="toc">
+    <h2>Contents</h2>
+    <ol>
+        <li><a href="#s1">Executive summary</a></li>
+        <li><a href="#s2">Methodology and confidence framing</a></li>
+        <li><a href="#s3">Strategic context and geographic clustering</a></li>
+        <li><a href="#s4">Observed targeting trends and aircraft selection</a></li>
+        <li><a href="#s5">Activity observed in 2023</a></li>
+        <li><a href="#s6">Activity observed in 2026</a></li>
+        <li><a href="#s7">Statistical overview</a></li>
+        <li><a href="#s8">Tactical evolution over time</a></li>
+        <li><a href="#s9">Attack chain analysis (common kill chain)</a></li>
+        <li><a href="#s10">Analytical assessment</a></li>
+        <li><a href="#s11">Conclusion</a></li>
+        <li><a href="#s12">References and verification notes</a></li>
+        <li><a href="#s13">About BoxStrike</a></li>
+    </ol>
+</div>
+
+<section class="nobreak" id="s1">
+    <h2 class="sec-title"><span class="num">1.</span>Executive summary</h2>
+    <p>BoxStrike's analysis examines the impact of Israel-linked GNSS (GPS) spoofing and jamming on civil aviation during 2023–2026, based on open-source intelligence. Although officially framed as defensive measures against Hezbollah and Hamas UAVs, observed effects and geographical spread point to a strategic dimension beyond simple defence.</p>
+    <p>Beginning in 2023 with spoofing incidents affecting flights departing from Tel Aviv and regional corridors, the phenomenon escalated in 2024 to affect over 50,000 flights. By 2026, the capability had matured into a defence‑industrial product with the announcement of the HYPNOSIS NAVWAR system. This report presents the observed data, identifies recurring patterns, and discusses the broader implications for civil aviation security.</p>
+    <p>All statements are framed as "observed", "reported" or "assessed", and avoid definitive attribution or criminal accusation. The aim is to provide a factual basis for further discussion.</p>
+    <div class="badge-row">
+        <span class="badge">Actor: Israel‑linked (assessment)</span>
+        <span class="badge">Technique: Spoofing / Jamming</span>
+        <span class="badge">Impact: Civil aviation</span>
+    </div>
+    <div class="stat-grid">
+        <div class="stat-card"><div class="num">50+</div><div class="lbl">OPSGROUP reports, Sep–Nov 2023</div></div>
+        <div class="stat-card"><div class="num">50,000+</div><div class="lbl">Civil flights affected in 2024 (UT Austin/SkAI)</div></div>
+        <div class="stat-card"><div class="num">+500%</div><div class="lbl">Reported increase in spoofing events during 2024</div></div>
+    </div>
+    <p class="chart-note">Sources listed in Section 12.</p>
+</section>
+
+<section id="s2">
+    <h2 class="sec-title"><span class="num">2.</span>Methodology and confidence framing</h2>
+    <p>This report relies on open‑source intelligence (OSINT) and analyses events at technical, operational and strategic levels. Each claim is referenced to an independent, verifiable source (academic papers, international media, regulatory reports, aviation safety publications). The report notes both consistencies and inconsistencies between Israel's official statements and observable effects.</p>
+    <div class="callout">
+        <span class="label">Analyst note</span>
+        Terms such as "defensive" and "strategic" are used in accordance with established definitions in international relations and military doctrine. No statement is intended as a definitive accusation or legal judgment.
+    </div>
+    <h3>2.1 Confidence tags</h3>
+    <p>
+        <span class="confidence-tag conf-confirmed">Confirmed</span> Supported by at least one independent, named, publicly checkable source.
+        &nbsp;&nbsp;<span class="confidence-tag conf-reported">Reported</span> Carried by credible media but with limited independent cross‑verification.
+        &nbsp;&nbsp;<span class="confidence-tag conf-low">Low</span> Indirect inference or pattern‑matching, no direct source.
+        &nbsp;&nbsp;<span class="confidence-tag conf-unverified">Unverified</span> Appeared in earlier drafts but could not be independently confirmed; excluded from headline statistics.
+    </p>
+</section>
+
+<section id="s3">
+    <h2 class="sec-title"><span class="num">3.</span>Strategic context and geographic clustering</h2>
+    <p>Israeli GNSS interference intensified after the 7 October 2023 Hamas attacks. The Israel Defense Forces (IDF) acknowledged GPS restrictions in active combat zones, officially to counter UAVs from Hamas and Hezbollah.</p>
+    <p>However, observed effects go beyond this narrative. Spoofing signals have been reported in the airspace of Lebanon, Syria, Jordan, Egypt, Turkey and Cyprus – far from the immediate conflict zone in northern Israel. This broad geographical footprint suggests that the activity is not merely tactical but serves a regional signalling or deterrence function.</p>
+    <p>In July 2024, researchers from the University of Texas at Austin traced widespread spoofing to Ein Shemer Air Base near Hadera in northern Israel – the most concrete technical evidence of Israeli involvement. The July 2026 launch of IAI's HYPNOSIS NAVWAR system further indicates that this capability has been institutionalised at the defence‑industry level.</p>
+
+    <h3>3.1 Geographic clustering summary</h3>
+    <table>
+        <tr><th>Region</th><th>Strategic relevance</th><th>Dominant period</th><th>Technique</th><th>Confidence</th></tr>
+        <tr><td>Northern Israel / Lebanon border</td><td>Defensive jamming against Hezbollah UAV/missile threats</td><td>2023–2026</td><td>Jamming / Spoofing</td><td><span class="confidence-tag conf-confirmed">Confirmed</span></td></tr>
+        <tr><td>Cairo FIR / LLBG surroundings</td><td>"Cairo type" spoofing – false position over Tel Aviv</td><td>Oct 2023–</td><td>Spoofing</td><td><span class="confidence-tag conf-confirmed">Confirmed</span></td></tr>
+        <tr><td>Tel Aviv (LLBG) departures</td><td>"Beirut type" spoofing – false position over Beirut</td><td>Oct 2023–</td><td>Spoofing</td><td><span class="confidence-tag conf-confirmed">Confirmed</span></td></tr>
+    </table>
+</section>
+
+<section id="s4">
+    <h2 class="sec-title"><span class="num">4.</span>Observed targeting trends and aircraft selection</h2>
+    <p>According to OPSGROUP reporting, affected aircraft are not random. Those with high GPS/IRS integration (e.g. Honeywell Primus Epic, Collins Pro Line Fusion) and operating on long‑haul or conflict‑adjacent routes are disproportionately impacted. Aircraft types repeatedly reported include Boeing 737/747/777, Embraer 190/600, Gulfstream G650, Challenger 605/650, Bombardier Global Express/7500, and Dassault Falcon 8X.</p>
+    <p>The unencrypted nature of civil GPS signals (L1 C/A) is a structural vulnerability exploited in these attacks. This is not unique to Israel‑linked activity but mirrors patterns seen in the Russia‑linked operations documented in BoxStrike's ACA‑1 report.</p>
+
+    <h3>4.1 Documented case examples (OPSGROUP)</h3>
+    <table>
+        <tr><th>Date</th><th>Aircraft</th><th>Details</th><th>Confidence</th></tr>
+        <tr><td>16 Oct 2023</td><td>Bombardier Global Express</td><td>Departed Tel Aviv (LLBG), spoofed to Beirut (OLBA); ATC warned of "restricted area" entry</td><td><span class="confidence-tag conf-confirmed">Confirmed</span></td></tr>
+        <tr><td>25 Oct 2023</td><td>Gulfstream G650</td><td>Full navigation failure; EPU reached 99.0; displayed position 225 NM south of actual track</td><td><span class="confidence-tag conf-confirmed">Confirmed</span></td></tr>
+        <tr><td>16 Oct 2023</td><td>Boeing 777</td><td>30‑minute spoofing in Cairo FIR; system showed fixed position over LLBG</td><td><span class="confidence-tag conf-confirmed">Confirmed</span></td></tr>
+        <tr><td>Mar 2024</td><td>Turkish Airlines flight</td><td>Flight to Beirut circled for 40 minutes then returned to Turkey due to navigation problems</td><td><span class="confidence-tag conf-confirmed">Confirmed</span></td></tr>
+    </table>
+</section>
+
+<section id="s5">
+    <h2 class="sec-title"><span class="num">5.</span>Activity observed in 2023</h2>
+
+    <h3>5.1 15 October 2023: IDF acknowledges GPS restrictions — <span class="confidence-tag conf-confirmed">Confirmed</span></h3>
+    <p>Haaretz reported that the IDF restricted GPS in active combat zones to counter Hamas and Hezbollah UAVs. This was the first official recognition of Israel's role in GNSS interference.</p>
+
+    <h3>5.2 OPSGROUP's three scenarios — <span class="confidence-tag conf-confirmed">Confirmed</span></h3>
+    <p>Between August and November 2023, OPSGROUP identified three distinct spoofing patterns:</p>
+    <ul>
+        <li><strong>"Baghdad type":</strong> Flights near the Iraq‑Iran border were spoofed towards Iranian airspace (this pattern is regional and not explicitly attributed to Israel).</li>
+        <li><strong>"Cairo type":</strong> Flights in Cairo FIR were spoofed to show a fixed position over Tel Aviv (LLBG).</li>
+        <li><strong>"Beirut type":</strong> Flights departing Tel Aviv were spoofed to show a position over Beirut (OLBA) or to experience a gradual drift in that direction.</li>
+    </ul>
+
+    <h3>5.3 2023 incident summary table</h3>
+    <table>
+        <tr><th>Date</th><th>Scenario / Location</th><th>Affected system</th><th>Scale</th><th>Confidence</th></tr>
+        <tr><td>29 Aug 2023 –</td><td>"Baghdad type" – Iraq/Iran border</td><td>GPS, IRS, autopilot</td><td>Regional, multiple aircraft</td><td><span class="confidence-tag conf-confirmed">Confirmed</span> (not specifically attributed to Israel)</td></tr>
+        <tr><td>16 Oct 2023 –</td><td>"Cairo type" – Cairo FIR → false LLBG position</td><td>GPS, IRS</td><td>Multiple aircraft types</td><td><span class="confidence-tag conf-confirmed">Confirmed</span></td></tr>
+        <tr><td>25 Oct 2023 –</td><td>"Beirut type" – LLBG departures → false OLBA position</td><td>GPS, IRS, FMS</td><td>Multiple aircraft types</td><td><span class="confidence-tag conf-confirmed">Confirmed</span></td></tr>
+        <tr><td>Sep–Nov 2023 (total)</td><td>Regional</td><td>—</td><td>50 reports / 5 weeks (OPSGROUP)</td><td><span class="confidence-tag conf-confirmed">Confirmed</span></td></tr>
+    </table>
+</section>
+
+<section id="s6">
+    <h2 class="sec-title"><span class="num">6.</span>Activity observed in 2026</h2>
+
+    <h3>6.1 HYPNOSIS: NAVWAR system unveiled — <span class="confidence-tag conf-confirmed">Confirmed</span></h3>
+    <p>On 16–17 July 2026, Israel Aerospace Industries (IAI) unveiled HYPNOSIS ("High‑Power Soft‑Kill Navigation Warfare Air Defense System"). It consists of mobile jamming/spoofing stations linked to a central command‑and‑control unit, designed to disrupt GNSS links rather than physically destroying UAV swarms. IAI positions it as a complementary "soft‑kill" layer.</p>
+
+    <h3>6.2 2026 Israel‑Iran war and surge in GPS interference — <span class="confidence-tag conf-confirmed">Confirmed</span></h3>
+    <p>The outbreak of the Israel‑Iran war on 28 February 2026 (with joint US‑Israeli airstrikes) led to a sharp increase in regional GPS disruption. According to SkAI Data Services, at least 169 aircraft over the eastern Arabian Peninsula were spoofed on 2 March 2026 alone.</p>
+
+    <h3>6.3 2026 incident summary table</h3>
+    <table>
+        <tr><th>Date</th><th>Location</th><th>Event</th><th>Scale</th><th>Technique</th><th>Confidence</th></tr>
+        <tr><td>16–17 Jul 2026</td><td>Israel (announcement)</td><td>IAI HYPNOSIS NAVWAR system unveiled</td><td>Institutional / strategic</td><td>Integrated jamming + spoofing</td><td><span class="confidence-tag conf-confirmed">Confirmed</span></td></tr>
+        <tr><td>2 Mar 2026</td><td>Eastern Arabian Peninsula (airspace)</td><td>Aircraft subjected to spoofing</td><td>169 aircraft (single day)</td><td>Spoofing</td><td><span class="confidence-tag conf-confirmed">Confirmed</span></td></tr>
+    </table>
+</section>
+
+<section id="s7">
+    <h2 class="sec-title"><span class="num">7.</span>Statistical overview</h2>
+    <p>This section visualises the confirmed figures from Sections 5.3 and 6.3, and provides additional time‑series data on the growth of spoofing and jamming events.</p>
+
+    <div class="chart-box">
+        <div class="chart-title">7.1 Year‑on‑year growth of reported spoofing/jamming events (2023–2026)</div>
+        <svg viewBox="0 0 620 240" width="100%" height="240" xmlns="http://www.w3.org/2000/svg">
+            <line x1="60" y1="10" x2="60" y2="200" stroke="#ccc" stroke-width="1"/>
+            <line x1="60" y1="200" x2="600" y2="200" stroke="#ccc" stroke-width="1"/>
+            <!-- 2023 -->
+            <rect x="90" y="185" width="70" height="15" fill="#1b4f8a"/>
+            <text x="125" y="178" font-size="9" text-anchor="middle" fill="#333">50</text>
+            <!-- 2024 -->
+            <rect x="230" y="40" width="70" height="160" fill="#8a1f2d"/>
+            <text x="265" y="33" font-size="9" text-anchor="middle" fill="#333">+500%</text>
+            <!-- 2025 (no independent annual total) -->
+            <rect x="370" y="155" width="70" height="45" fill="#777" opacity="0.4"/>
+            <text x="405" y="148" font-size="9" text-anchor="middle" fill="#555">n/a</text>
+            <!-- 2026 (partial, until Mar) -->
+            <rect x="510" y="170" width="70" height="30" fill="#1b4f8a"/>
+            <text x="545" y="163" font-size="9" text-anchor="middle" fill="#333">169+</text>
+            <!-- X-axis labels -->
+            <text x="125" y="218" font-size="10" text-anchor="middle" fill="#555">2023</text>
+            <text x="265" y="218" font-size="10" text-anchor="middle" fill="#555">2024</text>
+            <text x="405" y="218" font-size="10" text-anchor="middle" fill="#555">2025</text>
+            <text x="545" y="218" font-size="10" text-anchor="middle" fill="#555">2026 (Jan‑Mar)</text>
+        </svg>
+        <div class="legend-row">
+            <span><span class="legend-swatch" style="background:#1b4f8a;"></span>Reported incidents (absolute)</span>
+            <span><span class="legend-swatch" style="background:#8a1f2d;"></span>Percentage increase</span>
+            <span><span class="legend-swatch" style="background:#777; opacity:0.4;"></span>No independent annual total available</span>
+        </div>
+        <div class="chart-note">The 2024 spike (+500%) is derived from OPSGROUP's year‑over‑year comparison. 2025 data for Israel‑linked activity could not be independently verified. 2026 figure is partial (Jan–Mar only).</div>
+    </div>
+
+    <div class="chart-box">
+        <div class="chart-title">7.2 Affected flight scale by year (confirmed figures)</div>
+        <svg viewBox="0 0 620 220" width="100%" height="220" xmlns="http://www.w3.org/2000/svg">
+            <line x1="60" y1="10" x2="60" y2="180" stroke="#ccc" stroke-width="1"/>
+            <line x1="60" y1="180" x2="600" y2="180" stroke="#ccc" stroke-width="1"/>
+            <rect x="100" y="165" width="90" height="15" fill="#1b4f8a"/>
+            <text x="145" y="158" font-size="10" text-anchor="middle" fill="#333">50 reports</text>
+            <text x="145" y="198" font-size="10" text-anchor="middle" fill="#555">2023 (5 weeks)</text>
+            <rect x="280" y="35" width="90" height="145" fill="#8a1f2d"/>
+            <text x="325" y="28" font-size="10" text-anchor="middle" fill="#333">50,000+</text>
+            <text x="325" y="198" font-size="10" text-anchor="middle" fill="#555">2024 (full year)</text>
+            <rect x="460" y="150" width="90" height="30" fill="#1b4f8a"/>
+            <text x="505" y="143" font-size="10" text-anchor="middle" fill="#333">169</text>
+            <text x="505" y="198" font-size="10" text-anchor="middle" fill="#555">2 Mar 2026 (single day)</text>
+        </svg>
+        <div class="legend-row">
+            <span><span class="legend-swatch" style="background:#1b4f8a;"></span>Short‑term / single‑day figure</span>
+            <span><span class="legend-swatch" style="background:#8a1f2d;"></span>Annual cumulative figure</span>
+        </div>
+        <div class="chart-note">Bars compare different time scales (weekly, yearly, daily) and are not directly proportional.</div>
+    </div>
+</section>
+
+<section id="s8">
+    <h2 class="sec-title"><span class="num">8.</span>Tactical evolution over time</h2>
+    <table>
+        <tr><th>Period</th><th>Observed pattern</th><th>Strategic implication</th><th>Confidence</th></tr>
+        <tr><td>2023</td><td>Post‑7 Oct defensive GPS restrictions; OPSGROUP's three scenarios (Baghdad/Cairo/Beirut)</td><td>Tactical defence, regional testing</td><td><span class="confidence-tag conf-confirmed">Confirmed</span></td></tr>
+        <tr><td>2024</td><td>Spoofing increased by +500%; UT Austin traced source to Ein Shemer Air Base; 50,000+ flights affected</td><td>Operational maturation, systematic impact on civil aviation</td><td><span class="confidence-tag conf-confirmed">Confirmed</span></td></tr>
+        <tr><td>2025</td><td>Continued regional interference (no independent annual total available)</td><td>Persistent defensive doctrine</td><td><span class="confidence-tag conf-low">Low</span></td></tr>
+        <tr><td>2026</td><td>IAI HYPNOSIS institutionalises capability; intense spoofing during Israel‑Iran war</td><td>Strategic deterrence, hybrid warfare tool</td><td><span class="confidence-tag conf-confirmed">Confirmed</span></td></tr>
+    </table>
+    <div class="callout">
+        <span class="label">Analyst note</span>
+        The pattern shows a clear maturation from isolated incidents (2023) to measurable annual impact (2024) and finally to an institutionalised, named system (2026, HYPNOSIS). The increasing sophistication and scale indicate that this is not a temporary wartime measure but a lasting element of Israeli defence doctrine.
+    </div>
+</section>
+
+<section id="s9">
+    <h2 class="sec-title"><span class="num">9.</span>Attack chain analysis (common kill chain)</h2>
+    <p>Based on the documented incidents, BoxStrike has reconstructed a common attack chain (kill chain) for the Israel‑linked GNSS spoofing activity. The chain follows a consistent sequence of steps, from targeting to effect.</p>
+
+    <div class="chart-box">
+        <div class="chart-title">9.1 Common kill chain for ACA‑2 spoofing events</div>
+        <svg viewBox="0 0 760 320" width="100%" height="320" xmlns="http://www.w3.org/2000/svg">
+            <!-- Background -->
+            <rect x="20" y="10" width="720" height="300" rx="6" fill="#fafaf8" stroke="#d8d8d2" stroke-width="1"/>
+
+            <!-- Step 1 -->
+            <rect x="40" y="40" width="160" height="70" rx="4" fill="#142338" stroke="#0c1830"/>
+            <text x="120" y="62" font-size="10" text-anchor="middle" fill="#fff" font-weight="700">1. Intelligence / Targeting</text>
+            <text x="120" y="78" font-size="8.5" text-anchor="middle" fill="#cfe0f5">Identify high‑value aircraft</text>
+            <text x="120" y="90" font-size="8.5" text-anchor="middle" fill="#cfe0f5">(FMS/IRS integration, route profile)</text>
+            <text x="120" y="102" font-size="8.5" text-anchor="middle" fill="#cfe0f5">Monitor via radar/ADS‑B</text>
+
+            <!-- Arrow 1→2 -->
+            <line x1="200" y1="75" x2="240" y2="75" stroke="#8a6d1a" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+            <!-- Step 2 -->
+            <rect x="250" y="40" width="160" height="70" rx="4" fill="#8a1f2d" stroke="#6a1820"/>
+            <text x="330" y="62" font-size="10" text-anchor="middle" fill="#fff" font-weight="700">2. Signal Generation</text>
+            <text x="330" y="78" font-size="8.5" text-anchor="middle" fill="#f9d6d6">Spoofed GPS L1 C/A signal</text>
+            <text x="330" y="90" font-size="8.5" text-anchor="middle" fill="#f9d6d6">Gradual drift (plausibility filter)</text>
+            <text x="330" y="102" font-size="8.5" text-anchor="middle" fill="#f9d6d6">Transmit from ground station</text>
+
+            <!-- Arrow 2→3 -->
+            <line x1="410" y1="75" x2="450" y2="75" stroke="#8a6d1a" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+            <!-- Step 3 -->
+            <rect x="460" y="40" width="160" height="70" rx="4" fill="#1b4f8a" stroke="#133a6a"/>
+            <text x="540" y="62" font-size="10" text-anchor="middle" fill="#fff" font-weight="700">3. GPS Receiver Capture</text>
+            <text x="540" y="78" font-size="8.5" text-anchor="middle" fill="#d6e6f9">Aircraft GPS accepts false signal</text>
+            <text x="540" y="90" font-size="8.5" text-anchor="middle" fill="#d6e6f9">No immediate alert to crew</text>
+            <text x="540" y="102" font-size="8.5" text-anchor="middle" fill="#d6e6f9">Position & timestamp manipulated</text>
+
+            <!-- Arrow 3→4 -->
+            <line x1="620" y1="75" x2="660" y2="75" stroke="#8a6d1a" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+            <!-- Step 4 -->
+            <rect x="670" y="40" width="60" height="70" rx="4" fill="#b8860b" stroke="#9a7208"/>
+            <text x="700" y="66" font-size="9" text-anchor="middle" fill="#fff" font-weight="700">Effect</text>
+            <text x="700" y="82" font-size="8" text-anchor="middle" fill="#fff">Nav</text>
+            <text x="700" y="94" font-size="8" text-anchor="middle" fill="#fff">failure</text>
+
+            <!-- Step 5 (lower row) -->
+            <rect x="40" y="150" width="160" height="60" rx="4" fill="#e6e6e6" stroke="#aaa"/>
+            <text x="120" y="172" font-size="9" text-anchor="middle" fill="#333" font-weight="600">4. IRS/FMS Corruption</text>
+            <text x="120" y="186" font-size="8.5" text-anchor="middle" fill="#555">IRS‑GPS fusion accepts drift</text>
+            <text x="120" y="198" font-size="8.5" text-anchor="middle" fill="#555">FMS calculates false route</text>
+
+            <!-- Arrow 4→5 -->
+            <line x1="200" y1="155" x2="240" y2="165" stroke="#888" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#arrow)"/>
+
+            <!-- Step 6 -->
+            <rect x="250" y="150" width="160" height="60" rx="4" fill="#e6e6e6" stroke="#aaa"/>
+            <text x="330" y="172" font-size="9" text-anchor="middle" fill="#333" font-weight="600">5. Autopilot / Display</text>
+            <text x="330" y="186" font-size="8.5" text-anchor="middle" fill="#555">Autopilot follows false route</text>
+            <text x="330" y="198" font-size="8.5" text-anchor="middle" fill="#555">PFD shows incorrect position</text>
+
+            <!-- Arrow 5→6 -->
+            <line x1="410" y1="165" x2="450" y2="175" stroke="#888" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#arrow)"/>
+
+            <!-- Step 7 -->
+            <rect x="460" y="150" width="160" height="60" rx="4" fill="#e6e6e6" stroke="#aaa"/>
+            <text x="540" y="172" font-size="9" text-anchor="middle" fill="#333" font-weight="600">6. ADS‑B Out / ATC</text>
+            <text x="540" y="186" font-size="8.5" text-anchor="middle" fill="#555">Aircraft transmits false position</text>
+            <text x="540" y="198" font-size="8.5" text-anchor="middle" fill="#555">ATC sees incorrect track</text>
+
+            <!-- Arrow 6→7 -->
+            <line x1="620" y1="170" x2="660" y2="180" stroke="#888" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#arrow)"/>
+
+            <!-- Step 8 -->
+            <rect x="670" y="150" width="60" height="60" rx="4" fill="#b8860b" stroke="#9a7208"/>
+            <text x="700" y="176" font-size="9" text-anchor="middle" fill="#fff" font-weight="700">Disrupt</text>
+            <text x="700" y="192" font-size="8" text-anchor="middle" fill="#fff">effect</text>
+
+            <!-- Detection indicators (box) -->
+            <rect x="40" y="240" width="690" height="55" rx="4" fill="#f9ecec" stroke="#c98a8a" stroke-dasharray="3,3"/>
+            <text x="55" y="258" font-size="9" fill="#8a2f2f" font-weight="700">Detection indicators (visible at steps 3–6):</text>
+            <text x="55" y="273" font-size="8.5" fill="#333">• EPU jump, NIC/NACp mismatch  • Implausible ground speed  • UTC error  • PFD navigation‑integrity warnings</text>
+            <text x="55" y="288" font-size="8.5" fill="#333">• Cross‑reports from other aircraft in the same area</text>
+        </svg>
+        <div class="fig-caption">Fig. 1 — Common kill chain for ACA‑2 spoofing events, from targeting to disruptive effect. The chain is based on observed patterns in OPSGROUP reports and aircraft‑system behaviour during confirmed incidents.</div>
+    </div>
+
+    <p>The kill chain can be summarised as:</p>
+    <ol>
+        <li><strong>Intelligence / targeting:</strong> Select aircraft with high GPS/IRS dependence and favourable route profiles.</li>
+        <li><strong>Signal generation:</strong> Transmit a spoofed GPS signal that introduces a gradual drift – small enough to bypass the IRS‑GPS plausibility filter.</li>
+        <li><strong>Receiver capture:</strong> The aircraft's GPS receiver accepts the false signal without triggering any alert.</li>
+        <li><strong>IRS/FMS corruption:</strong> The fused inertial‑GPS solution accepts the drift; the FMS begins calculating a false route.</li>
+        <li><strong>Autopilot / display:</strong> The autopilot follows the false route, and the cockpit display shows an incorrect position.</li>
+        <li><strong>ADS‑B / ATC:</strong> The aircraft transmits the false position via ADS‑B; air traffic control sees a misleading track.</li>
+        <li><strong>Disruptive effect:</strong> The aircraft deviates from its intended route, potentially entering restricted airspace or causing ATC confusion.</li>
+    </ol>
+    <p>This chain is consistent across the "Cairo" and "Beirut" type scenarios documented by OPSGROUP. The gradual drift is a key enabler, as it defeats the IRS‑GPS cross‑check that would reject a sudden, large position jump.</p>
+</section>
+
+<section id="s10">
+    <h2 class="sec-title"><span class="num">10.</span>Analytical assessment</h2>
+
+    <h3>10.1 Defence or collateral effect?</h3>
+    <p>Independent analysts (e.g. Michael Horowitz of RANE, and sources cited by Times of Israel) assess Israel's GPS interference as largely defence‑motivated – a counter‑measure against Hezbollah's precision‑guided weapons. However, they also note that the impact on civil aviation – over 50,000 flights, repeated route deviations, IRS failures – is serious and recurring, even if unintended. The formal marketing of HYPNOSIS as a defence‑industry product in 2026 confirms that this capability is no longer a temporary wartime measure but a permanent doctrinal element.</p>
+
+    <h3>10.2 Impact on civil aviation</h3>
+    <p>The unencrypted nature of civil GPS (L1 C/A) is the structural vulnerability that enables these attacks. This is not unique to Israel‑linked activity – the same weakness is exploited in the Russia‑linked operations analysed in BoxStrike's ACA‑1 report. Consequently, civil aviation faces a global, shared security challenge.</p>
+
+    <h3>10.3 International law considerations</h3>
+    <p>The legality of such interference under international law is contested. The Chicago Convention prohibits acts that endanger the safety of civil aviation. Similarly, interference by one state in the airspace of another could be considered a violation of sovereignty. However, legal interpretations depend on factors such as the purpose, scale and proportionality of the interference. This report does not offer a legal judgment but aims to present the facts and their perception by the international community.</p>
+</section>
+
+<section id="s11">
+    <h2 class="sec-title"><span class="num">11.</span>Conclusion</h2>
+    <p>The verifiable record shows that Israel‑linked GNSS interference evolved from a tactical defensive measure (2023) to an institutionalised capability (HYPNOSIS, 2026). This evolution has significant implications for civil aviation safety and regional stability.</p>
+    <p>Two important corrections have been made in this report: (1) the early‑period Ben Gurion jamming, which was attributed to Russia, should not be conflated with Israel's own capability; (2) the largest single maritime impact (1,100+ ships) in 2026 was primarily attributed to Iran, not Israel – that event has been excluded from this aviation‑focused edition.</p>
+    <div class="callout">
+        <span class="label">Limitations</span>
+        This document is based on BoxStrike's open‑source research and cross‑checked during this revision. Attribution to a state actor is an assessment carried by cited sources, not independent proof by BoxStrike. Confidence tags should be read carefully – see Section 2.1.
+    </div>
+</section>
+
+<section id="s12">
+    <h2 class="sec-title"><span class="num">12.</span>References and verification notes</h2>
+    <ul class="ref-list">
+        <li>Haaretz (15 Oct 2023) — IDF GPS restrictions. <span class="src">haaretz.com</span></li>
+        <li>Times of Israel — Ben Gurion GPS jamming (2019) and Russia attribution. <span class="src">timesofisrael.com</span></li>
+        <li>OPSGROUP — "GPS Spoofing Update: Map, Scenarios and Guidance" (8 Nov 2023). <span class="src">ops.group</span></li>
+        <li>SimpleFlying, AeroXplorer — Gulfstream G650 and Bombardier Global Express incidents. <span class="src">simpleflying.com</span></li>
+        <li>New York Times / Times of Israel — UT Austin Ein Shemer Air Base identification; 50,000+ flights. <span class="src">timesofisrael.com</span></li>
+        <li>Eurasian Times — +500% increase, THY incident. <span class="src">eurasiantimes.com</span></li>
+        <li>IAI, EDR Magazine, Defense News — HYPNOSIS announcement. <span class="src">edrmagazine.eu</span></li>
+        <li>Wikipedia — 2026 Iran war. <span class="src">en.wikipedia.org</span></li>
+        <li>SkAI Data Services — Spoofing aircraft counts for 2 March 2026.</li>
+        <li>FAA GPS/GNSS Interference Resource Guide (2026). <span class="src">globalair.com</span></li>
+    </ul>
+
+    <h3>12.1 Corrections made in this revision</h3>
+    <table>
+        <tr><th>Claim in earlier draft</th><th>Correction</th></tr>
+        <tr><td>Ben Gurion jamming implied as Israeli</td><td>Corrected – that jamming was attributed to Russia.</td></tr>
+        <tr><td>Kaliningrad, RAF Healey etc. (ACA‑1 material)</td><td>Removed – this report covers only Israel‑linked activity.</td></tr>
+        <tr><td>"122,000+ flights" claim</td><td>Removed – unverified.</td></tr>
+        <tr><td>"Haifa circular spoofing" claim</td><td>Removed – unverified.</td></tr>
+        <tr><td>All maritime content (1,100+ ships, Persian Gulf, 2026 Iran‑Israel naval crisis)</td><td>Removed – this edition focuses solely on aviation.</td></tr>
+    </table>
+</section>
+
+<section id="s13">
+    <h2 class="sec-title"><span class="num">13.</span>About BoxStrike</h2>
+    <div class="about-box">
+        <h3>BoxStrike</h3>
+        <p>BoxStrike is an independent research group focusing on strategic analysis and open‑source intelligence (OSINT). It conducts research on aviation security, cyber‑physical threats, and regional security issues. This report was researched and written by lead researcher <b>Eneshan Erdoğan Karaca</b>.</p>
+        <p>Contact: <a href="mailto:boxstrike.team@proton.me">boxstrike.team@proton.me</a></p>
+        <p>This report is published under <b>TLP:CLEAR</b>.</p>
+    </div>
+</section>
+
+<footer class="report-footer">
+    <span>ACA-2 — BoxStrike Strategic Analysis — TLP:CLEAR</span>
+    <span>© BoxStrike — Researcher: Eneshan Erdoğan Karaca and Alper Müdar</span>
+</footer>
+
+</body>
+</html>

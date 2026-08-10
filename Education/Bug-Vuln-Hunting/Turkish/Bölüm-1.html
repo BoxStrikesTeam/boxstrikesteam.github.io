@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bölüm 1.1 – Hata Avcılığı ve Güvenlik Açığı Avcılığı</title>
+    <style>
+        /* --- Sade ve Temiz Eğitim Yazısı Stili --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #fafafa;
+            color: #1e293b;
+            line-height: 1.7;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 820px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 2.5rem 3rem;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #0f172a;
+            border-bottom: 4px solid #3b82f6;
+            padding-bottom: 0.5rem;
+            margin-bottom: 1.8rem;
+            letter-spacing: -0.02em;
+        }
+
+        h2 {
+            font-size: 1.6rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin-top: 2.2rem;
+            margin-bottom: 1rem;
+        }
+
+        h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #334155;
+            margin-top: 1.8rem;
+            margin-bottom: 0.6rem;
+        }
+
+        p {
+            margin-bottom: 1.2rem;
+            color: #334155;
+        }
+
+        blockquote {
+            background-color: #f1f5f9;
+            border-left: 6px solid #3b82f6;
+            padding: 1rem 1.8rem;
+            margin: 1.5rem 0;
+            border-radius: 0 8px 8px 0;
+            font-style: italic;
+            color: #1e293b;
+        }
+
+        blockquote strong {
+            font-style: normal;
+            color: #0f172a;
+        }
+
+        ul, ol {
+            margin: 1rem 0 1.5rem 1.8rem;
+            color: #334155;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.8rem 0;
+            font-size: 0.95rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+        }
+
+        th {
+            background-color: #e2e8f0;
+            color: #0f172a;
+            font-weight: 600;
+            padding: 0.8rem 1rem;
+            text-align: left;
+            border: 1px solid #cbd5e1;
+        }
+
+        td {
+            padding: 0.8rem 1rem;
+            border: 1px solid #cbd5e1;
+            vertical-align: top;
+            background-color: #ffffff;
+        }
+
+        td:first-child {
+            font-weight: 500;
+        }
+
+        .highlight-yes {
+            color: #16a34a;
+            font-weight: 600;
+        }
+
+        .highlight-no {
+            color: #dc2626;
+            font-weight: 600;
+        }
+
+        code {
+            background-color: #f1f5f9;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', 'Fira Code', monospace;
+            font-size: 0.9rem;
+            color: #0f172a;
+            border: 1px solid #e2e8f0;
+        }
+
+        .question-list {
+            list-style-type: decimal;
+            font-weight: 500;
+        }
+
+        .question-list li {
+            margin-bottom: 0.8rem;
+            font-weight: 400;
+        }
+
+        .question-list li strong {
+            font-weight: 600;
+            color: #0f172a;
+        }
+
+        .summary-box {
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 1.5rem 2rem;
+            margin-top: 2rem;
+        }
+
+        .summary-box p {
+            margin-bottom: 0.5rem;
+        }
+
+        .summary-box strong {
+            color: #0f172a;
+        }
+
+        hr {
+            border: none;
+            border-top: 2px dashed #e2e8f0;
+            margin: 2.5rem 0;
+        }
+
+        @media (max-width: 640px) {
+            .container {
+                padding: 1.5rem 1.2rem;
+            }
+
+            h1 {
+                font-size: 1.7rem;
+            }
+
+            h2 {
+                font-size: 1.3rem;
+            }
+
+            table {
+                font-size: 0.85rem;
+            }
+
+            th, td {
+                padding: 0.5rem 0.6rem;
+            }
+
+            blockquote {
+                padding: 0.8rem 1.2rem;
+            }
+
+            .summary-box {
+                padding: 1rem 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+
+        <h1>Bölüm 1.1 – Hata Avcılığı ve Güvenlik Açığı Avcılığı Nedir?</h1>
+
+        <p>Şimdik temelden baslayalım. Bu iki kavram kulağa benzer gelebilir ama işin içine girdiğinde hissettirdikleri çok farklıdır. Birinde "Ulan bu kod niye böyle saçmalıyor?" diye sinirlenirsin, diğerinde ise "Vay be, bunu nasıl sömürürler?" diye terlemeye başlarsın. Hadi gel, aradaki çizgiyi netleştirelim.</p>
+
+        <h2>Hata Avcılığı (Bug Hunting) – "Kod Sana Ters Yaptığında"</h2>
+
+        <p>Bir yazılımı, kodun kendi kendine verdiği bir söz gibi düşün. Mesela der ki:</p>
+        <ul>
+            <li>"Ben şu fonksiyonda şu veriyi alıp, şu sonucu döneceğim."</li>
+            <li>"Benim şu dizim en fazla 100 kişi alır, taşmam."</li>
+            <li>"Şu bellek bloğunu kullanıp, ardından temiz bir şekilde iade edeceğim."</li>
+        </ul>
+
+        <p><strong>Bug hunting</strong>, tam olarak kodun bu sözünü <strong>tutmadığı anı</strong> yakalamaktır. Yani kod tutarsız davranmaya başladığında, orada bir bug vardır. </p>
+
+        <p><strong>Birkaç gerçek hayat örneği vereyim:</strong></p>
+        <ul>
+            <li>Fonksiyon <code>-1</code> döndü "hata var" diye. Ama senin yazdığın kod bunu kontrol etmiyor, direkt o <code>-1</code>'i alıp dizi indeksi olarak kullanıyor. Sonuç? Patlama! Bu düpedüz <strong>bug</strong>.</li>
+            <li><code>for</code> döngünde <code>i &lt;= length</code> yazdın ama dizinin boyutu <code>length</code>. Son elemana geldiğinde yine patladın. Off-by-one dediğimiz klasik <strong>bug</strong>.</li>
+            <li><code>malloc</code> bellek ister, olmaz <code>NULL</code> döner. Sen hiç sorgulamadan o <code>NULL</code>'a <code>memcpy</code> çekersin. Bum! Null pointer. Yine <strong>bug</strong>.</li>
+        </ul>
+
+        <blockquote>
+            <strong>Bu aşamada amacın net:</strong> "Kod niye çalışmıyor, nerede yanlış yaptın lan?" diye söylenmektir. 
+            Bu noktada <strong>güvenlik umrunda değil</strong>, sadece <strong>doğru çalışmasını</strong> sağlamaya odaklanırsın.
+        </blockquote>
+
+        <h2>Güvenlik Açığı Avcılığı (Vulnerability Hunting) – "Bu Hata Başımıza Belâ Olur mu?"</h2>
+
+        <p>Güzel, bir bug buldun diyelim. Peki şimdi şu soruyu sor: Bu bug'ı <strong>kötü niyetli bir herif</strong> internetin öbür ucundan <strong>bilerek tetikleyebilir mi</strong>? Eğer tetiklerse, sistemin içine eder mi? İşte o an bu sıradan bug, bir <strong>güvenlik açığına (vulnerability)</strong> dönüşür.</p>
+
+        <p><strong>Vulnerability hunting</strong> yapmak, bulduğun her bug'ı şöyle bir süzmektir:</p>
+
+        <blockquote>
+            "Bu hatayı bir saldırgan <strong>nasıl kendi lehine</strong> çevirir?<br>
+            Bu hata ona ne kazandırır, bana ne kaybettirir?<br>
+            Sistemi çökertir mi, içeri sızar mı, yoksa kendini admin mi yapar?"
+        </blockquote>
+
+        <p><strong>Şimdi aradaki uçurumu net görmek için şu karşılaştırmaya bak:</strong></p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Durum</th>
+                    <th>Bug mı?</th>
+                    <th>Zafiyet mi?</th>
+                    <th>Neden?</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>malloc</code> başarısız olup <code>NULL</code> dönünce çökmen</td>
+                    <td><span class="highlight-yes">Evet</span></td>
+                    <td><span class="highlight-no">Hayır</span> (genelde)</td>
+                    <td>Bunu dışarıdan tetikleyemezsin ki. Adam gelip "hadi bellek bit!" diyemez. Olsa olsa DoS olur, ama genelde kendi kendine patlar, kimsenin umrunda olmaz.</td>
+                </tr>
+                <tr>
+                    <td>Ağ sunucusunda gelen paket uzunluğu kontrolsüz <code>memcpy</code></td>
+                    <td><span class="highlight-yes">Evet</span></td>
+                    <td><span class="highlight-yes">Evet</span></td>
+                    <td>İşte bu tam zafiyet! Saldırgan özel hazırlanmış bir paket gönderir, stack'i taşar, return adresini ezer ve kendi kodunu çalıştırır. RCE dediğimiz olay budur.</td>
+                </tr>
+                <tr>
+                    <td><code>if (user = "admin")</code> yazmak (eşitlik değil atama)</td>
+                    <td><span class="highlight-yes">Evet</span></td>
+                    <td><span class="highlight-yes">Evet</span> (Kimlik Atlatma)</td>
+                    <td>Bu basit yanlış, her girişi başarılı gösterir. Saldırgan şifre bilmeden admin olarak içeri dalar. Budur zafiyet!</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>İlişki ve Ayrım – "Her Zafiyet Bug'dır Ama Her Bug Zafiyet Değildir"</h2>
+
+        <p>Bu lafı tam buraya yapıştır aklına. Bu işin <strong>can alıcı noktası</strong> burasıdır.</p>
+
+        <ul>
+            <li><strong>Bug</strong>, kodun yaptığı fiziksel ya da mantıksal bir hatadır. Bu kadar.</li>
+            <li><strong>Vulnerability</strong> ise o hatanın <strong>saldırı yüzeyiyle</strong> buluştuğu yerdir. Yani hata, kullanıcıdan gelen veriyle <strong>tetiklenebiliyorsa</strong> ve bu tetiklenme <strong>can sıkıcı sonuçlar</strong> doğuruyorsa, işte o zaman bug, zafiyete dönüşür.</li>
+        </ul>
+
+        <p>Pratikte şu 3 soruyu kendine hep sor:</p>
+
+        <ol class="question-list">
+            <li><strong>Kontrol bende mi, onda mı?</strong> – Saldırgan bu hatayı tetikleyecek veriyi gönderebilir mi? (dosya adı, network paketi, ortam değişkeni vs.)</li>
+            <li><strong>Ne kaybederim?</strong> – Bu hata patladığında sistemden ne gider? Gizlilik mi, bütünlük mü, yoksa hizmet mi?</li>
+            <li><strong>Tek başına yeter mi?</strong> – Bu hata tek başına işe yaramıyorsa, başka bir bug'la birleştirip daha büyük bir felakete yol açabilir mi?</li>
+        </ol>
+
+        <h2>Neden C/C++'ta Bu Ayrım Daha da Can Yakıyor?</h2>
+
+        <p>Çünkü C ve C++'ta bellek sana emanet. Kimse sana "dur" demez. Bu yüzden:</p>
+
+        <ul>
+            <li>Bir <strong>buffer overflow</strong> sadece "çöktü geçti" değildir; doğrudan <strong>kontrol akışını ele geçirme</strong> kapısıdır.</li>
+            <li>Bir <strong>use-after-free</strong> sadece hata vermez; <strong>RCE'ye (uzaktan kod çalıştırma)</strong> ya da <strong>info leak'e</strong> kadar gider.</li>
+        </ul>
+
+        <p>O yüzden C/C++ avcısıysan, karşına çıkan her bug'a <strong>"Bundan nasıl faydalanırlar?"</strong> diye bakmak zorundasın. Bu bakış açısı, seni sıradan bir test mühendisinden <strong>gerçek bir güvenlik araştırmacısına</strong> dönüştüren şeydir.</p>
+
+        <hr>
+
+        <div class="summary-box">
+            <h2 style="margin-top: 0; font-size: 1.4rem;">Toparlayalım</h2>
+            <p><strong>Bug Hunting:</strong> "Kod niye çalışmıyor lan?"</p>
+            <p><strong>Vulnerability Hunting:</strong> "Bu çalışmama hali, bir saldırganın işine nasıl yarar?"</p>
+            <p style="margin-top: 1rem;">Bu ikisi <strong>aynı yolun iki farklı basamağı</strong>. Önce bug'ı bulursun, sonra o bug'ın <strong>güvenlikle imtihanını</strong> yaparsın. Bu sorgulamayı yapmayan sadece "bug raporlayıcısı"dır. Bunu sorgulayan kişi ise <strong>güvenlik araştırmacısı</strong>dır. Fark bu kadar net.</p>
+        </div>
+
+    </div>
+</body>
+</html>
